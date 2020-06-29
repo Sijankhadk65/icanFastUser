@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "878906369174",
+    "firebase_url": "https://fast-d2857.firebaseio.com",
+    "project_id": "fast-d2857",
+    "storage_bucket": "fast-d2857.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878906369174:android:c9a59e80b4c963f1834eb7",
+        "android_client_info": {
+          "package_name": "com.fast977.fastuserapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "878906369174-ep2ufidjfm1dpeghoerp5ile5m2t3dok.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fast977.fastuserapp",
+            "certificate_hash": "f26720f81b12a9a59cd1d5a7604369f40637bc68"
+          }
+        },
+        {
+          "client_id": "878906369174-va0tqoml60lga8vja1ug7741hi4iq995.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAyuOsNnaYhZwCjjydPJlV62WG2Nyx8D8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "878906369174-va0tqoml60lga8vja1ug7741hi4iq995.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

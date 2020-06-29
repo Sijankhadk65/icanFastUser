@@ -1,0 +1,109 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class FirestoreProvider {
+  final _firestore = Firestore.instance;
+  Stream<QuerySnapshot> getOrder(String tableID) {
+    return _firestore
+        .collection("orders")
+        .where("table", isEqualTo: tableID)
+        .snapshots();
+  }
+
+  Future<void> createRefrence(Map<String, dynamic> refObj) {
+    return _firestore
+        .document("liveOnlineOrders/${refObj['refID']}")
+        .setData(refObj);
+  }
+
+  Future<void> saveOrder(Map<String, dynamic> order) {
+    return _firestore
+        .document("liveOnlineOrders/${order['refID']}")
+        .collection("orders")
+        .document(order['createdAt'])
+        .setData(order);
+  }
+
+  Stream<DocumentSnapshot> getVendor(String vendorName) {
+    return _firestore.document("vendors/$vendorName").snapshots();
+  }
+
+  Stream<QuerySnapshot> getVendorMenu(String category, String vendor) {
+    return _firestore
+        .collection("menu")
+        .where("category", isEqualTo: category)
+        .where("vendor", isEqualTo: vendor)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getVendorCategory(String vendor) {
+    return _firestore
+        .collection("category")
+        .where("vendors", arrayContains: vendor)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getOrderRefs(Map<String, dynamic> user) {
+    return _firestore
+        .collection("liveOnlineOrders")
+        .where(
+          "user",
+          isEqualTo: user,
+        )
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getLiveOrders(String refID) {
+    return _firestore
+        .document("liveOnlineOrders/$refID")
+        .collection("orders")
+        .snapshots();
+  }
+
+  addNewCart(String timeStamp, Map<String, dynamic> cartInfo, String tableID) {
+    _firestore
+        .collection("tables")
+        .document(tableID)
+        .updateData({"status": "active"}).whenComplete(() {});
+
+    return _firestore
+        .collection("liveOnlineOrders")
+        .document(timeStamp)
+        .setData(cartInfo);
+  }
+
+  Stream<QuerySnapshot> getVendors(String tag) {
+    if (tag == "all") return _firestore.collection("vendors").snapshots();
+    return _firestore
+        .collection("vendors")
+        .where("tags", arrayContains: tag)
+        .snapshots();
+  }
+
+  Future<void> updateCart(String docID, Map<String, dynamic> newData) {
+    return _firestore
+        .collection("liveOnlineOrders")
+        .document(docID)
+        .updateData(newData);
+  }
+
+  Stream<DocumentSnapshot> checkForUser(String email) =>
+      _firestore.document("users/$email").snapshots();
+
+  Future<void> addNewUser(Map<String, dynamic> data) =>
+      _firestore.collection("users").document(data['email']).setData(data);
+
+  Stream<QuerySnapshot> getTags() => _firestore.collection("tags").snapshots();
+
+  // ratings
+  Stream<QuerySnapshot> getRatings(String vendorName) => _firestore
+      .document("vendors/$vendorName")
+      .collection("ratings")
+      .limit(20)
+      .snapshots();
+  Future<void> saveRating(String vendorName, Map<String, dynamic> rating) =>
+      _firestore
+          .document("vendors/$vendorName/ratings/${rating['createdAt']}")
+          .setData(rating);
+}
