@@ -74,13 +74,8 @@ class CartMenuBloc {
     );
   }
 
-  getMenu(String category, String vendor) {
-    _repository.getVendorMenu(category, vendor).listen(
-      (menuData) {
-        _cartMenu = menuData;
-        changeCartMenu(List.unmodifiable(_cartMenu));
-      },
-    );
+  Stream<List<MenuItem>> getMenu(String category, String vendor) {
+    return _repository.getVendorMenu(category, vendor);
   }
 
   getCategories(String vendor) {

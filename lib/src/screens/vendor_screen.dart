@@ -1,14 +1,16 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:fastuserapp/src/bloc/cart_menu_bloc.dart';
+import 'package:fastuserapp/src/widgets/custom_tab_bar.dart';
+import 'package:fastuserapp/src/widgets/menu_item_displayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:toast/toast.dart';
 import '../bloc/ratings_bloc.dart';
 import '../models/online_order.dart';
 import '../screens/cart_screen.dart';
 import '../screens/rating_screen.dart';
-import '../bloc/cart_bloc.dart';
 import '../bloc/order_cart_bloc.dart';
-import '../widgets/menu_displayer.dart';
 import 'package:provider/provider.dart';
 
 class VendorScreen extends StatefulWidget {
@@ -33,18 +35,11 @@ class VendorScreen extends StatefulWidget {
 class _VendorScreenState extends State<VendorScreen>
     with SingleTickerProviderStateMixin {
   double height = 65;
-
-  TabController _tabController;
-
-  @override
-  void initState() {
-    _tabController =
-        TabController(vsync: this, length: widget.categories.length);
-    super.initState();
-  }
+  CartMenuBloc _cartMenuBloc;
 
   @override
   void didChangeDependencies() {
+    _cartMenuBloc = Provider.of<CartMenuBloc>(context);
     super.didChangeDependencies();
   }
 
@@ -99,38 +94,64 @@ class _VendorScreenState extends State<VendorScreen>
         ),
       ),
       body: Column(
-        // alignment: Alignment.bottomCenter,
         children: [
-          Container(
-            child: TabBar(
-              isScrollable: true,
-              controller: _tabController,
-              tabs: widget.categories
-                  .map<Widget>(
-                    (category) => Container(
-                      child: Text(category),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
           Expanded(
-            child: Container(
-              child: TabBarView(
-                controller: _tabController,
-                children: widget.categories
-                    .map<Widget>(
-                      (category) => Provider(
-                        create: (_) => CartBloc(),
-                        child: MenuBuilder(
-                          category: category,
-                          vendorName: widget.vendorName,
-                          user: widget.user,
-                        ),
-                        dispose: (context, CartBloc bloc) => bloc.dispose(),
-                      ),
-                    )
-                    .toList(),
+            child: CustomTabView(
+              itemCount: widget.categories.length,
+              tabBuilder: (context, index) => Text(widget.categories[index]),
+              pageBuilder: (context, index) => StreamBuilder(
+                stream: _cartMenuBloc.getMenu(
+                    widget.categories[index], widget.vendorName),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError)
+                    return Text("Error: ${snapshot.error}");
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                      return Text("Awaiting Bids....");
+                      break;
+                    case ConnectionState.waiting:
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                      break;
+                    case ConnectionState.active:
+                      return snapshot.data.isNotEmpty
+                          ? GridView.count(
+                              crossAxisCount: 2,
+                              shrinkWrap: true,
+                              children: snapshot.data
+                                  .map<Widget>(
+                                    (f) => MenuItemDisplayer(
+                                        item: f,
+                                        onTapped: () {
+                                          orderCartBloc.addNewOrder(
+                                            widget.vendorName,
+                                            f,
+                                            widget.user,
+                                          );
+                                          Toast.show("${f.name} added to cart",
+                                              context,
+                                              duration: Toast.LENGTH_SHORT,
+                                              gravity: Toast.CENTER);
+                                        }),
+                                  )
+                                  .toList(),
+                            )
+                          : Center(
+                              child: Text(
+                                "no items here!",
+                                style: GoogleFonts.pacifico(
+                                  fontSize: 30,
+                                ),
+                              ),
+                            );
+                      break;
+                    case ConnectionState.done:
+                      return Text("The task has completed.");
+                      break;
+                  }
+                  return null;
+                },
               ),
             ),
           ),

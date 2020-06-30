@@ -93,20 +93,23 @@ class _CartScreenState extends State<CartScreen>
                             ),
                           ),
                         ),
-                        Container(
+                        AnimatedContainer(
+                          duration: Duration(
+                            milliseconds: 300,
+                          ),
                           height: 65,
+                          color: snapshot.data
+                                      .map((order) => order.totalPrice)
+                                      .toList()
+                                      .fold(
+                                          0,
+                                          (previousValue, element) =>
+                                              element + previousValue) >
+                                  widget.minOrder
+                              ? Colors.blue[800]
+                              : Colors.red[800],
                           child: Material(
-                            color: snapshot.data
-                                        .map((order) => order.totalPrice)
-                                        .toList()
-                                        .fold(
-                                            0,
-                                            (previousValue, element) =>
-                                                element + previousValue) >
-                                    widget.minOrder
-                                ? Colors.blue[800]
-                                : Colors.red[800],
-                            elevation: 10,
+                            color: Colors.transparent,
                             child: InkWell(
                               onTap: snapshot.data
                                           .map((order) => order.totalPrice)
@@ -117,43 +120,40 @@ class _CartScreenState extends State<CartScreen>
                                                   element + previousValue) >
                                       widget.minOrder
                                   ? () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => CheckoutScreen(
-                                            user: widget.user,
-                                          ),
-                                        ),
-                                      );
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (_) => CheckoutScreen(
+                                      //       user: widget.user,
+                                      //     ),
+                                      //   ),
+                                      // );
                                     }
                                   : null,
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child: Column(
                                   children: <Widget>[
-                                    Text(
-                                      "Total Cost:",
-                                      style: GoogleFonts.montserrat(
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                    Center(
-                                      child: StreamBuilder(
-                                        stream: orderCartBloc.cartsTotal,
-                                        builder: (context, snapshot) {
-                                          return Center(
-                                            child: Text(
-                                              "Total Cost (Rs.${snapshot.data})",
-                                              style: GoogleFonts.montserrat(
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.white,
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                          );
-                                        },
+                                    Expanded(
+                                      child: AnimatedContainer(
+                                        duration: Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        child: Center(
+                                          child: StreamBuilder(
+                                            stream: orderCartBloc.cartsTotal,
+                                            builder: (context, snapshot) {
+                                              return Text(
+                                                "Total Cost (Rs.${snapshot.data})",
+                                                style: GoogleFonts.montserrat(
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                  fontSize: 18,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
                                       ),
                                     ),
                                     snapshot.data
@@ -167,12 +167,19 @@ class _CartScreenState extends State<CartScreen>
                                                         previousValue) >
                                             widget.minOrder
                                         ? Container()
-                                        : Text(
-                                            "Minimum Order Not Met !",
-                                            style: GoogleFonts.montserrat(
-                                              fontStyle: FontStyle.italic,
-                                              color: Colors.white38,
-                                              fontSize: 12,
+                                        : Expanded(
+                                            child: AnimatedContainer(
+                                              duration: Duration(
+                                                milliseconds: 300,
+                                              ),
+                                              child: Text(
+                                                "Minimum Order Not Met !",
+                                                style: GoogleFonts.montserrat(
+                                                  fontStyle: FontStyle.italic,
+                                                  color: Colors.white38,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                   ],
