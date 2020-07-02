@@ -54,6 +54,25 @@ class _$MenuItemSerializer implements StructuredSerializer<MenuItem> {
         ..add(serializers.serialize(object.isHotAndNew,
             specifiedType: const FullType(bool)));
     }
+    if (object.description != null) {
+      result
+        ..add('description')
+        ..add(serializers.serialize(object.description,
+            specifiedType: const FullType(String)));
+    }
+    if (object.vendor != null) {
+      result
+        ..add('vendor')
+        ..add(serializers.serialize(object.vendor,
+            specifiedType: const FullType(String)));
+    }
+    if (object.addOn != null) {
+      result
+        ..add('addOn')
+        ..add(serializers.serialize(object.addOn,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
+    }
     return result;
   }
 
@@ -92,6 +111,20 @@ class _$MenuItemSerializer implements StructuredSerializer<MenuItem> {
           result.isHotAndNew = serializers.deserialize(value,
               specifiedType: const FullType(bool)) as bool;
           break;
+        case 'description':
+          result.description = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'vendor':
+          result.vendor = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'addOn':
+          result.addOn.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(String)]))
+              as BuiltList<dynamic>);
+          break;
       }
     }
 
@@ -112,6 +145,12 @@ class _$MenuItem extends MenuItem {
   final bool isAvailable;
   @override
   final bool isHotAndNew;
+  @override
+  final String description;
+  @override
+  final String vendor;
+  @override
+  final BuiltList<String> addOn;
 
   factory _$MenuItem([void Function(MenuItemBuilder) updates]) =>
       (new MenuItemBuilder()..update(updates)).build();
@@ -122,7 +161,10 @@ class _$MenuItem extends MenuItem {
       this.photoURI,
       this.price,
       this.isAvailable,
-      this.isHotAndNew})
+      this.isHotAndNew,
+      this.description,
+      this.vendor,
+      this.addOn})
       : super._();
 
   @override
@@ -141,7 +183,10 @@ class _$MenuItem extends MenuItem {
         photoURI == other.photoURI &&
         price == other.price &&
         isAvailable == other.isAvailable &&
-        isHotAndNew == other.isHotAndNew;
+        isHotAndNew == other.isHotAndNew &&
+        description == other.description &&
+        vendor == other.vendor &&
+        addOn == other.addOn;
   }
 
   @override
@@ -149,11 +194,17 @@ class _$MenuItem extends MenuItem {
     return $jf($jc(
         $jc(
             $jc(
-                $jc($jc($jc(0, category.hashCode), name.hashCode),
-                    photoURI.hashCode),
-                price.hashCode),
-            isAvailable.hashCode),
-        isHotAndNew.hashCode));
+                $jc(
+                    $jc(
+                        $jc(
+                            $jc($jc($jc(0, category.hashCode), name.hashCode),
+                                photoURI.hashCode),
+                            price.hashCode),
+                        isAvailable.hashCode),
+                    isHotAndNew.hashCode),
+                description.hashCode),
+            vendor.hashCode),
+        addOn.hashCode));
   }
 
   @override
@@ -164,7 +215,10 @@ class _$MenuItem extends MenuItem {
           ..add('photoURI', photoURI)
           ..add('price', price)
           ..add('isAvailable', isAvailable)
-          ..add('isHotAndNew', isHotAndNew))
+          ..add('isHotAndNew', isHotAndNew)
+          ..add('description', description)
+          ..add('vendor', vendor)
+          ..add('addOn', addOn))
         .toString();
   }
 }
@@ -196,6 +250,18 @@ class MenuItemBuilder implements Builder<MenuItem, MenuItemBuilder> {
   bool get isHotAndNew => _$this._isHotAndNew;
   set isHotAndNew(bool isHotAndNew) => _$this._isHotAndNew = isHotAndNew;
 
+  String _description;
+  String get description => _$this._description;
+  set description(String description) => _$this._description = description;
+
+  String _vendor;
+  String get vendor => _$this._vendor;
+  set vendor(String vendor) => _$this._vendor = vendor;
+
+  ListBuilder<String> _addOn;
+  ListBuilder<String> get addOn => _$this._addOn ??= new ListBuilder<String>();
+  set addOn(ListBuilder<String> addOn) => _$this._addOn = addOn;
+
   MenuItemBuilder();
 
   MenuItemBuilder get _$this {
@@ -206,6 +272,9 @@ class MenuItemBuilder implements Builder<MenuItem, MenuItemBuilder> {
       _price = _$v.price;
       _isAvailable = _$v.isAvailable;
       _isHotAndNew = _$v.isHotAndNew;
+      _description = _$v.description;
+      _vendor = _$v.vendor;
+      _addOn = _$v.addOn?.toBuilder();
       _$v = null;
     }
     return this;
@@ -226,14 +295,30 @@ class MenuItemBuilder implements Builder<MenuItem, MenuItemBuilder> {
 
   @override
   _$MenuItem build() {
-    final _$result = _$v ??
-        new _$MenuItem._(
-            category: category,
-            name: name,
-            photoURI: photoURI,
-            price: price,
-            isAvailable: isAvailable,
-            isHotAndNew: isHotAndNew);
+    _$MenuItem _$result;
+    try {
+      _$result = _$v ??
+          new _$MenuItem._(
+              category: category,
+              name: name,
+              photoURI: photoURI,
+              price: price,
+              isAvailable: isAvailable,
+              isHotAndNew: isHotAndNew,
+              description: description,
+              vendor: vendor,
+              addOn: _addOn?.build());
+    } catch (_) {
+      String _$failedField;
+      try {
+        _$failedField = 'addOn';
+        _addOn?.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            'MenuItem', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

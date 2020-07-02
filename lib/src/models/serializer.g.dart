@@ -7,13 +7,21 @@ part of serializers;
 // **************************************************************************
 
 Serializers _$serializers = (new Serializers().toBuilder()
+      ..add(CarouselItem.serializer)
       ..add(CartItem.serializer)
       ..add(MenuItem.serializer)
+      ..add(OffersItem.serializer)
       ..add(OnlineOrder.serializer)
       ..add(OrderRef.serializer)
       ..add(Rating.serializer)
       ..add(User.serializer)
       ..add(Vendor.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => new ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => new ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => new ListBuilder<String>())

@@ -1,4 +1,3 @@
-import 'package:fastuserapp/src/widgets/progress_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/order_ref.dart';
@@ -76,6 +75,7 @@ class _OrderRefCardState extends State<OrderRefCard> {
                     color: Colors.black26,
                   ),
                 ),
+
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[

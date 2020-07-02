@@ -1,3 +1,4 @@
+import 'package:fastuserapp/src/widgets/add_to_cart_dialouge.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
@@ -100,13 +101,17 @@ class OrderCartBloc {
     );
   }
 
+  Future<void> deleteOrderRef(String refID) =>
+      _repository.deleteOrderRefs(refID);
+
   getLiveOrders(String refID) {
     _repository.getLiveOrders(refID).listen((orders) {
       changeLiveOrders(orders);
     });
   }
 
-  void addNewOrder(String vendor, MenuItem newItem, Map<String, dynamic> user) {
+  void addNewOrder(BuildContext context, String vendor, CartItem newItem,
+      Map<String, dynamic> user) {
     if (!_localOrders
         .map((e) => e['vendor'].toLowerCase())
         .toList()
@@ -129,15 +134,16 @@ class OrderCartBloc {
       changeLocalOrders(
           _localOrders.map((order) => parseJsonToOnlineOrder(order)).toList());
     }
+    getCartsTotal();
   }
 
-  void addItemsToCart(String vendor, MenuItem newItem) {
+  void addItemsToCart(String vendor, CartItem newItem) {
     _localOrders.forEach(
       (localOrder) {
         if (localOrder['vendor'] == vendor) {
           if (localOrder['items'].isEmpty) {
             localOrder['items'].add(
-              newFromItemModel(newItem).toJson(),
+              newItem.toJson(),
             );
             changeCartItems(
               localOrder['items']
@@ -146,8 +152,8 @@ class OrderCartBloc {
                   )
                   .toList(),
             );
-            localOrder['totalPrice'] += newItem.price;
-            localOrder['cartLength'] += 1;
+            localOrder['totalPrice'] += newItem.totalPrice;
+            localOrder['cartLength'] += newItem.quantity;
           } else if (localOrder['items']
               .map(
                 (item) => item['name'],
@@ -156,16 +162,16 @@ class OrderCartBloc {
               .contains(newItem.name)) {
             localOrder['items'].forEach((item) {
               if (item['name'] == newItem.name) {
-                item['quantity'] += 1;
+                item['quantity'] += newItem.quantity;
                 localOrder['totalPrice'] -= item['totalPrice'];
                 item['totalPrice'] = item['quantity'] * item['price'];
                 localOrder['totalPrice'] += item['totalPrice'];
-                localOrder['cartLength'] += 1;
+                localOrder['cartLength'] += newItem.quantity;
               }
             });
           } else {
             localOrder['items'].add(
-              newFromItemModel(newItem).toJson(),
+              newItem.toJson(),
             );
             changeCartItems(
               localOrder['items']
@@ -174,8 +180,8 @@ class OrderCartBloc {
                   )
                   .toList(),
             );
-            localOrder['totalPrice'] += newItem.price;
-            localOrder['cartLength'] += 1;
+            localOrder['totalPrice'] += newItem.totalPrice;
+            localOrder['cartLength'] += newItem.quantity;
           }
           getTotalPrice(vendor);
           getCartLenth(vendor);
@@ -303,6 +309,7 @@ class OrderCartBloc {
       "lat": _currentLocationSubject.value.latitude,
       "lang": _currentLocationSubject.value.longitude,
       "physicalLocation": _physicaLocation,
+      "status": [],
       "isAssignedTo": {
         "name": "",
         "email": "",

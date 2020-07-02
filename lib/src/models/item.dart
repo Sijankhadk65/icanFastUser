@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -18,6 +19,12 @@ abstract class MenuItem implements Built<MenuItem, MenuItemBuilder> {
   bool get isAvailable;
   @nullable
   bool get isHotAndNew;
+  @nullable
+  String get description;
+  @nullable
+  String get vendor;
+  @nullable
+  BuiltList<String> get addOn;
   MenuItem._();
   factory MenuItem([updates(MenuItemBuilder b)]) = _$MenuItem;
 
@@ -27,7 +34,7 @@ abstract class MenuItem implements Built<MenuItem, MenuItemBuilder> {
         "name": this.name,
         "price": this.price,
         "quantity": 1,
-        "totalPrice": this.price
+        "totalPrice": this.price,
       };
 }
 

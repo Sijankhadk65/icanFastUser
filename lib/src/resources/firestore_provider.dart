@@ -54,6 +54,9 @@ class FirestoreProvider {
         .snapshots();
   }
 
+  Future<void> deleteOrderRef(String refID) =>
+      _firestore.document("liveOnlineOrders/$refID").delete();
+
   Stream<QuerySnapshot> getLiveOrders(String refID) {
     return _firestore
         .document("liveOnlineOrders/$refID")
@@ -106,4 +109,17 @@ class FirestoreProvider {
       _firestore
           .document("vendors/$vendorName/ratings/${rating['createdAt']}")
           .setData(rating);
+  Stream<QuerySnapshot> getCarouselItems() {
+    return _firestore
+        .collection("carousel")
+        .where("isActive", isEqualTo: true)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getOffers() {
+    return _firestore
+        .collection("specialOffers")
+        .where("isAvailable", isEqualTo: true)
+        .snapshots();
+  }
 }

@@ -48,10 +48,10 @@ class _$VendorSerializer implements StructuredSerializer<Vendor> {
         ..add(serializers.serialize(object.minOrder,
             specifiedType: const FullType(int)));
     }
-    if (object.location != null) {
+    if (object.physicalLocation != null) {
       result
-        ..add('location')
-        ..add(serializers.serialize(object.location,
+        ..add('physicalLocation')
+        ..add(serializers.serialize(object.physicalLocation,
             specifiedType: const FullType(String)));
     }
     if (object.lat != null) {
@@ -126,8 +126,8 @@ class _$VendorSerializer implements StructuredSerializer<Vendor> {
           result.minOrder = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
           break;
-        case 'location':
-          result.location = serializers.deserialize(value,
+        case 'physicalLocation':
+          result.physicalLocation = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
         case 'lat':
@@ -177,7 +177,7 @@ class _$Vendor extends Vendor {
   @override
   final int minOrder;
   @override
-  final String location;
+  final String physicalLocation;
   @override
   final double lat;
   @override
@@ -200,7 +200,7 @@ class _$Vendor extends Vendor {
       this.closeTime,
       this.openTime,
       this.minOrder,
-      this.location,
+      this.physicalLocation,
       this.lat,
       this.lang,
       this.averageRating,
@@ -225,7 +225,7 @@ class _$Vendor extends Vendor {
         closeTime == other.closeTime &&
         openTime == other.openTime &&
         minOrder == other.minOrder &&
-        location == other.location &&
+        physicalLocation == other.physicalLocation &&
         lat == other.lat &&
         lang == other.lang &&
         averageRating == other.averageRating &&
@@ -251,7 +251,7 @@ class _$Vendor extends Vendor {
                                             closeTime.hashCode),
                                         openTime.hashCode),
                                     minOrder.hashCode),
-                                location.hashCode),
+                                physicalLocation.hashCode),
                             lat.hashCode),
                         lang.hashCode),
                     averageRating.hashCode),
@@ -268,7 +268,7 @@ class _$Vendor extends Vendor {
           ..add('closeTime', closeTime)
           ..add('openTime', openTime)
           ..add('minOrder', minOrder)
-          ..add('location', location)
+          ..add('physicalLocation', physicalLocation)
           ..add('lat', lat)
           ..add('lang', lang)
           ..add('averageRating', averageRating)
@@ -302,9 +302,10 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
   int get minOrder => _$this._minOrder;
   set minOrder(int minOrder) => _$this._minOrder = minOrder;
 
-  String _location;
-  String get location => _$this._location;
-  set location(String location) => _$this._location = location;
+  String _physicalLocation;
+  String get physicalLocation => _$this._physicalLocation;
+  set physicalLocation(String physicalLocation) =>
+      _$this._physicalLocation = physicalLocation;
 
   double _lat;
   double get lat => _$this._lat;
@@ -342,7 +343,7 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
       _closeTime = _$v.closeTime;
       _openTime = _$v.openTime;
       _minOrder = _$v.minOrder;
-      _location = _$v.location;
+      _physicalLocation = _$v.physicalLocation;
       _lat = _$v.lat;
       _lang = _$v.lang;
       _averageRating = _$v.averageRating;
@@ -378,7 +379,7 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
               closeTime: closeTime,
               openTime: openTime,
               minOrder: minOrder,
-              location: location,
+              physicalLocation: physicalLocation,
               lat: lat,
               lang: lang,
               averageRating: averageRating,

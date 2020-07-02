@@ -78,7 +78,9 @@ class _RatingScreenState extends State<RatingScreen> {
                             stream: _ratingsBloc.canSubmitRating(),
                             builder: (context, snapshot) {
                               return RawMaterialButton(
-                                fillColor: Colors.orange[800],
+                                fillColor: snapshot.hasData
+                                    ? Colors.orange[800]
+                                    : Colors.grey,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),
                                 ),
@@ -99,8 +101,15 @@ class _RatingScreenState extends State<RatingScreen> {
                                               ),
                                             );
                                       }
-                                    : null,
-                                elevation: 5,
+                                    : () {
+                                        Scaffold.of(context).showSnackBar(
+                                          SnackBar(
+                                            content:
+                                                Text("Please add a comment!"),
+                                          ),
+                                        );
+                                      },
+                                elevation: snapshot.hasData ? 10 : 5,
                                 disabledElevation: 0,
                                 child: Text(
                                   "Submit",
@@ -142,7 +151,9 @@ class _RatingScreenState extends State<RatingScreen> {
                             ),
                             child: TextField(
                               maxLines: 5,
-                              onChanged: _ratingsBloc.changeRatingComment,
+                              onChanged: (value) {
+                                _ratingsBloc.changeRatingComment(value);
+                              },
                               style: GoogleFonts.nunito(),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -168,6 +179,7 @@ class _RatingScreenState extends State<RatingScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                    Divider(),
                     StreamBuilder<List<Rating>>(
                       stream: _ratingsBloc.ratings,
                       builder: (context, snapshot) {
@@ -192,7 +204,6 @@ class _RatingScreenState extends State<RatingScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          Divider(),
                                           Row(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,

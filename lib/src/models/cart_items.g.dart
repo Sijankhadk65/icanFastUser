@@ -42,6 +42,13 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
         ..add(serializers.serialize(object.quantity,
             specifiedType: const FullType(int)));
     }
+    if (object.addOn != null) {
+      result
+        ..add('addOn')
+        ..add(serializers.serialize(object.addOn,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
+    }
     return result;
   }
 
@@ -72,6 +79,12 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
           result.quantity = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
           break;
+        case 'addOn':
+          result.addOn.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(String)]))
+              as BuiltList<dynamic>);
+          break;
       }
     }
 
@@ -88,11 +101,14 @@ class _$CartItem extends CartItem {
   final int totalPrice;
   @override
   final int quantity;
+  @override
+  final BuiltList<String> addOn;
 
   factory _$CartItem([void Function(CartItemBuilder) updates]) =>
       (new CartItemBuilder()..update(updates)).build();
 
-  _$CartItem._({this.name, this.price, this.totalPrice, this.quantity})
+  _$CartItem._(
+      {this.name, this.price, this.totalPrice, this.quantity, this.addOn})
       : super._();
 
   @override
@@ -109,14 +125,18 @@ class _$CartItem extends CartItem {
         name == other.name &&
         price == other.price &&
         totalPrice == other.totalPrice &&
-        quantity == other.quantity;
+        quantity == other.quantity &&
+        addOn == other.addOn;
   }
 
   @override
   int get hashCode {
     return $jf($jc(
-        $jc($jc($jc(0, name.hashCode), price.hashCode), totalPrice.hashCode),
-        quantity.hashCode));
+        $jc(
+            $jc($jc($jc(0, name.hashCode), price.hashCode),
+                totalPrice.hashCode),
+            quantity.hashCode),
+        addOn.hashCode));
   }
 
   @override
@@ -125,7 +145,8 @@ class _$CartItem extends CartItem {
           ..add('name', name)
           ..add('price', price)
           ..add('totalPrice', totalPrice)
-          ..add('quantity', quantity))
+          ..add('quantity', quantity)
+          ..add('addOn', addOn))
         .toString();
   }
 }
@@ -149,6 +170,10 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
   int get quantity => _$this._quantity;
   set quantity(int quantity) => _$this._quantity = quantity;
 
+  ListBuilder<String> _addOn;
+  ListBuilder<String> get addOn => _$this._addOn ??= new ListBuilder<String>();
+  set addOn(ListBuilder<String> addOn) => _$this._addOn = addOn;
+
   CartItemBuilder();
 
   CartItemBuilder get _$this {
@@ -157,6 +182,7 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
       _price = _$v.price;
       _totalPrice = _$v.totalPrice;
       _quantity = _$v.quantity;
+      _addOn = _$v.addOn?.toBuilder();
       _$v = null;
     }
     return this;
@@ -177,12 +203,26 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
 
   @override
   _$CartItem build() {
-    final _$result = _$v ??
-        new _$CartItem._(
-            name: name,
-            price: price,
-            totalPrice: totalPrice,
-            quantity: quantity);
+    _$CartItem _$result;
+    try {
+      _$result = _$v ??
+          new _$CartItem._(
+              name: name,
+              price: price,
+              totalPrice: totalPrice,
+              quantity: quantity,
+              addOn: _addOn?.build());
+    } catch (_) {
+      String _$failedField;
+      try {
+        _$failedField = 'addOn';
+        _addOn?.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            'CartItem', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

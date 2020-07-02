@@ -1,3 +1,5 @@
+import 'package:fastuserapp/src/models/offers_item.dart';
+
 import '../models/vendor.dart';
 import '../models/item.dart';
 import '../resources/repository.dart';
@@ -93,6 +95,8 @@ class CartMenuBloc {
       },
     );
   }
+
+  Stream<List<OffersItem>> getOffers() => _repository.getSpecialOffers();
 
   void dispose() {
     _cartMenuSubject.close();

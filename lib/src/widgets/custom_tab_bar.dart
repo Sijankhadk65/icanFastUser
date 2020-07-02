@@ -102,6 +102,7 @@ class _CustomTabsState extends State<CustomTabView>
           margin: EdgeInsets.only(
             left: 10,
             right: 10,
+            bottom: 5,
           ),
           alignment: Alignment.center,
           child: TabBar(

@@ -19,10 +19,24 @@ class MenuItemDisplayer extends StatefulWidget {
 
 class _MenuItemDisplayerState extends State<MenuItemDisplayer> {
   bool hasNoError = true;
+  double _height = 150;
+
+  toogleHeight() {
+    this.setState(() {
+      if (_height == 150) {
+        _height = 200;
+      } else {
+        _height = 150;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 150,
+    return AnimatedContainer(
+      duration: Duration(
+        milliseconds: 300,
+      ),
       margin: EdgeInsets.all(10),
       child: Material(
         elevation: 5,
@@ -43,31 +57,11 @@ class _MenuItemDisplayerState extends State<MenuItemDisplayer> {
               CachedNetworkImage(
                 imageUrl: widget.item.photoURI,
                 progressIndicatorBuilder: (context, url, downloadProgress) {
-                  // WidgetsBinding.instance.addPostFrameCallback(
-                  //   (_) {
-                  //     if (hasNoError) {
-                  //       this.setState(() {
-                  //         hasNoError = !hasNoError;
-                  //       });
-                  //     }
-                  //   },
-                  // );
-
                   return Center(
                     child: CircularProgressIndicator(),
                   );
                 },
                 imageBuilder: (context, imageProvider) {
-                  // WidgetsBinding.instance.addPostFrameCallback(
-                  //   (_) {
-                  //     if (hasNoError == false) {
-                  //       this.setState(() {
-                  //         hasNoError = true;
-                  //       });
-                  //     }
-                  //   },
-                  // );
-
                   return Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
@@ -78,18 +72,6 @@ class _MenuItemDisplayerState extends State<MenuItemDisplayer> {
                 },
                 placeholder: (context, string) => Container(color: Colors.grey),
                 errorWidget: (context, url, error) {
-                  // WidgetsBinding.instance.addPostFrameCallback(
-                  //   (_) {
-                  //     if (!hasNoError) {
-                  //       this.setState(
-                  //         () {
-                  //           hasNoError = !hasNoError;
-                  //         },
-                  //       );
-                  //     }
-                  //   },
-                  // );
-
                   return Container(
                     decoration: BoxDecoration(
                         color: Colors.red,

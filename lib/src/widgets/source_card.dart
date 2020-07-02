@@ -23,7 +23,7 @@ class _SourceCardState extends State<SourceCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
+      height: 180,
       margin: EdgeInsets.all(10),
       child: Material(
         elevation: 5,
@@ -91,7 +91,7 @@ class _SourceCardState extends State<SourceCard> {
               ),
               !hasError
                   ? Container(
-                      height: 150,
+                      height: 180,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
                         gradient: LinearGradient(
@@ -165,7 +165,7 @@ class _SourceCardState extends State<SourceCard> {
                       ),
                     ),
                     Text(
-                      "${widget.vendor.location}",
+                      "${widget.vendor.physicalLocation}",
                       style: GoogleFonts.montserrat(
                           fontSize: 13,
                           color: Colors.white,

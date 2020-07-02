@@ -17,7 +17,7 @@ abstract class Vendor implements Built<Vendor, VendorBuilder> {
   @nullable
   int get minOrder;
   @nullable
-  String get location;
+  String get physicalLocation;
   @nullable
   double get lat;
   @nullable

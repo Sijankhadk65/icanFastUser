@@ -1,5 +1,6 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:fastuserapp/src/bloc/cart_menu_bloc.dart';
+import 'package:fastuserapp/src/widgets/add_to_cart_dialouge.dart';
 import 'package:fastuserapp/src/widgets/custom_tab_bar.dart';
 import 'package:fastuserapp/src/widgets/menu_item_displayer.dart';
 import 'package:flutter/foundation.dart';
@@ -122,18 +123,19 @@ class _VendorScreenState extends State<VendorScreen>
                               children: snapshot.data
                                   .map<Widget>(
                                     (f) => MenuItemDisplayer(
-                                        item: f,
-                                        onTapped: () {
-                                          orderCartBloc.addNewOrder(
-                                            widget.vendorName,
-                                            f,
-                                            widget.user,
-                                          );
-                                          Toast.show("${f.name} added to cart",
-                                              context,
-                                              duration: Toast.LENGTH_SHORT,
-                                              gravity: Toast.CENTER);
-                                        }),
+                                      item: f,
+                                      onTapped: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              AddToCartDialouge(
+                                            item: f,
+                                            user: widget.user,
+                                            vendorName: widget.vendorName,
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   )
                                   .toList(),
                             )

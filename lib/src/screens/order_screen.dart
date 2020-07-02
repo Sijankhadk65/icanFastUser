@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../bloc/order_cart_bloc.dart';
 import '../models/order_ref.dart';
@@ -41,9 +42,35 @@ class _OrderScreenState extends State<OrderScreen>
                   shrinkWrap: true,
                   children: snapshot.data
                       .map(
-                        (order) => OrderRefCard(
-                          orderRef: order,
-                        ),
+                        (order) => order.status.isNotEmpty
+                            ? OrderRefCard(
+                                orderRef: order,
+                              )
+                            : Dismissible(
+                                key: UniqueKey(),
+                                onDismissed: (direction) {
+                                  orderCartBloc.deleteOrderRef(order.refID);
+                                },
+                                background: Container(
+                                  margin: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: Colors.red[800],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "The item will be deleted!",
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                child: OrderRefCard(
+                                  orderRef: order,
+                                ),
+                              ),
                       )
                       .toList(),
                 );

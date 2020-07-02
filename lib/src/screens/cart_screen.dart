@@ -120,14 +120,14 @@ class _CartScreenState extends State<CartScreen>
                                                   element + previousValue) >
                                       widget.minOrder
                                   ? () {
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //     builder: (_) => CheckoutScreen(
-                                      //       user: widget.user,
-                                      //     ),
-                                      //   ),
-                                      // );
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => CheckoutScreen(
+                                            user: widget.user,
+                                          ),
+                                        ),
+                                      );
                                     }
                                   : null,
                               child: Padding(

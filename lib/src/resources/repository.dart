@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fastuserapp/src/models/carousel_item.dart';
+import 'package:fastuserapp/src/models/offers_item.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/order_ref.dart';
 import '../models/rating.dart';
@@ -64,6 +66,8 @@ class Repository {
           },
         ),
       );
+  Future<void> deleteOrderRefs(String refID) =>
+      _firestoreProvider.deleteOrderRef(refID);
 
   Stream<List<OnlineOrder>> getLiveOrders(String refID) =>
       _firestoreProvider.getLiveOrders(refID).transform(
@@ -177,4 +181,33 @@ class Repository {
 
   Future<void> saveRating(String vendorName, Map<String, dynamic> rating) =>
       _firestoreProvider.saveRating(vendorName, rating);
+
+  Stream<List<CarouselItem>> getCarouselItems() =>
+      _firestoreProvider.getCarouselItems().transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<CarouselItem> carouselItems = [];
+            snapshot.documents.forEach(
+              (document) {
+                carouselItems.add(
+                  parseToCarouselItem(
+                    document.data,
+                  ),
+                );
+              },
+            );
+            sink.add(carouselItems);
+          },
+        ),
+      );
+
+  Stream<List<OffersItem>> getSpecialOffers() =>
+      _firestoreProvider.getOffers().transform(StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+        List<OffersItem> offers = [];
+        snapshot.documents.forEach((document) {
+          offers.add(parseToOffersItem(document.data));
+        });
+        sink.add(offers);
+      }));
 }

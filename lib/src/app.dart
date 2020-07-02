@@ -25,13 +25,10 @@ class App extends StatelessWidget {
           indicator: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
             color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                offset: Offset(0, 0),
-                blurRadius: 5,
-              ),
-            ],
+            border: Border.all(
+              width: 2,
+              color: Colors.orange[800],
+            ),
           ),
           labelStyle: GoogleFonts.montserrat(
             fontWeight: FontWeight.w600,
@@ -43,8 +40,8 @@ class App extends StatelessWidget {
         ),
         appBarTheme: AppBarTheme(
           iconTheme: IconThemeData(color: Colors.black),
-          elevation: 0.0,
-          color: Colors.transparent,
+          // elevation: 0.0,
+          color: Colors.white,
           textTheme: TextTheme(
             headline6: GoogleFonts.oswald(
                 color: Colors.black,
