@@ -1,11 +1,11 @@
 import 'package:fastuserapp/src/bloc/dash_bloc.dart';
 import 'package:fastuserapp/src/models/vendor.dart';
 import 'package:fastuserapp/src/screens/dash_screen.dart';
+import 'package:fastuserapp/src/widgets/food_search_delegate.dart';
 import 'package:fastuserapp/src/widgets/source_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geocoder/geocoder.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_menu_bloc.dart';
 import '../bloc/login_bloc.dart';
@@ -30,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   PageController _pageController;
 
-  LoginBloc _loginBloc;
   CartMenuBloc _cartMenuBloc;
 
   @override
@@ -41,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void didChangeDependencies() {
-    _loginBloc = Provider.of<LoginBloc>(context);
     _cartMenuBloc = Provider.of<CartMenuBloc>(context);
     super.didChangeDependencies();
   }
@@ -121,182 +119,129 @@ class _HomeScreenState extends State<HomeScreen>
             Text(
               "FAST",
             ),
-            Expanded(
-                child: Container(
-              child: StreamBuilder<String>(
-                stream: _cartMenuBloc.query,
-                builder: (context, snapshot) {
-                  return TextField(
-                    onChanged: _cartMenuBloc.changeQuery,
-                  );
-                },
-              ),
-            ))
           ],
         ),
 
-        actions: [
+        actions: <Widget>[
           IconButton(
             icon: Icon(
               EvaIcons.search,
-              color: Colors.orange[600],
-            ),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(
-              EvaIcons.logOut,
-              color: Colors.orange[200],
+              color: Colors.orange[500],
             ),
             onPressed: () {
-              _loginBloc.signOut();
+              showSearch(
+                context: context,
+                delegate: FoodSearchDelegate(),
+              );
             },
-          ),
+          )
         ],
       ),
-      body: StreamBuilder<String>(
-          stream: _cartMenuBloc.query,
-          builder: (context, snapshot) {
-            return snapshot.hasData && snapshot.data.isNotEmpty
-                ? StreamBuilder<List<Vendor>>(
-                    stream: _cartMenuBloc.queryItems,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError)
-                        return Text("Error: ${snapshot.error}");
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.none:
-                          return Text("Awaiting bids");
-                          break;
-                        case ConnectionState.waiting:
-                          return CircularProgressIndicator();
-                          break;
-                        case ConnectionState.active:
-                          return ListView(
-                            shrinkWrap: true,
-                            children: snapshot.data
-                                .map(
-                                  (vendor) => SourceCard(
-                                    vendor: vendor,
-                                    user: widget.user,
-                                    minOrder: vendor.minOrder,
-                                  ),
-                                )
-                                .toList(),
-                          );
-                          break;
-                        case ConnectionState.done:
-                          return Text("The task has completed");
-                          break;
-                      }
-                      return null;
-                    })
-                : Stack(
-                    alignment: Alignment.bottomCenter,
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          PageView(
+            physics: NeverScrollableScrollPhysics(),
+            controller: _pageController,
+            children: [
+              MultiProvider(
+                providers: [
+                  Provider(
+                    create: (_) => CartMenuBloc(),
+                  ),
+                  Provider(
+                    create: (_) => DashBloc(),
+                  )
+                ],
+                child: DashScreen(
+                  user: widget.user,
+                ),
+              ),
+              Provider(
+                create: (_) => CartBloc(),
+                dispose: (context, CartBloc bloc) => bloc.dispose(),
+                child: OrderScreen(user: widget.user),
+              ),
+              Provider(
+                create: (_) => LoginBloc(),
+                dispose: (context, LoginBloc bloc) => bloc.dispose(),
+                child: ProfileScreen(
+                  email: widget.user['email'],
+                ),
+              )
+            ],
+          ),
+          Positioned(
+            child: Container(
+              height: 50,
+              width: 200,
+              margin: EdgeInsets.only(top: 10, bottom: 10, left: 50, right: 50),
+              child: Material(
+                elevation: 10,
+                borderRadius: BorderRadius.circular(50),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  child: Row(
                     children: [
-                      PageView(
-                        physics: NeverScrollableScrollPhysics(),
-                        controller: _pageController,
-                        children: [
-                          MultiProvider(
-                            providers: [
-                              Provider(
-                                create: (_) => CartMenuBloc(),
+                      Expanded(
+                        child: IconButton(
+                          icon: Icon(
+                            EvaIcons.home,
+                            color: Colors.orange[500],
+                          ),
+                          onPressed: () {
+                            _pageController.animateToPage(
+                              0,
+                              duration: Duration(
+                                milliseconds: 300,
                               ),
-                              Provider(
-                                create: (_) => DashBloc(),
-                              )
-                            ],
-                            child: DashScreen(
-                              user: widget.user,
-                            ),
-                          ),
-                          Provider(
-                            create: (_) => CartBloc(),
-                            dispose: (context, CartBloc bloc) => bloc.dispose(),
-                            child: OrderScreen(user: widget.user),
-                          ),
-                          Provider(
-                            create: (_) => LoginBloc(),
-                            dispose: (context, LoginBloc bloc) =>
-                                bloc.dispose(),
-                            child: ProfileScreen(),
-                          )
-                        ],
+                              curve: Curves.easeIn,
+                            );
+                          },
+                        ),
                       ),
-                      Positioned(
-                        child: Container(
-                          height: 50,
-                          width: 200,
-                          margin: EdgeInsets.only(
-                              top: 10, bottom: 10, left: 50, right: 50),
-                          child: Material(
-                            elevation: 10,
-                            borderRadius: BorderRadius.circular(50),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 10, right: 10),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: IconButton(
-                                      icon: Icon(
-                                        EvaIcons.home,
-                                        color: Colors.orange[500],
-                                      ),
-                                      onPressed: () {
-                                        _pageController.animateToPage(
-                                          0,
-                                          duration: Duration(
-                                            milliseconds: 300,
-                                          ),
-                                          curve: Curves.easeIn,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.shopping_cart,
-                                        color: Colors.orange[500],
-                                      ),
-                                      onPressed: () {
-                                        _pageController.animateToPage(
-                                          1,
-                                          duration: Duration(
-                                            milliseconds: 300,
-                                          ),
-                                          curve: Curves.easeIn,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: IconButton(
-                                      icon: Icon(
-                                        EvaIcons.person,
-                                        color: Colors.orange[500],
-                                      ),
-                                      onPressed: () {
-                                        _pageController.animateToPage(
-                                          2,
-                                          duration: Duration(
-                                            milliseconds: 300,
-                                          ),
-                                          curve: Curves.easeIn,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                      Expanded(
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.shopping_cart,
+                            color: Colors.orange[500],
                           ),
+                          onPressed: () {
+                            _pageController.animateToPage(
+                              1,
+                              duration: Duration(
+                                milliseconds: 300,
+                              ),
+                              curve: Curves.easeIn,
+                            );
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: IconButton(
+                          icon: Icon(
+                            EvaIcons.person,
+                            color: Colors.orange[500],
+                          ),
+                          onPressed: () {
+                            _pageController.animateToPage(
+                              2,
+                              duration: Duration(
+                                milliseconds: 300,
+                              ),
+                              curve: Curves.easeIn,
+                            );
+                          },
                         ),
                       ),
                     ],
-                  );
-          }),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

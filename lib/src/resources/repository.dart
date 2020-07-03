@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fastuserapp/src/models/carousel_item.dart';
 import 'package:fastuserapp/src/models/offers_item.dart';
+import 'package:fastuserapp/src/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/order_ref.dart';
 import '../models/rating.dart';
@@ -210,4 +211,27 @@ class Repository {
         });
         sink.add(offers);
       }));
+
+  Stream<bool> getUserStatus(String email) =>
+      _firestoreProvider.getUser(email).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (DocumentSnapshot snapshot, sink) {
+            if (snapshot.exists) {
+              sink.add(true);
+            } else {
+              sink.add(false);
+            }
+          },
+        ),
+      );
+  Stream<User> getUser(String email) =>
+      _firestoreProvider.getUser(email).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (DocumentSnapshot snapshot, sink) {
+            sink.add(parseJsonToUser(snapshot.data));
+          },
+        ),
+      );
+  Future<void> saveUserToken(String email, Map<String, dynamic> tokenData) =>
+      _firestoreProvider.saveUserToken(email, tokenData);
 }

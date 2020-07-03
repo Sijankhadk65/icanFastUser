@@ -85,6 +85,12 @@ class OrderCartBloc {
   Stream<bool> get checkedOut => _checkedOutSubject.stream;
   Function(bool) get changeCheckoutStatus => _checkedOutSubject.sink.add;
 
+  final BehaviorSubject<String> _userPhoneNumberSubject =
+      BehaviorSubject<String>();
+  Stream<String> get userPhoneNumber => _userPhoneNumberSubject.stream;
+  Function(String) get changeUserPhoneNumber =>
+      _userPhoneNumberSubject.sink.add;
+
   OrderCartBloc() {
     changeTotalLenght(0);
     changeTotalPrice(0);
@@ -112,6 +118,9 @@ class OrderCartBloc {
 
   void addNewOrder(BuildContext context, String vendor, CartItem newItem,
       Map<String, dynamic> user) {
+    if (_checkedOutSubject.value == true) {
+      changeCheckoutStatus(false);
+    }
     if (!_localOrders
         .map((e) => e['vendor'].toLowerCase())
         .toList()

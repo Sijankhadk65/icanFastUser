@@ -3,10 +3,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fastuserapp/src/bloc/cart_menu_bloc.dart';
 import 'package:fastuserapp/src/bloc/dash_bloc.dart';
 import 'package:fastuserapp/src/models/carousel_item.dart';
-import 'package:fastuserapp/src/models/vendor.dart';
 import 'package:fastuserapp/src/screens/vendors_screen.dart';
 import 'package:fastuserapp/src/widgets/custom_tab_bar.dart';
-import 'package:fastuserapp/src/widgets/source_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -124,33 +122,6 @@ class _DashScreenState extends State<DashScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(left: 10, right: 10),
-                        child: Text(
-                          "VENDORS",
-                          style: GoogleFonts.oswald(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.orange[800],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(
-                          left: 10,
-                          right: 10,
-                        ),
-                        child: Text(
-                          "A huge variety to satisfy your every need.",
-                          style: GoogleFonts.nunito(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Divider(
-                        height: 30,
-                      ),
                       Expanded(
                         child: StreamBuilder<List<String>>(
                           stream: _cartMenuBloc.tags,

@@ -30,11 +30,17 @@ class _$UserSerializer implements StructuredSerializer<User> {
         ..add(serializers.serialize(object.name,
             specifiedType: const FullType(String)));
     }
-    if (object.photoUrl != null) {
+    if (object.photoURI != null) {
       result
-        ..add('photoUrl')
-        ..add(serializers.serialize(object.photoUrl,
+        ..add('photoURI')
+        ..add(serializers.serialize(object.photoURI,
             specifiedType: const FullType(String)));
+    }
+    if (object.phoneNumber != null) {
+      result
+        ..add('phoneNumber')
+        ..add(serializers.serialize(object.phoneNumber,
+            specifiedType: const FullType(int)));
     }
     return result;
   }
@@ -58,9 +64,13 @@ class _$UserSerializer implements StructuredSerializer<User> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'photoUrl':
-          result.photoUrl = serializers.deserialize(value,
+        case 'photoURI':
+          result.photoURI = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
+          break;
+        case 'phoneNumber':
+          result.phoneNumber = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int;
           break;
       }
     }
@@ -75,12 +85,15 @@ class _$User extends User {
   @override
   final String name;
   @override
-  final String photoUrl;
+  final String photoURI;
+  @override
+  final int phoneNumber;
 
   factory _$User([void Function(UserBuilder) updates]) =>
       (new UserBuilder()..update(updates)).build();
 
-  _$User._({this.email, this.name, this.photoUrl}) : super._();
+  _$User._({this.email, this.name, this.photoURI, this.phoneNumber})
+      : super._();
 
   @override
   User rebuild(void Function(UserBuilder) updates) =>
@@ -95,13 +108,15 @@ class _$User extends User {
     return other is User &&
         email == other.email &&
         name == other.name &&
-        photoUrl == other.photoUrl;
+        photoURI == other.photoURI &&
+        phoneNumber == other.phoneNumber;
   }
 
   @override
   int get hashCode {
-    return $jf(
-        $jc($jc($jc(0, email.hashCode), name.hashCode), photoUrl.hashCode));
+    return $jf($jc(
+        $jc($jc($jc(0, email.hashCode), name.hashCode), photoURI.hashCode),
+        phoneNumber.hashCode));
   }
 
   @override
@@ -109,7 +124,8 @@ class _$User extends User {
     return (newBuiltValueToStringHelper('User')
           ..add('email', email)
           ..add('name', name)
-          ..add('photoUrl', photoUrl))
+          ..add('photoURI', photoURI)
+          ..add('phoneNumber', phoneNumber))
         .toString();
   }
 }
@@ -125,9 +141,13 @@ class UserBuilder implements Builder<User, UserBuilder> {
   String get name => _$this._name;
   set name(String name) => _$this._name = name;
 
-  String _photoUrl;
-  String get photoUrl => _$this._photoUrl;
-  set photoUrl(String photoUrl) => _$this._photoUrl = photoUrl;
+  String _photoURI;
+  String get photoURI => _$this._photoURI;
+  set photoURI(String photoURI) => _$this._photoURI = photoURI;
+
+  int _phoneNumber;
+  int get phoneNumber => _$this._phoneNumber;
+  set phoneNumber(int phoneNumber) => _$this._phoneNumber = phoneNumber;
 
   UserBuilder();
 
@@ -135,7 +155,8 @@ class UserBuilder implements Builder<User, UserBuilder> {
     if (_$v != null) {
       _email = _$v.email;
       _name = _$v.name;
-      _photoUrl = _$v.photoUrl;
+      _photoURI = _$v.photoURI;
+      _phoneNumber = _$v.phoneNumber;
       _$v = null;
     }
     return this;
@@ -156,8 +177,12 @@ class UserBuilder implements Builder<User, UserBuilder> {
 
   @override
   _$User build() {
-    final _$result =
-        _$v ?? new _$User._(email: email, name: name, photoUrl: photoUrl);
+    final _$result = _$v ??
+        new _$User._(
+            email: email,
+            name: name,
+            photoURI: photoURI,
+            phoneNumber: phoneNumber);
     replace(_$result);
     return _$result;
   }

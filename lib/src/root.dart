@@ -1,3 +1,5 @@
+import 'package:fastuserapp/src/models/user.dart';
+import 'package:fastuserapp/src/screens/user_info_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,9 +28,10 @@ class _RootState extends State<Root> {
     return Scaffold(
       body: StreamBuilder<FirebaseUser>(
         stream: _bloc.currentUserStateStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-          switch (snapshot.connectionState) {
+        builder: (context, userSnapshot) {
+          if (userSnapshot.hasError)
+            return Text('Error: ${userSnapshot.error}');
+          switch (userSnapshot.connectionState) {
             case ConnectionState.none:
               return Text('Select lot');
             case ConnectionState.waiting:
@@ -45,11 +48,65 @@ class _RootState extends State<Root> {
                     dispose: (context, CartMenuBloc bloc) => bloc.dispose(),
                   ),
                 ],
-                child: snapshot.hasData
-                    ? HomeScreen(
-                        user: {
-                          "name": snapshot.data.displayName,
-                          "email": snapshot.data.email
+                child: userSnapshot.hasData
+                    ? StreamBuilder<bool>(
+                        stream: _bloc.getUserStatus(userSnapshot.data.email),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError)
+                            return Text("Error: ${snapshot.error}");
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.none:
+                              return Text("Awaitng Bids....");
+                              break;
+                            case ConnectionState.waiting:
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                              break;
+                            case ConnectionState.active:
+                              return snapshot.data == true
+                                  ? StreamBuilder<User>(
+                                      stream: _bloc
+                                          .getUser(userSnapshot.data.email),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasError)
+                                          return Text(
+                                              "Error: ${snapshot.error}");
+                                        switch (snapshot.connectionState) {
+                                          case ConnectionState.none:
+                                            return Text("Awaiting bids....");
+                                            break;
+                                          case ConnectionState.waiting:
+                                            return Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                            break;
+                                          case ConnectionState.active:
+                                            return HomeScreen(
+                                              user: {
+                                                "name": snapshot.data.name,
+                                                "email": snapshot.data.email,
+                                                "phoneNumber":
+                                                    snapshot.data.phoneNumber,
+                                              },
+                                            );
+                                            break;
+                                          case ConnectionState.done:
+                                            return Text(
+                                                "The task has completed");
+                                            break;
+                                        }
+                                      })
+                                  : UserInfoScreen(
+                                      user: userSnapshot.data,
+                                    );
+                              break;
+                            case ConnectionState.done:
+                              return Text("The task has Completed");
+                              break;
+                          }
+                          return null;
                         },
                       )
                     : LoginScreen(),

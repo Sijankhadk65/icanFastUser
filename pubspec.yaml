@@ -49,6 +49,8 @@ dependencies:
   rating_dialog: ^1.0.0
   smooth_star_rating: ^1.1.1
   carousel_slider: ^2.2.1
+  flare_flutter: ^2.0.4
+
 
 dev_dependencies:
   build_runner: ^1.0.0

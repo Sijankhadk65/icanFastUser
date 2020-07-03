@@ -10,7 +10,9 @@ abstract class User implements Built<User, UserBuilder> {
   @nullable
   String get name;
   @nullable
-  String get photoUrl;
+  String get photoURI;
+  @nullable
+  int get phoneNumber;
 
   factory User([void Function(UserBuilder) updates]) = _$User;
   User._();
@@ -22,4 +24,4 @@ User parseJsonToUser(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> convertUserToJson(User user) =>
-    {"name": user.name, "email": user.email, "photoUrl": user.photoUrl};
+    {"name": user.name, "email": user.email, "photoURI": user.photoURI};

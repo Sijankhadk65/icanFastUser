@@ -91,8 +91,8 @@ class FirestoreProvider {
         .updateData(newData);
   }
 
-  Stream<DocumentSnapshot> checkForUser(String email) =>
-      _firestore.document("users/$email").snapshots();
+  // Stream<DocumentSnapshot> checkForUser(String email) =>
+  //     _firestore.document("users/$email").snapshots();
 
   Future<void> addNewUser(Map<String, dynamic> data) =>
       _firestore.collection("users").document(data['email']).setData(data);
@@ -122,4 +122,13 @@ class FirestoreProvider {
         .where("isAvailable", isEqualTo: true)
         .snapshots();
   }
+
+  Stream<DocumentSnapshot> getUser(String email) =>
+      _firestore.document("users/$email").snapshots();
+  Future<void> saveUserToken(String email, Map<String, dynamic> tokenData) =>
+      _firestore
+          .document("users/$email")
+          .collection("tokens")
+          .document(tokenData['createdAt'])
+          .setData(tokenData);
 }

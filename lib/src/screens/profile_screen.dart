@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fastuserapp/src/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +9,9 @@ import '../bloc/login_bloc.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
+  final String email;
+
+  const ProfileScreen({Key key, this.email}) : super(key: key);
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
@@ -25,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       body: Container(
         margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-        child: StreamBuilder<FirebaseUser>(
+        child: StreamBuilder<User>(
           builder: (context, snapshot) {
             if (snapshot.hasError) return Text("Error:${snapshot.error}");
             switch (snapshot.connectionState) {
@@ -44,7 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         CachedNetworkImage(
-                          imageUrl: snapshot.data.photoUrl,
+                          imageUrl: snapshot.data.photoURI,
                           placeholder: (context, msg) => Center(
                             child: CircularProgressIndicator(),
                           ),
@@ -76,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                  snapshot.data.displayName.toUpperCase(),
+                                  snapshot.data.name.toUpperCase(),
                                   style: GoogleFonts.oswald(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w700,
@@ -96,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ],
                                 ),
                                 Text(
-                                  snapshot.data.phoneNumber,
+                                  snapshot.data.phoneNumber.toString(),
                                   style: GoogleFonts.montserrat(
                                     fontSize: 10,
                                     fontStyle: FontStyle.italic,
@@ -118,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             }
             return null;
           },
-          stream: _loginBloc.currentUserStateStream,
+          stream: _loginBloc.getUser(widget.email),
         ),
       ),
     );

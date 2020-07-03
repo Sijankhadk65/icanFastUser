@@ -1,5 +1,7 @@
 import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
 import 'package:fastuserapp/src/models/online_order.dart';
+import 'package:flare_flutter/flare_actor.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +15,23 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
+  TextEditingController _phoneNumberController;
+  String _newNumber = "";
+
+  _changeNewNumber(number) {
+    this.setState(() {
+      _newNumber = number;
+    });
+  }
+
+  @override
+  void initState() {
+    _phoneNumberController = TextEditingController();
+    orderCartBloc.changeUserPhoneNumber(widget.user['phoneNumber'].toString());
+    _phoneNumberController.text = widget.user['phoneNumber'].toString();
+    super.initState();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -33,7 +52,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               return snapshot.data == true
                   ? Container(
                       child: Center(
-                        child: Text("Your Order has been Placed!"),
+                        child: FlareActor(
+                          "assets/flare/Success Check.flr",
+                          animation: "check",
+                        ),
                       ),
                     )
                   : Column(
@@ -48,12 +70,140 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text(
-                                "${widget.user['name']},",
-                                style: GoogleFonts.nunito(
-                                  fontSize: 23,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Text(
+                                    "${widget.user['name']},",
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 23,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  StreamBuilder<String>(
+                                    stream: orderCartBloc.userPhoneNumber,
+                                    builder: (context, snapshot) {
+                                      return Container(
+                                        padding: EdgeInsets.only(
+                                          left: 5,
+                                        ),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            style: GoogleFonts.nunito(
+                                              color: Colors.black,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                            text: snapshot.data.toString(),
+                                            children: [
+                                              TextSpan(
+                                                text: " (change number)",
+                                                recognizer:
+                                                    TapGestureRecognizer()
+                                                      ..onTap = () {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (context) =>
+                                                              Dialog(
+                                                            child:
+                                                                LayoutBuilder(
+                                                              builder: (context,
+                                                                  constraint) {
+                                                                return Container(
+                                                                  height: 150,
+                                                                  child:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                            10),
+                                                                    child:
+                                                                        Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      children: <
+                                                                          Widget>[
+                                                                        Text(
+                                                                          "Enter a different number",
+                                                                          style:
+                                                                              GoogleFonts.nunito(
+                                                                            fontWeight:
+                                                                                FontWeight.w700,
+                                                                          ),
+                                                                        ),
+                                                                        TextField(
+                                                                          controller:
+                                                                              _phoneNumberController,
+                                                                          onChanged:
+                                                                              _changeNewNumber,
+                                                                        ),
+                                                                        Row(
+                                                                          children: <
+                                                                              Widget>[
+                                                                            RawMaterialButton(
+                                                                              onPressed: () {
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              child: Text(
+                                                                                "Cancel",
+                                                                                style: GoogleFonts.nunito(
+                                                                                  fontWeight: FontWeight.w600,
+                                                                                  color: Colors.white,
+                                                                                ),
+                                                                              ),
+                                                                              fillColor: Colors.grey,
+                                                                              shape: RoundedRectangleBorder(
+                                                                                borderRadius: BorderRadius.circular(
+                                                                                  5,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              width: 10,
+                                                                            ),
+                                                                            RawMaterialButton(
+                                                                              onPressed: () {
+                                                                                orderCartBloc.changeUserPhoneNumber(_newNumber);
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              child: Text(
+                                                                                "Change",
+                                                                                style: GoogleFonts.nunito(
+                                                                                  fontWeight: FontWeight.w600,
+                                                                                  color: Colors.white,
+                                                                                ),
+                                                                              ),
+                                                                              fillColor: Colors.blue,
+                                                                              shape: RoundedRectangleBorder(
+                                                                                borderRadius: BorderRadius.circular(
+                                                                                  5,
+                                                                                ),
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                style: GoogleFonts.nunito(
+                                                  color: Colors.blue,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
                               StreamBuilder<Address>(
                                 stream: orderCartBloc.physicalLocation,
@@ -268,7 +418,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                               );
                             }),
-                        Divider(),
                         Container(
                           margin: EdgeInsets.only(
                             left: 10,
@@ -297,7 +446,62 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ],
                           ),
                         ),
-                        Divider(),
+                        Container(
+                          margin: EdgeInsets.only(
+                            left: 10,
+                            right: 10,
+                            top: 5,
+                            bottom: 5,
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  "VAT",
+                                  style: GoogleFonts.nunito(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                "13%",
+                                style: GoogleFonts.nunito(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                            left: 10,
+                            right: 10,
+                            top: 5,
+                            bottom: 5,
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  "Service Charge",
+                                  style: GoogleFonts.nunito(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                "10%",
+                                style: GoogleFonts.nunito(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                         StreamBuilder<int>(
                             stream: orderCartBloc.cartsTotal,
                             builder: (context, snapshot) {
@@ -320,7 +524,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       ),
                                     ),
                                     Text(
-                                      "Rs.${snapshot.data + 20}",
+                                      "Rs.${snapshot.data + (snapshot.data * 0.1) + (snapshot.data * 0.13) + 20}",
                                       style: GoogleFonts.nunito(
                                         fontWeight: FontWeight.w800,
                                         fontSize: 16,

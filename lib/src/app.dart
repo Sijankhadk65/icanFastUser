@@ -40,8 +40,8 @@ class App extends StatelessWidget {
         ),
         appBarTheme: AppBarTheme(
           iconTheme: IconThemeData(color: Colors.black),
-          // elevation: 0.0,
-          color: Colors.white,
+          color: Colors.transparent,
+          elevation: 0.0,
           textTheme: TextTheme(
             headline6: GoogleFonts.oswald(
                 color: Colors.black,

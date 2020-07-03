@@ -98,8 +98,9 @@ class _SourceCardState extends State<SourceCard> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
+                            Colors.transparent,
                             Colors.black26,
-                            Colors.black87,
+                            Colors.black45,
                           ],
                         ),
                       ),
