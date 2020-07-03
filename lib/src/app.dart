@@ -38,6 +38,15 @@ class App extends StatelessWidget {
             fontSize: 15,
           ),
         ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
+          ),
+          hintStyle: GoogleFonts.nunito(
+            fontWeight: FontWeight.w400,
+          ),
+          border: InputBorder.none,
+        ),
         appBarTheme: AppBarTheme(
           iconTheme: IconThemeData(color: Colors.black),
           color: Colors.transparent,

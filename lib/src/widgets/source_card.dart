@@ -10,8 +10,7 @@ import 'package:provider/provider.dart';
 class SourceCard extends StatefulWidget {
   final Vendor vendor;
   final Map<String, dynamic> user;
-  final int minOrder;
-  const SourceCard({Key key, @required this.vendor, this.user, this.minOrder})
+  const SourceCard({Key key, @required this.vendor, this.user})
       : super(key: key);
 
   @override
@@ -41,7 +40,7 @@ class _SourceCardState extends State<SourceCard> {
                     vendorName: widget.vendor.name,
                     categories: widget.vendor.categories.toList(),
                     user: widget.user,
-                    minOrder: widget.minOrder,
+                    minOrder: widget.vendor.minOrder,
                   ),
                 ),
               ),

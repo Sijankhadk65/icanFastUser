@@ -1,11 +1,12 @@
 import 'package:fastuserapp/src/bloc/dash_bloc.dart';
-import 'package:fastuserapp/src/models/vendor.dart';
+import 'package:fastuserapp/src/bloc/search_bloc.dart';
+import 'package:fastuserapp/src/models/online_order.dart';
+import 'package:fastuserapp/src/screens/cart_screen.dart';
 import 'package:fastuserapp/src/screens/dash_screen.dart';
 import 'package:fastuserapp/src/widgets/food_search_delegate.dart';
-import 'package:fastuserapp/src/widgets/source_card.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_menu_bloc.dart';
 import '../bloc/login_bloc.dart';
@@ -58,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     orderCartBloc.getCurrentLocation();
+    orderCartBloc.getLocalOrder();
     return Scaffold(
       appBar: AppBar(
         // bottom: PreferredSize(
@@ -129,11 +131,85 @@ class _HomeScreenState extends State<HomeScreen>
               color: Colors.orange[500],
             ),
             onPressed: () {
-              showSearch(
-                context: context,
-                delegate: FoodSearchDelegate(),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Provider(
+                    create: (_) => SearchBloc(),
+                    dispose: (context, SearchBloc bloc) => bloc.dispose(),
+                    child: FoodSearchDelegate(
+                      user: widget.user,
+                    ),
+                  ),
+                ),
               );
             },
+          ),
+          Stack(
+            children: <Widget>[
+              IconButton(
+                icon: Icon(
+                  Icons.shopping_basket,
+                  color: Colors.orange[500],
+                ),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CartScreen(),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 5,
+                right: 3,
+                child: StreamBuilder<List<OnlineOrder>>(
+                  stream: orderCartBloc.localOrder,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError)
+                      return Text("Error: ${snapshot.error}");
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                        return Text("AW");
+                        break;
+                      case ConnectionState.waiting:
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                        break;
+                      case ConnectionState.active:
+                        return SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: Material(
+                            elevation: 10,
+                            color: Colors.white,
+                            type: MaterialType.circle,
+                            child: Center(
+                              child: Text(
+                                snapshot.data
+                                    .map((order) => order.cartLength)
+                                    .toList()
+                                    .fold(
+                                        0,
+                                        (previousValue, element) =>
+                                            previousValue + element)
+                                    .toString(),
+                                style: GoogleFonts.oswald(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                        break;
+                      case ConnectionState.done:
+                        return Text("TC");
+                        break;
+                    }
+                  },
+                ),
+              ),
+            ],
           )
         ],
       ),

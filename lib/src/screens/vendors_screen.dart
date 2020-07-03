@@ -49,7 +49,6 @@ class _VendorsScreenState extends State<VendorsScreen> {
                         child: SourceCard(
                           vendor: vendor,
                           user: widget.user,
-                          minOrder: vendor.minOrder,
                         ),
                       ),
                     )

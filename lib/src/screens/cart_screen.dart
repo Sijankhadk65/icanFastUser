@@ -1,8 +1,6 @@
-import 'package:fastuserapp/src/bloc/login_bloc.dart';
 import 'package:fastuserapp/src/screens/checkout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import '../bloc/order_cart_bloc.dart';
 import '../models/online_order.dart';
 import '../widgets/cart_list.dart';
@@ -24,29 +22,18 @@ class CartScreen extends StatefulWidget {
   _CartScreenState createState() => _CartScreenState();
 }
 
-class _CartScreenState extends State<CartScreen>
-    with SingleTickerProviderStateMixin {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
+class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
-    orderCartBloc.getCurrentOrder(widget.vendor);
-    orderCartBloc.getTotalPrice(widget.vendor);
+    // orderCartBloc.getCurrentOrder(widget.vendor);
+    // orderCartBloc.getTotalPrice(widget.vendor);
     orderCartBloc.getCartsTotal();
     orderCartBloc.getLocalOrder();
     orderCartBloc.getDeliveryCharge();
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "${widget.vendor} : Cart",
+          "Cart",
           style: GoogleFonts.oswald(
             fontSize: 18,
           ),

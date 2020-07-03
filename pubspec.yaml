@@ -50,6 +50,7 @@ dependencies:
   smooth_star_rating: ^1.1.1
   carousel_slider: ^2.2.1
   flare_flutter: ^2.0.4
+  flutter_slidable: ^0.5.4
 
 
 dev_dependencies:

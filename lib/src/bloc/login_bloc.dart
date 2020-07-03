@@ -8,17 +8,32 @@ import '../resources/repository.dart';
 
 class LoginBloc {
   final _repo = Repository();
-
-  final BehaviorSubject<int> _userPhoneNumberSubject = BehaviorSubject<int>();
-  Stream<int> get userPhoneNumber => _userPhoneNumberSubject.stream;
-  Function(int) get change => _userPhoneNumberSubject.sink.add;
+  String _name = "";
+  String _phoneNumber = "";
 
   final BehaviorSubject<String> _nameSubject = BehaviorSubject<String>();
-  Stream<String> get name => _nameSubject.stream;
+  Stream<String> get name => _nameSubject.stream.transform(
+        StreamTransformer.fromHandlers(
+          handleData: (String name, sink) {
+            if (name.isNotEmpty && !name.contains("  ")) {
+              sink.add(name);
+            } else {
+              sink.addError("Enter a valid name.");
+            }
+          },
+        ),
+      );
   Function(String) get changeName => _nameSubject.sink.add;
 
   final BehaviorSubject<String> _phoneNumberSubject = BehaviorSubject<String>();
-  Stream<String> get phoneNumber => _phoneNumberSubject.stream;
+  Stream<String> get phoneNumber => _phoneNumberSubject.stream.transform(
+          StreamTransformer.fromHandlers(handleData: (String number, sink) {
+        if (!(number.length > 10) && !(number.length < 10)) {
+          sink.add(number);
+        } else {
+          sink.addError("Enter a valid number");
+        }
+      }));
   Function(String) get changePhoneNumber => _phoneNumberSubject.sink.add;
 
   saveUserNumber(int phoneNumber) {}
@@ -33,17 +48,28 @@ class LoginBloc {
 
   Stream<User> getUser(String email) => _repo.getUser(email);
 
-  Stream<bool> canSubmitData() =>
-      Rx.combineLatest2(name, phoneNumber, (a, b) => true);
+  Stream<bool> get canSubmitData => Rx.combineLatest2<String, String, bool>(
+        name,
+        phoneNumber,
+        (String name, String phoneNumber) {
+          _name = name;
+          _phoneNumber = phoneNumber;
+          if (_name.isNotEmpty && _phoneNumber.isNotEmpty) {
+            print("name: $_name");
+            return true;
+          }
+          return null;
+        },
+      );
 
   Future<void> saveUser(FirebaseUser user) async {
     var token = await user.getIdToken();
     return _repo.addUser(
       {
-        "name": _nameSubject.value,
+        "name": _name,
         "email": user.email,
         "UID": user.uid,
-        "phoneNumber": int.parse(_phoneNumberSubject.value),
+        "phoneNumber": int.parse(_phoneNumber),
         "photoURI": user.photoUrl,
         "type": "client",
         "token": {
@@ -58,7 +84,6 @@ class LoginBloc {
   Future<void> signOut() => _repo.signOut();
 
   void dispose() {
-    _userPhoneNumberSubject.close();
     _nameSubject.close();
     _phoneNumberSubject.close();
   }

@@ -30,6 +30,7 @@ class FirestoreProvider {
   }
 
   Stream<QuerySnapshot> getVendorMenu(String category, String vendor) {
+    if (category == "all") return _firestore.collection("menu").snapshots();
     return _firestore
         .collection("menu")
         .where("category", isEqualTo: category)
@@ -74,6 +75,13 @@ class FirestoreProvider {
         .collection("liveOnlineOrders")
         .document(timeStamp)
         .setData(cartInfo);
+  }
+
+  Stream<QuerySnapshot> getVendorsFromName(String name) {
+    return _firestore
+        .collection("vendors")
+        .where("name", isEqualTo: name)
+        .snapshots();
   }
 
   Stream<QuerySnapshot> getVendors(String tag) {
