@@ -1,5 +1,6 @@
 import 'package:fastuserapp/src/models/user.dart';
 import 'package:fastuserapp/src/screens/user_info_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,6 +18,7 @@ class Root extends StatefulWidget {
 
 class _RootState extends State<Root> {
   LoginBloc _bloc;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

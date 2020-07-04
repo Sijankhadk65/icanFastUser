@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:fastuserapp/src/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:rxdart/rxdart.dart';
 import '../resources/repository.dart';
 
@@ -63,7 +64,7 @@ class LoginBloc {
       );
 
   Future<void> saveUser(FirebaseUser user) async {
-    var token = await user.getIdToken();
+    var token = await FirebaseMessaging().getToken();
     return _repo.addUser(
       {
         "name": _name,
@@ -74,7 +75,7 @@ class LoginBloc {
         "type": "client",
         "token": {
           "createdAt": DateTime.now().toIso8601String(),
-          "token": token.token,
+          "token": token,
           "platform": Platform.operatingSystem,
         },
       },

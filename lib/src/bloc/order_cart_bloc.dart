@@ -416,12 +416,15 @@ class OrderCartBloc {
     final coordinates = new Coordinates(location.latitude, location.longitude);
     List<Address> addresses = [];
     print(coordinates);
-
-    addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-
-    var first = addresses.first;
-    _physicaLocation = first.addressLine;
-    changePhysicalLocation(first);
+    try {
+      addresses =
+          await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      var first = addresses.first;
+      _physicaLocation = first.addressLine;
+      changePhysicalLocation(first);
+    } catch (e) {
+      print(e);
+    }
   }
 
   void dispose() {

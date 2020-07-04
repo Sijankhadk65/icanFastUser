@@ -6,6 +6,7 @@ import 'package:fastuserapp/src/screens/dash_screen.dart';
 import 'package:fastuserapp/src/widgets/food_search_delegate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_menu_bloc.dart';
@@ -13,6 +14,7 @@ import '../bloc/login_bloc.dart';
 import '../bloc/order_cart_bloc.dart';
 import '../screens/profile_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 
@@ -29,13 +31,37 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  _getToken() {
+    _firebaseMessaging.getToken().then(
+          (deviceToken) => print(
+            "Device Token:$deviceToken",
+          ),
+        );
+  }
+
+  _configureFCM() {
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print('onMessage: $message');
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print('onLaunch: $message');
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print('onResume: $message');
+      },
+    );
+  }
+
   PageController _pageController;
 
   CartMenuBloc _cartMenuBloc;
-
   @override
   void initState() {
     super.initState();
+    _getToken();
+    _configureFCM();
     _pageController = PageController();
   }
 
@@ -62,60 +88,60 @@ class _HomeScreenState extends State<HomeScreen>
     orderCartBloc.getLocalOrder();
     return Scaffold(
       appBar: AppBar(
-        // bottom: PreferredSize(
-        //   child: Container(
-        //     margin: EdgeInsets.only(
-        //       left: 15,
-        //     ),
-        //     child: Column(
-        //       children: <Widget>[
-        //         Row(
-        //           children: <Widget>[
-        //             StreamBuilder<Address>(
-        //               builder: (context, snapshot) {
-        //                 if (snapshot.hasError)
-        //                   return Text("Error: ${snapshot.error}");
-        //                 switch (snapshot.connectionState) {
-        //                   case ConnectionState.none:
-        //                     return Text("Awaiting bids....");
-        //                     break;
-        //                   case ConnectionState.waiting:
-        //                     return Center(
-        //                       child: CircularProgressIndicator(),
-        //                     );
-        //                     break;
-        //                   case ConnectionState.active:
-        //                     return Text(
-        //                       snapshot.data.addressLine,
-        //                       style: GoogleFonts.montserrat(
-        //                         fontSize: 12,
-        //                         fontWeight: FontWeight.bold,
-        //                         fontStyle: FontStyle.italic,
-        //                       ),
-        //                     );
-        //                     break;
-        //                   case ConnectionState.done:
-        //                     return Text("The task has completed....");
-        //                     break;
-        //                 }
-        //                 return null;
-        //               },
-        //               stream: orderCartBloc.physicalLocation,
-        //             ),
-        //             Expanded(
-        //               child: Icon(
-        //                 EvaIcons.pin,
-        //                 size: 18,
-        //                 color: Colors.red,
-        //               ),
-        //             ),
-        //           ],
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        //   preferredSize: Size.fromHeight(10),
-        // ),
+        bottom: PreferredSize(
+          child: Container(
+            margin: EdgeInsets.only(
+              left: 15,
+            ),
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    StreamBuilder<Address>(
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError)
+                          return Text("Error: ${snapshot.error}");
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                            return Text("Awaiting bids....");
+                            break;
+                          case ConnectionState.waiting:
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                            break;
+                          case ConnectionState.active:
+                            return Text(
+                              snapshot.data.addressLine,
+                              style: GoogleFonts.montserrat(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            );
+                            break;
+                          case ConnectionState.done:
+                            return Text("The task has completed....");
+                            break;
+                        }
+                        return null;
+                      },
+                      stream: orderCartBloc.physicalLocation,
+                    ),
+                    Expanded(
+                      child: Icon(
+                        EvaIcons.pin,
+                        size: 18,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          preferredSize: Size.fromHeight(10),
+        ),
         title: Row(
           children: <Widget>[
             Text(
@@ -123,7 +149,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ],
         ),
-
         actions: <Widget>[
           IconButton(
             icon: Icon(
