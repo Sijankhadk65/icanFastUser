@@ -55,10 +55,20 @@ class FirestoreProvider {
         .snapshots();
   }
 
+  Stream<QuerySnapshot> getClosedOrderRefs(Map<String, dynamic> user) {
+    return _firestore
+        .collection("closedOnlineOrders")
+        .where(
+          "user",
+          isEqualTo: user,
+        )
+        .snapshots();
+  }
+
   Future<void> deleteOrderRef(String refID) =>
       _firestore.document("liveOnlineOrders/$refID").delete();
 
-  Stream<QuerySnapshot> getLiveOrders(String refID) {
+  Stream<QuerySnapshot> getOrders(String refID) {
     return _firestore
         .document("liveOnlineOrders/$refID")
         .collection("orders")
@@ -137,6 +147,6 @@ class FirestoreProvider {
       _firestore
           .document("users/$email")
           .collection("tokens")
-          .document(tokenData['createdAt'])
+          .document(tokenData['token'])
           .setData(tokenData);
 }

@@ -132,6 +132,7 @@ class _VendorScreenState extends State<VendorScreen>
                                             item: f,
                                             user: widget.user,
                                             vendorName: widget.vendorName,
+                                            minOrder: widget.minOrder,
                                           ),
                                         );
                                       },

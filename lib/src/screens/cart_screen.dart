@@ -25,8 +25,6 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
-    // orderCartBloc.getCurrentOrder(widget.vendor);
-    // orderCartBloc.getTotalPrice(widget.vendor);
     orderCartBloc.getCartsTotal();
     orderCartBloc.getLocalOrder();
     orderCartBloc.getDeliveryCharge();
@@ -92,7 +90,14 @@ class _CartScreenState extends State<CartScreen> {
                                           0,
                                           (previousValue, element) =>
                                               element + previousValue) >
-                                  widget.minOrder
+                                  snapshot.data
+                                      .map((order) => order.minOrder)
+                                      .toList()
+                                      .fold(
+                                        0,
+                                        (previousValue, element) =>
+                                            previousValue + element,
+                                      )
                               ? Colors.blue[800]
                               : Colors.red[800],
                           child: Material(
@@ -105,7 +110,14 @@ class _CartScreenState extends State<CartScreen> {
                                               0,
                                               (previousValue, element) =>
                                                   element + previousValue) >
-                                      widget.minOrder
+                                      snapshot.data
+                                          .map((order) => order.minOrder)
+                                          .toList()
+                                          .fold(
+                                            0,
+                                            (previousValue, element) =>
+                                                previousValue + element,
+                                          )
                                   ? () {
                                       Navigator.push(
                                         context,
@@ -152,7 +164,14 @@ class _CartScreenState extends State<CartScreen> {
                                                     (previousValue, element) =>
                                                         element +
                                                         previousValue) >
-                                            widget.minOrder
+                                            snapshot.data
+                                                .map((order) => order.minOrder)
+                                                .toList()
+                                                .fold(
+                                                  0,
+                                                  (previousValue, element) =>
+                                                      previousValue + element,
+                                                )
                                         ? Container()
                                         : Expanded(
                                             child: AnimatedContainer(

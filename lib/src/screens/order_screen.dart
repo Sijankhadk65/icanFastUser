@@ -140,7 +140,7 @@ class _OrderScreenState extends State<OrderScreen>
                 ),
                 Container(
                   child: StreamBuilder<List<OrderRef>>(
-                    stream: orderCartBloc.orderRefrence,
+                    stream: orderCartBloc.closedRefrence,
                     builder: (context, snapshot) {
                       switch (snapshot.connectionState) {
                         case ConnectionState.none:

@@ -67,11 +67,26 @@ class Repository {
           },
         ),
       );
+
+  Stream<List<OrderRef>> getClosedOrderRefs(Map<String, dynamic> user) =>
+      _firestoreProvider.getClosedOrderRefs(user).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<OrderRef> orders = [];
+            snapshot.documents.forEach(
+              (document) {
+                orders.add(parseJsonToOrderRef(document.data));
+              },
+            );
+            sink.add(orders);
+          },
+        ),
+      );
   Future<void> deleteOrderRefs(String refID) =>
       _firestoreProvider.deleteOrderRef(refID);
 
-  Stream<List<OnlineOrder>> getLiveOrders(String refID) =>
-      _firestoreProvider.getLiveOrders(refID).transform(
+  Stream<List<OnlineOrder>> getOrders(String refID) =>
+      _firestoreProvider.getOrders(refID).transform(
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<OnlineOrder> orders = [];

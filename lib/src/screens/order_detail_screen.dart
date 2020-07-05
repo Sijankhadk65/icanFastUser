@@ -21,7 +21,7 @@ class OrderDetailScreen extends StatefulWidget {
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   Widget build(BuildContext context) {
-    orderCartBloc.getLiveOrders(widget.orderRef);
+    orderCartBloc.getOrders(widget.orderRef);
     return Scaffold(
       appBar: AppBar(
         title: Text(

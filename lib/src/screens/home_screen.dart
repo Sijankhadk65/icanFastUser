@@ -4,6 +4,7 @@ import 'package:fastuserapp/src/models/online_order.dart';
 import 'package:fastuserapp/src/screens/cart_screen.dart';
 import 'package:fastuserapp/src/screens/dash_screen.dart';
 import 'package:fastuserapp/src/widgets/food_search_delegate.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
@@ -107,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen>
                             break;
                           case ConnectionState.waiting:
                             return Center(
-                              child: CircularProgressIndicator(),
+                              child: LinearProgressIndicator(),
                             );
                             break;
                           case ConnectionState.active:
@@ -152,6 +153,15 @@ class _HomeScreenState extends State<HomeScreen>
         actions: <Widget>[
           IconButton(
             icon: Icon(
+              EvaIcons.logOut,
+              color: Colors.orange[500],
+            ),
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
+          ),
+          IconButton(
+            icon: Icon(
               EvaIcons.search,
               color: Colors.orange[500],
             ),
@@ -180,7 +190,9 @@ class _HomeScreenState extends State<HomeScreen>
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => CartScreen(),
+                    builder: (_) => CartScreen(
+                      user: widget.user,
+                    ),
                   ),
                 ),
               ),

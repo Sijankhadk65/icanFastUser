@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_map_location_picker/google_map_location_picker.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -17,6 +18,13 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   TextEditingController _phoneNumberController;
   String _newNumber = "";
+  Map<String, dynamic> _location;
+
+  _changeLocation(Map<String, dynamic> location) {
+    this.setState(() {
+      _location = location;
+    });
+  }
 
   _changeNewNumber(number) {
     this.setState(() {
@@ -41,6 +49,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     orderCartBloc.getLocalOrder();
     orderCartBloc.getCartsTotal();
+    orderCartBloc.getChangedLocation(_location);
     return Scaffold(
       appBar: AppBar(
         title: Text("Checkout"),
@@ -53,8 +62,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ? Container(
                       child: Center(
                         child: FlareActor(
-                          "assets/flare/Success Check.flr",
+                          "assets/flare/check.flr",
                           animation: "check",
+                          alignment: Alignment.center,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     )
@@ -205,35 +216,72 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                 ],
                               ),
-                              StreamBuilder<Address>(
-                                stream: orderCartBloc.physicalLocation,
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasError)
-                                    return Text("Error: ${snapshot.error}");
-                                  switch (snapshot.connectionState) {
-                                    case ConnectionState.none:
-                                      return Text("Awaiting Bids...");
-                                      break;
-                                    case ConnectionState.waiting:
-                                      return Center(
-                                        child: LinearProgressIndicator(),
-                                      );
-                                      break;
-                                    case ConnectionState.active:
-                                      return Text(
-                                        snapshot.data.addressLine,
-                                        style: GoogleFonts.montserrat(
-                                          fontStyle: FontStyle.italic,
-                                          fontSize: 12,
-                                        ),
-                                      );
-                                      break;
-                                    case ConnectionState.done:
-                                      return Text("The task has completed");
-                                      break;
-                                  }
-                                  return null;
-                                },
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: StreamBuilder<Address>(
+                                      stream: orderCartBloc.physicalLocation,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasError)
+                                          return Text(
+                                              "Error: ${snapshot.error}");
+                                        switch (snapshot.connectionState) {
+                                          case ConnectionState.none:
+                                            return Text("Awaiting Bids...");
+                                            break;
+                                          case ConnectionState.waiting:
+                                            return Center(
+                                              child: LinearProgressIndicator(),
+                                            );
+                                            break;
+                                          case ConnectionState.active:
+                                            return Text(
+                                              snapshot.data.addressLine,
+                                              style: GoogleFonts.montserrat(
+                                                fontStyle: FontStyle.italic,
+                                                fontSize: 12,
+                                              ),
+                                            );
+                                            break;
+                                          case ConnectionState.done:
+                                            return Text(
+                                                "The task has completed");
+                                            break;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                  RichText(
+                                    text: TextSpan(
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () async {
+                                          LocationResult result =
+                                              await showLocationPicker(
+                                            context,
+                                            "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                            automaticallyAnimateToCurrentLocation:
+                                                true,
+                                            myLocationButtonEnabled: true,
+                                            layersButtonEnabled: true,
+                                          );
+                                          _changeLocation(
+                                            {
+                                              "lat": result.latLng.latitude,
+                                              "lang": result.latLng.longitude,
+                                            },
+                                          );
+                                          print('Location: ${result.latLng}');
+                                        },
+                                      text: " ( change location )",
+                                      style: GoogleFonts.nunito(
+                                        color: Colors.blue,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  )
+                                ],
                               )
                             ],
                           ),
@@ -278,16 +326,37 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                               ListView(
                                                                 shrinkWrap:
                                                                     true,
+                                                                physics:
+                                                                    ClampingScrollPhysics(),
                                                                 children: order
                                                                     .items
                                                                     .map(
                                                                       (item) =>
-                                                                          Text(
-                                                                        "${item.name},",
-                                                                        style: GoogleFonts
-                                                                            .nunito(
-                                                                          fontSize:
-                                                                              10.5,
+                                                                          RichText(
+                                                                        text:
+                                                                            TextSpan(
+                                                                          text:
+                                                                              item.name,
+                                                                          children: [
+                                                                            TextSpan(
+                                                                              text: " x${item.quantity}",
+                                                                              style: GoogleFonts.nunito(
+                                                                                fontSize: 10,
+                                                                                color: Colors.black,
+                                                                                fontWeight: FontWeight.w800,
+                                                                              ),
+                                                                            ),
+                                                                            TextSpan(
+                                                                              text: ",",
+                                                                            ),
+                                                                          ],
+                                                                          style:
+                                                                              GoogleFonts.nunito(
+                                                                            fontSize:
+                                                                                10,
+                                                                            color:
+                                                                                Colors.black,
+                                                                          ),
                                                                         ),
                                                                       ),
                                                                     )
@@ -542,25 +611,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             elevation: 10,
                             child: InkWell(
                               onTap: () {
+                                orderCartBloc.changeTransactionStatus(true);
                                 orderCartBloc
                                     .saveOrder(
-                                      widget.user,
-                                    )
-                                    .whenComplete(
-                                      () => orderCartBloc
-                                          .changeCheckoutStatus(true),
-                                    );
+                                  widget.user,
+                                )
+                                    .whenComplete(() {
+                                  orderCartBloc.changeTransactionStatus(false);
+                                  orderCartBloc.changeCheckoutStatus(true);
+                                });
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child: Center(
-                                  child: Text(
-                                    "Check Out!",
-                                    style: GoogleFonts.oswald(
-                                      color: Colors.white,
-                                      fontSize: 25,
-                                    ),
-                                  ),
+                                  child: StreamBuilder<bool>(
+                                      stream: orderCartBloc.transactionStatus,
+                                      builder: (context, snapshot) {
+                                        return snapshot.data
+                                            ? CircularProgressIndicator(
+                                                backgroundColor: Colors.green,
+                                              )
+                                            : Text(
+                                                "Check Out!",
+                                                style: GoogleFonts.oswald(
+                                                  color: Colors.white,
+                                                  fontSize: 25,
+                                                ),
+                                              );
+                                      }),
                                 ),
                               ),
                             ),

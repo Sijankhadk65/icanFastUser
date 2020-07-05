@@ -1,7 +1,6 @@
 import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
 import 'package:fastuserapp/src/models/cart_items.dart';
 import 'package:fastuserapp/src/models/item.dart';
-import 'package:fastuserapp/src/widgets/add_on_item.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -9,12 +8,14 @@ class AddToCartDialouge extends StatefulWidget {
   final MenuItem item;
   final Map<String, dynamic> user;
   final String vendorName;
+  final int minOrder;
 
   const AddToCartDialouge({
     Key key,
     this.item,
     this.vendorName,
     this.user,
+    this.minOrder,
   }) : super(key: key);
 
   @override
@@ -25,7 +26,6 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
   List<String> _addOn = [];
   int itemQuantity = 1;
   int totalCost = 0;
-  bool _checked = false;
 
   @override
   void initState() {
@@ -46,6 +46,24 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            Center(
+              child: Container(
+                height: 150,
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey,
+                      offset: Offset(0, 5),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
             Text(
               widget.item.name.toUpperCase(),
               style: GoogleFonts.oswald(
@@ -61,28 +79,6 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
               ),
             ),
             Divider(),
-            Text(
-              "Add On's",
-              style: GoogleFonts.nunito(
-                color: Colors.orange[500],
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            ListView(
-              shrinkWrap: true,
-              children: widget.item.addOn
-                  .map((addOn) => AddOnItem(
-                        addOn: addOn,
-                        onChecked: (value) {
-                          if (value) {
-                            _addOn.add(addOn);
-                          } else {
-                            _addOn.remove(addOn);
-                          }
-                        },
-                      ))
-                  .toList(),
-            ),
             Expanded(child: Container()),
             Divider(),
             Row(
@@ -168,6 +164,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                               },
                             ),
                             widget.user,
+                            widget.minOrder,
                           );
                           Navigator.pop(context);
                         },

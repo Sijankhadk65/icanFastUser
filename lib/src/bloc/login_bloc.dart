@@ -42,7 +42,19 @@ class LoginBloc {
   Stream<FirebaseUser> get currentUserStateStream => _repo.onAuthStateChanged;
 
   signInWithGoogle() {
-    _repo.googleSignIn();
+    _repo.googleSignIn().then(
+      (value) async {
+        var token = await FirebaseMessaging().getToken();
+        await _repo.saveUserToken(
+          value.email,
+          {
+            "createdAt": DateTime.now().toIso8601String(),
+            "token": token,
+            "platform": Platform.operatingSystem,
+          },
+        );
+      },
+    );
   }
 
   Stream<bool> getUserStatus(String email) => _repo.getUserStatus(email);
@@ -73,11 +85,17 @@ class LoginBloc {
         "phoneNumber": int.parse(_phoneNumber),
         "photoURI": user.photoUrl,
         "type": "client",
-        "token": {
-          "createdAt": DateTime.now().toIso8601String(),
-          "token": token,
-          "platform": Platform.operatingSystem,
-        },
+      },
+    ).then(
+      (value) async {
+        await _repo.saveUserToken(
+          user.email,
+          {
+            "createdAt": DateTime.now().toIso8601String(),
+            "token": token,
+            "platform": Platform.operatingSystem,
+          },
+        );
       },
     );
   }

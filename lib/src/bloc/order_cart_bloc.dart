@@ -1,11 +1,10 @@
-import 'package:fastuserapp/src/widgets/add_to_cart_dialouge.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
+import 'package:google_map_location_picker/google_map_location_picker.dart';
 
 import '../models/order_ref.dart';
 import '../models/cart_items.dart';
-import '../models/item.dart';
 import '../models/online_order.dart';
 import '../resources/repository.dart';
 
@@ -26,6 +25,12 @@ class OrderCartBloc {
   Stream<List<OrderRef>> get orderRefrence => _orderRefrenceSubject.stream;
   Function(List<OrderRef>) get changeOrderRefrence =>
       _orderRefrenceSubject.sink.add;
+
+  final BehaviorSubject<List<OrderRef>> _closedRefrenceSubject =
+      BehaviorSubject<List<OrderRef>>();
+  Stream<List<OrderRef>> get closedRefrence => _closedRefrenceSubject.stream;
+  Function(List<OrderRef>) get changeClosedRefrences =>
+      _closedRefrenceSubject.sink.add;
 
   final BehaviorSubject<List<OnlineOrder>> _liveOrdersSubject =
       BehaviorSubject<List<OnlineOrder>>();
@@ -61,10 +66,11 @@ class OrderCartBloc {
   Stream<int> get cartsTotal => _cartsTotalSubject.stream;
   Function(int) get changeCartsTotal => _cartsTotalSubject.sink.add;
 
-  final BehaviorSubject<LocationData> _currentLocationSubject =
-      BehaviorSubject<LocationData>();
-  Stream<LocationData> get currentLocation => _currentLocationSubject.stream;
-  Function(LocationData) get changeCurrentLocation =>
+  final BehaviorSubject<Map<String, dynamic>> _currentLocationSubject =
+      BehaviorSubject<Map<String, dynamic>>();
+  Stream<Map<String, dynamic>> get currentLocation =>
+      _currentLocationSubject.stream;
+  Function(Map<String, dynamic>) get changeCurrentLocation =>
       _currentLocationSubject.sink.add;
   final BehaviorSubject<Address> _physicalLocationSubject =
       BehaviorSubject<Address>();
@@ -85,6 +91,12 @@ class OrderCartBloc {
   Stream<bool> get checkedOut => _checkedOutSubject.stream;
   Function(bool) get changeCheckoutStatus => _checkedOutSubject.sink.add;
 
+  final BehaviorSubject<bool> _transactionStatusSubject =
+      BehaviorSubject<bool>();
+  Stream<bool> get transactionStatus => _transactionStatusSubject.stream;
+  Function(bool) get changeTransactionStatus =>
+      _transactionStatusSubject.sink.add;
+
   final BehaviorSubject<String> _userPhoneNumberSubject =
       BehaviorSubject<String>();
   Stream<String> get userPhoneNumber => _userPhoneNumberSubject.stream;
@@ -97,6 +109,7 @@ class OrderCartBloc {
     changeSavingStatus(false);
     changeCheckoutStatus(false);
     getCurrentLocation();
+    changeTransactionStatus(false);
   }
 
   getOrderRefs(Map<String, dynamic> user) {
@@ -107,17 +120,23 @@ class OrderCartBloc {
     );
   }
 
+  getClosedOrderRefs(Map<String, dynamic> user) {
+    _repository.getClosedOrderRefs(user).listen((closedRef) {
+      changeClosedRefrences(closedRef);
+    });
+  }
+
   Future<void> deleteOrderRef(String refID) =>
       _repository.deleteOrderRefs(refID);
 
-  getLiveOrders(String refID) {
-    _repository.getLiveOrders(refID).listen((orders) {
+  getOrders(String refID) {
+    _repository.getOrders(refID).listen((orders) {
       changeLiveOrders(orders);
     });
   }
 
   void addNewOrder(BuildContext context, String vendor, CartItem newItem,
-      Map<String, dynamic> user) {
+      Map<String, dynamic> user, int minOrder) {
     if (_checkedOutSubject.value == true) {
       changeCheckoutStatus(false);
     }
@@ -133,6 +152,7 @@ class OrderCartBloc {
           "createdAt": DateTime.now().toIso8601String(),
           "status": [],
           "cartLength": 0,
+          "minOrder": minOrder,
         },
       );
       addItemsToCart(vendor, newItem);
@@ -315,8 +335,8 @@ class OrderCartBloc {
     _refID = UniqueKey().toString();
     return createRef({
       "vendors": _localOrders.map((e) => e['vendor']).toList(),
-      "lat": _currentLocationSubject.value.latitude,
-      "lang": _currentLocationSubject.value.longitude,
+      "lat": _currentLocationSubject.value['lat'],
+      "lang": _currentLocationSubject.value['lang'],
       "physicalLocation": _physicaLocation,
       "status": [],
       "isAssignedTo": {
@@ -406,14 +426,31 @@ class OrderCartBloc {
   getCurrentLocation() {
     Location _location = Location();
     _location.getLocation().then((value) {
-      print("This is the location: $value");
-      changeCurrentLocation(value);
-      getPhysicalLocation(value);
+      changeCurrentLocation(
+        {"lat": value.latitude, "lang": value.longitude},
+      );
+      getPhysicalLocation(
+        {"lat": value.latitude, "lang": value.longitude},
+      );
     });
   }
 
-  getPhysicalLocation(LocationData location) async {
-    final coordinates = new Coordinates(location.latitude, location.longitude);
+  getChangedLocation(Map<String, dynamic> location) {
+    if (location != null) {
+      changeCurrentLocation(
+        {"lat": location['lat'], "lang": location['lang']},
+      );
+      getPhysicalLocation(
+        {"lat": location['lat'], "lang": location['lang']},
+      );
+    } else {
+      getCurrentLocation();
+    }
+  }
+
+  getPhysicalLocation(Map<String, dynamic> location) async {
+    final coordinates = Coordinates(location['lat'], location['lang']);
+
     List<Address> addresses = [];
     print(coordinates);
     try {

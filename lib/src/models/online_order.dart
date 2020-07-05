@@ -21,6 +21,8 @@ abstract class OnlineOrder implements Built<OnlineOrder, OnlineOrderBuilder> {
   @nullable
   String get vendor;
   @nullable
+  int get minOrder;
+  @nullable
   BuiltList<CartItem> get items;
 
   OnlineOrder._();

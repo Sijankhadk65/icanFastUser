@@ -55,6 +55,12 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
         ..add(serializers.serialize(object.vendor,
             specifiedType: const FullType(String)));
     }
+    if (object.minOrder != null) {
+      result
+        ..add('minOrder')
+        ..add(serializers.serialize(object.minOrder,
+            specifiedType: const FullType(int)));
+    }
     if (object.items != null) {
       result
         ..add('items')
@@ -102,6 +108,10 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
           result.vendor = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
+        case 'minOrder':
+          result.minOrder = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int;
+          break;
         case 'items':
           result.items.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
@@ -129,6 +139,8 @@ class _$OnlineOrder extends OnlineOrder {
   @override
   final String vendor;
   @override
+  final int minOrder;
+  @override
   final BuiltList<CartItem> items;
 
   factory _$OnlineOrder([void Function(OnlineOrderBuilder) updates]) =>
@@ -141,6 +153,7 @@ class _$OnlineOrder extends OnlineOrder {
       this.status,
       this.createdAt,
       this.vendor,
+      this.minOrder,
       this.items})
       : super._();
 
@@ -161,6 +174,7 @@ class _$OnlineOrder extends OnlineOrder {
         status == other.status &&
         createdAt == other.createdAt &&
         vendor == other.vendor &&
+        minOrder == other.minOrder &&
         items == other.items;
   }
 
@@ -170,11 +184,13 @@ class _$OnlineOrder extends OnlineOrder {
         $jc(
             $jc(
                 $jc(
-                    $jc($jc($jc(0, totalPrice.hashCode), refID.hashCode),
-                        cartLength.hashCode),
-                    status.hashCode),
-                createdAt.hashCode),
-            vendor.hashCode),
+                    $jc(
+                        $jc($jc($jc(0, totalPrice.hashCode), refID.hashCode),
+                            cartLength.hashCode),
+                        status.hashCode),
+                    createdAt.hashCode),
+                vendor.hashCode),
+            minOrder.hashCode),
         items.hashCode));
   }
 
@@ -187,6 +203,7 @@ class _$OnlineOrder extends OnlineOrder {
           ..add('status', status)
           ..add('createdAt', createdAt)
           ..add('vendor', vendor)
+          ..add('minOrder', minOrder)
           ..add('items', items))
         .toString();
   }
@@ -220,6 +237,10 @@ class OnlineOrderBuilder implements Builder<OnlineOrder, OnlineOrderBuilder> {
   String get vendor => _$this._vendor;
   set vendor(String vendor) => _$this._vendor = vendor;
 
+  int _minOrder;
+  int get minOrder => _$this._minOrder;
+  set minOrder(int minOrder) => _$this._minOrder = minOrder;
+
   ListBuilder<CartItem> _items;
   ListBuilder<CartItem> get items =>
       _$this._items ??= new ListBuilder<CartItem>();
@@ -235,6 +256,7 @@ class OnlineOrderBuilder implements Builder<OnlineOrder, OnlineOrderBuilder> {
       _status = _$v.status?.toBuilder();
       _createdAt = _$v.createdAt;
       _vendor = _$v.vendor;
+      _minOrder = _$v.minOrder;
       _items = _$v.items?.toBuilder();
       _$v = null;
     }
@@ -266,6 +288,7 @@ class OnlineOrderBuilder implements Builder<OnlineOrder, OnlineOrderBuilder> {
               status: _status?.build(),
               createdAt: createdAt,
               vendor: vendor,
+              minOrder: minOrder,
               items: _items?.build());
     } catch (_) {
       String _$failedField;
