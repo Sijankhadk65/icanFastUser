@@ -23,7 +23,12 @@ class _OrderRefCardState extends State<OrderRefCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(10),
+      margin: EdgeInsets.only(
+        left: 10,
+        right: 10,
+        top: 20,
+        bottom: 20,
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
         boxShadow: <BoxShadow>[

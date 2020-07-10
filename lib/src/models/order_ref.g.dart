@@ -55,6 +55,13 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
             specifiedType:
                 const FullType(BuiltList, const [const FullType(String)])));
     }
+    if (object.vendors != null) {
+      result
+        ..add('vendors')
+        ..add(serializers.serialize(object.vendors,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
+    }
     if (object.physicalLocation != null) {
       result
         ..add('physicalLocation')
@@ -119,6 +126,12 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
                       const FullType(BuiltList, const [const FullType(String)]))
               as BuiltList<dynamic>);
           break;
+        case 'vendors':
+          result.vendors.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(String)]))
+              as BuiltList<dynamic>);
+          break;
         case 'physicalLocation':
           result.physicalLocation = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
@@ -156,6 +169,8 @@ class _$OrderRef extends OrderRef {
   @override
   final BuiltList<String> status;
   @override
+  final BuiltList<String> vendors;
+  @override
   final String physicalLocation;
   @override
   final User isAssignedTo;
@@ -174,6 +189,7 @@ class _$OrderRef extends OrderRef {
       this.deliveryCharge,
       this.createdAt,
       this.status,
+      this.vendors,
       this.physicalLocation,
       this.isAssignedTo,
       this.lat,
@@ -197,6 +213,7 @@ class _$OrderRef extends OrderRef {
         deliveryCharge == other.deliveryCharge &&
         createdAt == other.createdAt &&
         status == other.status &&
+        vendors == other.vendors &&
         physicalLocation == other.physicalLocation &&
         isAssignedTo == other.isAssignedTo &&
         lat == other.lat &&
@@ -213,12 +230,14 @@ class _$OrderRef extends OrderRef {
                         $jc(
                             $jc(
                                 $jc(
-                                    $jc($jc(0, totalCost.hashCode),
-                                        user.hashCode),
-                                    refID.hashCode),
-                                deliveryCharge.hashCode),
-                            createdAt.hashCode),
-                        status.hashCode),
+                                    $jc(
+                                        $jc($jc(0, totalCost.hashCode),
+                                            user.hashCode),
+                                        refID.hashCode),
+                                    deliveryCharge.hashCode),
+                                createdAt.hashCode),
+                            status.hashCode),
+                        vendors.hashCode),
                     physicalLocation.hashCode),
                 isAssignedTo.hashCode),
             lat.hashCode),
@@ -234,6 +253,7 @@ class _$OrderRef extends OrderRef {
           ..add('deliveryCharge', deliveryCharge)
           ..add('createdAt', createdAt)
           ..add('status', status)
+          ..add('vendors', vendors)
           ..add('physicalLocation', physicalLocation)
           ..add('isAssignedTo', isAssignedTo)
           ..add('lat', lat)
@@ -271,6 +291,11 @@ class OrderRefBuilder implements Builder<OrderRef, OrderRefBuilder> {
       _$this._status ??= new ListBuilder<String>();
   set status(ListBuilder<String> status) => _$this._status = status;
 
+  ListBuilder<String> _vendors;
+  ListBuilder<String> get vendors =>
+      _$this._vendors ??= new ListBuilder<String>();
+  set vendors(ListBuilder<String> vendors) => _$this._vendors = vendors;
+
   String _physicalLocation;
   String get physicalLocation => _$this._physicalLocation;
   set physicalLocation(String physicalLocation) =>
@@ -299,6 +324,7 @@ class OrderRefBuilder implements Builder<OrderRef, OrderRefBuilder> {
       _deliveryCharge = _$v.deliveryCharge;
       _createdAt = _$v.createdAt;
       _status = _$v.status?.toBuilder();
+      _vendors = _$v.vendors?.toBuilder();
       _physicalLocation = _$v.physicalLocation;
       _isAssignedTo = _$v.isAssignedTo?.toBuilder();
       _lat = _$v.lat;
@@ -333,6 +359,7 @@ class OrderRefBuilder implements Builder<OrderRef, OrderRefBuilder> {
               deliveryCharge: deliveryCharge,
               createdAt: createdAt,
               status: _status?.build(),
+              vendors: _vendors?.build(),
               physicalLocation: physicalLocation,
               isAssignedTo: _isAssignedTo?.build(),
               lat: lat,
@@ -345,6 +372,8 @@ class OrderRefBuilder implements Builder<OrderRef, OrderRefBuilder> {
 
         _$failedField = 'status';
         _status?.build();
+        _$failedField = 'vendors';
+        _vendors?.build();
 
         _$failedField = 'isAssignedTo';
         _isAssignedTo?.build();

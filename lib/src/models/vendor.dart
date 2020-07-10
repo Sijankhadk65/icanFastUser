@@ -30,6 +30,8 @@ abstract class Vendor implements Built<Vendor, VendorBuilder> {
   BuiltList<String> get categories;
   @nullable
   bool get isBusy;
+  @nullable
+  bool get isAway;
 
   factory Vendor([void Function(VendorBuilder) updates]) = _$Vendor;
   Vendor._();

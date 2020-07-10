@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
-import 'package:google_map_location_picker/google_map_location_picker.dart';
 
 import '../models/order_ref.dart';
 import '../models/cart_items.dart';
@@ -72,10 +73,10 @@ class OrderCartBloc {
       _currentLocationSubject.stream;
   Function(Map<String, dynamic>) get changeCurrentLocation =>
       _currentLocationSubject.sink.add;
-  final BehaviorSubject<Address> _physicalLocationSubject =
-      BehaviorSubject<Address>();
-  Stream<Address> get physicalLocation => _physicalLocationSubject.stream;
-  Function(Address) get changePhysicalLocation =>
+  final BehaviorSubject<String> _physicalLocationSubject =
+      BehaviorSubject<String>();
+  Stream<String> get physicalLocation => _physicalLocationSubject.stream;
+  Function(String) get changePhysicalLocation =>
       _physicalLocationSubject.sink.add;
 
   final BehaviorSubject<bool> _isSavingSubject = BehaviorSubject<bool>();
@@ -103,6 +104,37 @@ class OrderCartBloc {
   Function(String) get changeUserPhoneNumber =>
       _userPhoneNumberSubject.sink.add;
 
+  final BehaviorSubject<Map<String, dynamic>> _checkoutCoordinatesSubject =
+      BehaviorSubject<Map<String, dynamic>>();
+  Stream<Map<String, dynamic>> get checkoutCoordinates =>
+      _checkoutCoordinatesSubject.stream;
+  Function(Map<String, dynamic>) get changeChkeckoutCoordinates =>
+      _checkoutCoordinatesSubject.sink.add;
+  final BehaviorSubject<String> _checkoutPhysicalLocationSubject =
+      BehaviorSubject<String>();
+  Stream<String> get checkoutPhysicalLocation =>
+      _checkoutPhysicalLocationSubject.stream;
+  Function(String) get changeCheckoutPhysicalLocation =>
+      _checkoutPhysicalLocationSubject.sink.add;
+
+  final BehaviorSubject<String> _promoCodeSubject = BehaviorSubject<String>();
+  Stream<String> get promoCode => _promoCodeSubject.stream.transform(
+          StreamTransformer.fromHandlers(handleData: (String promoCode, sink) {
+        if (promoCode.isNotEmpty) {
+          sink.add(promoCode);
+        } else {
+          sink.addError("Add a vlaid Code");
+        }
+      }));
+  Function(String) get changePromoCode => _promoCodeSubject.sink.add;
+
+  final BehaviorSubject<bool> _promoCodeIsUsedSubject = BehaviorSubject<bool>();
+  Stream<bool> get promoCodeIsUsed => _promoCodeIsUsedSubject.stream;
+  Function(bool) get changePromoUsedStateUsed =>
+      _promoCodeIsUsedSubject.sink.add;
+
+  String get orderRefrenceID => _refID;
+
   OrderCartBloc() {
     changeTotalLenght(0);
     changeTotalPrice(0);
@@ -110,6 +142,7 @@ class OrderCartBloc {
     changeCheckoutStatus(false);
     getCurrentLocation();
     changeTransactionStatus(false);
+    changePromoUsedStateUsed(false);
   }
 
   getOrderRefs(Map<String, dynamic> user) {
@@ -140,6 +173,9 @@ class OrderCartBloc {
     if (_checkedOutSubject.value == true) {
       changeCheckoutStatus(false);
     }
+    if (_promoCodeIsUsedSubject.value == true) {
+      changeCheckoutStatus(false);
+    }
     if (!_localOrders
         .map((e) => e['vendor'].toLowerCase())
         .toList()
@@ -164,6 +200,33 @@ class OrderCartBloc {
           _localOrders.map((order) => parseJsonToOnlineOrder(order)).toList());
     }
     getCartsTotal();
+  }
+
+  applyPromoCode(String email) {
+    _repository.getUser(email).listen(
+      (user) {
+        if (user.promoCodes.contains(_promoCodeSubject.value)) {
+          changePromoUsedStateUsed(true);
+        } else {
+          _repository.getPromoCode(_promoCodeSubject.value).listen(
+            (disRate) async {
+              _cartsTotal = _localOrders
+                  .map((order) => order['totalPrice'])
+                  .toList()
+                  .fold(0, (previousValue, element) => previousValue + element);
+              changeCartsTotal(
+                  _cartsTotal - (_cartsTotal * (disRate / 100)).toInt());
+              await _repository.addPromoCode(
+                email,
+                _promoCodeSubject.value,
+                user.promoCodes.toList(),
+              );
+              changePromoUsedStateUsed(true);
+            },
+          );
+        }
+      },
+    );
   }
 
   void addItemsToCart(String vendor, CartItem newItem) {
@@ -335,9 +398,9 @@ class OrderCartBloc {
     _refID = UniqueKey().toString();
     return createRef({
       "vendors": _localOrders.map((e) => e['vendor']).toList(),
-      "lat": _currentLocationSubject.value['lat'],
-      "lang": _currentLocationSubject.value['lang'],
-      "physicalLocation": _physicaLocation,
+      "lat": _checkoutCoordinatesSubject.value['lat'],
+      "lang": _checkoutCoordinatesSubject.value['lang'],
+      "physicalLocation": _checkoutPhysicalLocationSubject.value,
       "status": [],
       "isAssignedTo": {
         "name": "",
@@ -346,11 +409,9 @@ class OrderCartBloc {
       "refID": _refID,
       "user": user,
       "isPaid": false,
+      "isDelivered": false,
       "createdAt": DateTime.now().toIso8601String(),
-      "totalCost": _localOrders
-          .map((e) => e['totalPrice'])
-          .toList()
-          .fold(0, (previousValue, element) => previousValue + element),
+      "totalCost": _cartsTotalSubject.value,
       "deliveryCharge": 20,
     }).whenComplete(() {
       _localOrders.forEach((order) async {
@@ -448,19 +509,35 @@ class OrderCartBloc {
     }
   }
 
-  getPhysicalLocation(Map<String, dynamic> location) async {
-    final coordinates = Coordinates(location['lat'], location['lang']);
+  getCheckoutLocation(
+      {Map<String, dynamic> coordinates, String phycialLocation}) {
+    if (coordinates == null && phycialLocation == null) {
+      changeChkeckoutCoordinates(_currentLocationSubject.value);
+      changeCheckoutPhysicalLocation(_physicalLocationSubject.value);
+    } else {
+      changeChkeckoutCoordinates(coordinates);
+      changeCheckoutPhysicalLocation(phycialLocation);
+    }
+  }
 
-    List<Address> addresses = [];
-    print(coordinates);
-    try {
-      addresses =
-          await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      var first = addresses.first;
-      _physicaLocation = first.addressLine;
-      changePhysicalLocation(first);
-    } catch (e) {
-      print(e);
+  getPhysicalLocation(Map<String, dynamic> location,
+      {String addressLine}) async {
+    if (addressLine == null) {
+      final coordinates = Coordinates(location['lat'], location['lang']);
+
+      List<Address> addresses = [];
+      print(coordinates);
+      try {
+        addresses =
+            await Geocoder.local.findAddressesFromCoordinates(coordinates);
+        var first = addresses.first;
+        _physicaLocation = first.addressLine;
+        changePhysicalLocation(first.addressLine);
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      changePhysicalLocation(addressLine);
     }
   }
 

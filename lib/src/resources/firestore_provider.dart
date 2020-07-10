@@ -109,6 +109,16 @@ class FirestoreProvider {
         .updateData(newData);
   }
 
+  Future<void> addPromoCode(String email, String code, List<String> codes) =>
+      _firestore.collection("users").document(email).updateData(
+        {
+          'promoCodes': [
+            ...codes,
+            code,
+          ],
+        },
+      );
+
   // Stream<DocumentSnapshot> checkForUser(String email) =>
   //     _firestore.document("users/$email").snapshots();
 
@@ -149,4 +159,18 @@ class FirestoreProvider {
           .collection("tokens")
           .document(tokenData['token'])
           .setData(tokenData);
+
+  Future<void> updateUserHomeLocation(
+          {Map<String, dynamic> home, String email}) =>
+      _firestore.document("users/$email").updateData({
+        "home": home,
+      });
+  Future<void> updateUserOfficeLocation(
+          {Map<String, dynamic> office, String email}) =>
+      _firestore.document("users/$email").updateData({
+        "office": office,
+      });
+
+  Stream<DocumentSnapshot> getPromoCode(String code) =>
+      _firestore.document("promoCodes/$code").snapshots();
 }

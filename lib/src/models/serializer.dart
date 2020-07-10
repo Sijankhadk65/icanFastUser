@@ -13,6 +13,7 @@ import '../models/vendor.dart';
 import './cart_items.dart';
 import './item.dart';
 import './online_order.dart';
+import './user_location.dart';
 
 part 'serializer.g.dart';
 
@@ -27,6 +28,7 @@ part 'serializer.g.dart';
     Rating,
     CarouselItem,
     OffersItem,
+    UserLocation,
   ],
 )
 final Serializers serializers = _$serializers;

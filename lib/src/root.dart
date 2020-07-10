@@ -1,6 +1,6 @@
 import 'package:fastuserapp/src/models/user.dart';
+import 'package:fastuserapp/src/models/user_location.dart';
 import 'package:fastuserapp/src/screens/user_info_screen.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -91,6 +91,12 @@ class _RootState extends State<Root> {
                                                 "email": snapshot.data.email,
                                                 "phoneNumber":
                                                     snapshot.data.phoneNumber,
+                                                "home":
+                                                    convertUserLocationToJson(
+                                                        snapshot.data.home),
+                                                "office":
+                                                    convertUserLocationToJson(
+                                                        snapshot.data.office),
                                               },
                                             );
                                             break;
@@ -99,8 +105,14 @@ class _RootState extends State<Root> {
                                                 "The task has completed");
                                             break;
                                         }
-                                      })
-                                  : UserInfoScreen(
+                                        return null;
+                                      },
+                                    )
+                                  :
+                                  // IntroPage(
+                                  //     user: userSnapshot.data,
+                                  //   );
+                                  UserInfoScreen(
                                       user: userSnapshot.data,
                                     );
                               break;

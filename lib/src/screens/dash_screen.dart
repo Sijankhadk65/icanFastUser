@@ -6,7 +6,6 @@ import 'package:fastuserapp/src/models/carousel_item.dart';
 import 'package:fastuserapp/src/screens/vendors_screen.dart';
 import 'package:fastuserapp/src/widgets/custom_tab_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class DashScreen extends StatefulWidget {
@@ -55,7 +54,9 @@ class _DashScreenState extends State<DashScreen> {
                       itemBuilder: (context, index) => CachedNetworkImage(
                         imageUrl: snapshot.data[index].photoURI,
                         progressIndicatorBuilder: (context, msg, progress) =>
-                            CircularProgressIndicator(),
+                            Center(
+                          child: CircularProgressIndicator(),
+                        ),
                         imageBuilder: (context, imageProvider) => Container(
                           margin: EdgeInsets.only(
                             top: 5,

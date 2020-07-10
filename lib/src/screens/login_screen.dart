@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Center(
                 child: Material(
                   elevation: 10,
-                  color: Color(0xFFdeb853),
+                  color: Colors.orange,
                   borderRadius: BorderRadius.circular(10),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -71,16 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.only(left: 20.0, right: 20),
                 child: Column(
                   children: <Widget>[
-                    SocialLoginButton(
-                        onPressed: () {},
-                        fillColour: Color(0xFF0D3C75),
-                        spalshColour: Color(0xFF005AC8),
-                        asset: "assets/svg/facebook.svg",
-                        name: "Facebook"),
-                    Text(
-                      "Or",
-                      style: GoogleFonts.montserrat(color: Colors.black38),
-                    ),
                     SocialLoginButton(
                         onPressed: () {
                           _loginBloc.signInWithGoogle();

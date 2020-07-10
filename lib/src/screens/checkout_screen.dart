@@ -1,9 +1,11 @@
 import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
 import 'package:fastuserapp/src/models/online_order.dart';
+import 'package:fastuserapp/src/screens/change_phone_number_dialog.dart';
+import 'package:fastuserapp/src/widgets/changable_displayer.dart';
+import 'package:fastuserapp/src/widgets/location_selectors.dart';
+import 'package:fastuserapp/src/widgets/order_bottom_sheet.dart';
 import 'package:flare_flutter/flare_actor.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_map_location_picker/google_map_location_picker.dart';
 
@@ -18,11 +20,11 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   TextEditingController _phoneNumberController;
   String _newNumber = "";
-  Map<String, dynamic> _location;
+  bool _chooseLocation = false;
 
-  _changeLocation(Map<String, dynamic> location) {
+  _switchToFavouredLocation(bool value) {
     this.setState(() {
-      _location = location;
+      _chooseLocation = value;
     });
   }
 
@@ -49,8 +51,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     orderCartBloc.getLocalOrder();
     orderCartBloc.getCartsTotal();
-    orderCartBloc.getChangedLocation(_location);
+    orderCartBloc.getCheckoutLocation();
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text("Checkout"),
       ),
@@ -61,11 +64,51 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               return snapshot.data == true
                   ? Container(
                       child: Center(
-                        child: FlareActor(
-                          "assets/flare/check.flr",
-                          animation: "check",
-                          alignment: Alignment.center,
-                          fit: BoxFit.cover,
+                        child: Column(
+                          children: <Widget>[
+                            Expanded(
+                              flex: 4,
+                              child: FlareActor(
+                                "assets/flare/check.flr",
+                                animation: "check",
+                                alignment: Alignment.center,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Text(
+                              "Your Order has been placed, go to the order section to check it out.",
+                              style: GoogleFonts.oswald(),
+                            ),
+                            RawMaterialButton(
+                              onPressed: () {
+                                showBottomSheet(
+                                  context: context,
+                                  builder: (context) => OrderBottomSheet(),
+                                );
+                              },
+                              padding: EdgeInsets.only(
+                                left: 10,
+                                right: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  5,
+                                ),
+                              ),
+                              child: Text(
+                                "Look at your orders",
+                                style: GoogleFonts.nunito(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              fillColor: Colors.orange[800],
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Container(),
+                            ),
+                          ],
                         ),
                       ),
                     )
@@ -81,181 +124,59 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: <Widget>[
-                                  Text(
-                                    "${widget.user['name']},",
-                                    style: GoogleFonts.nunito(
-                                      fontSize: 23,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  StreamBuilder<String>(
-                                    stream: orderCartBloc.userPhoneNumber,
-                                    builder: (context, snapshot) {
-                                      return Container(
-                                        padding: EdgeInsets.only(
-                                          left: 5,
-                                        ),
-                                        child: RichText(
-                                          text: TextSpan(
-                                            style: GoogleFonts.nunito(
-                                              color: Colors.black,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                            text: snapshot.data.toString(),
-                                            children: [
-                                              TextSpan(
-                                                text: " (change number)",
-                                                recognizer:
-                                                    TapGestureRecognizer()
-                                                      ..onTap = () {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (context) =>
-                                                              Dialog(
-                                                            child:
-                                                                LayoutBuilder(
-                                                              builder: (context,
-                                                                  constraint) {
-                                                                return Container(
-                                                                  height: 150,
-                                                                  child:
-                                                                      Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            10),
-                                                                    child:
-                                                                        Column(
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children: <
-                                                                          Widget>[
-                                                                        Text(
-                                                                          "Enter a different number",
-                                                                          style:
-                                                                              GoogleFonts.nunito(
-                                                                            fontWeight:
-                                                                                FontWeight.w700,
-                                                                          ),
-                                                                        ),
-                                                                        TextField(
-                                                                          controller:
-                                                                              _phoneNumberController,
-                                                                          onChanged:
-                                                                              _changeNewNumber,
-                                                                        ),
-                                                                        Row(
-                                                                          children: <
-                                                                              Widget>[
-                                                                            RawMaterialButton(
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              child: Text(
-                                                                                "Cancel",
-                                                                                style: GoogleFonts.nunito(
-                                                                                  fontWeight: FontWeight.w600,
-                                                                                  color: Colors.white,
-                                                                                ),
-                                                                              ),
-                                                                              fillColor: Colors.grey,
-                                                                              shape: RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.circular(
-                                                                                  5,
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                            SizedBox(
-                                                                              width: 10,
-                                                                            ),
-                                                                            RawMaterialButton(
-                                                                              onPressed: () {
-                                                                                orderCartBloc.changeUserPhoneNumber(_newNumber);
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              child: Text(
-                                                                                "Change",
-                                                                                style: GoogleFonts.nunito(
-                                                                                  fontWeight: FontWeight.w600,
-                                                                                  color: Colors.white,
-                                                                                ),
-                                                                              ),
-                                                                              fillColor: Colors.blue,
-                                                                              shape: RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.circular(
-                                                                                  5,
-                                                                                ),
-                                                                              ),
-                                                                            )
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                style: GoogleFonts.nunito(
-                                                  color: Colors.blue,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                              Text("Delivery To:"),
+                              Text(
+                                "${widget.user['name']},",
+                                style: GoogleFonts.nunito(
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              StreamBuilder<String>(
+                                stream: orderCartBloc.userPhoneNumber,
+                                builder: (context, snapshot) {
+                                  return ChangableDisplayer(
+                                    primaryText: snapshot.data.toString(),
+                                    secondaryText: " ( change phone number ) ",
+                                    displayChanger: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            ChangePhoneNumberDialog(
+                                          phoneNumberController:
+                                              _phoneNumberController,
+                                          onPhoneNumberChanged:
+                                              _changeNewNumber,
+                                          onChangePressed: () {
+                                            orderCartBloc.changeUserPhoneNumber(
+                                                _newNumber);
+                                            Navigator.pop(context);
+                                          },
                                         ),
                                       );
                                     },
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: StreamBuilder<Address>(
-                                      stream: orderCartBloc.physicalLocation,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasError)
-                                          return Text(
-                                              "Error: ${snapshot.error}");
-                                        switch (snapshot.connectionState) {
-                                          case ConnectionState.none:
-                                            return Text("Awaiting Bids...");
-                                            break;
-                                          case ConnectionState.waiting:
-                                            return Center(
-                                              child: LinearProgressIndicator(),
-                                            );
-                                            break;
-                                          case ConnectionState.active:
-                                            return Text(
-                                              snapshot.data.addressLine,
-                                              style: GoogleFonts.montserrat(
-                                                fontStyle: FontStyle.italic,
-                                                fontSize: 12,
-                                              ),
-                                            );
-                                            break;
-                                          case ConnectionState.done:
-                                            return Text(
-                                                "The task has completed");
-                                            break;
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                  RichText(
-                                    text: TextSpan(
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () async {
+                              StreamBuilder<String>(
+                                stream: orderCartBloc.checkoutPhysicalLocation,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError)
+                                    return Text("Error: ${snapshot.error}");
+                                  switch (snapshot.connectionState) {
+                                    case ConnectionState.none:
+                                      return Text("Awaiting Bids...");
+                                      break;
+                                    case ConnectionState.waiting:
+                                      return Center(
+                                        child: LinearProgressIndicator(),
+                                      );
+                                      break;
+                                    case ConnectionState.active:
+                                      return ChangableDisplayer(
+                                        primaryText: snapshot.data,
+                                        secondaryText: " ( change location )",
+                                        displayChanger: () async {
                                           LocationResult result =
                                               await showLocationPicker(
                                             context,
@@ -265,27 +186,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                             myLocationButtonEnabled: true,
                                             layersButtonEnabled: true,
                                           );
-                                          _changeLocation(
-                                            {
+                                          orderCartBloc.getCheckoutLocation(
+                                            coordinates: {
                                               "lat": result.latLng.latitude,
                                               "lang": result.latLng.longitude,
                                             },
+                                            phycialLocation: result.address,
                                           );
-                                          print('Location: ${result.latLng}');
                                         },
-                                      text: " ( change location )",
-                                      style: GoogleFonts.nunito(
-                                        color: Colors.blue,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )
+                                      );
+
+                                      break;
+                                    case ConnectionState.done:
+                                      return Text("The task has completed");
+                                      break;
+                                  }
+                                  return null;
+                                },
+                              ),
                             ],
                           ),
                         ),
+                        Divider(),
                         Expanded(
                           child: StreamBuilder<List<OnlineOrder>>(
                             stream: orderCartBloc.localOrder,
@@ -297,162 +219,361 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         right: 10,
                                       ),
                                       child: ListView(
-                                        shrinkWrap: true,
-                                        children: snapshot.data
-                                            .map<Widget>((order) => Column(
-                                                  children: <Widget>[
-                                                    Divider(),
-                                                    Row(
-                                                      children: <Widget>[
-                                                        Expanded(
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: <Widget>[
-                                                              Text(
-                                                                order.vendor
-                                                                    .toUpperCase(),
-                                                                style: GoogleFonts
-                                                                    .montserrat(
-                                                                  fontSize: 20,
-                                                                  letterSpacing:
-                                                                      1.5,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w800,
+                                          shrinkWrap: true,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(
+                                                left: 10,
+                                                right: 10,
+                                              ),
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Row(
+                                                    children: <Widget>[
+                                                      Text(
+                                                        "Choose a saved location",
+                                                        style:
+                                                            GoogleFonts.nunito(
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                        ),
+                                                      ),
+                                                      Switch.adaptive(
+                                                        value: _chooseLocation,
+                                                        onChanged:
+                                                            _switchToFavouredLocation,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  _chooseLocation
+                                                      ? StreamBuilder<String>(
+                                                          stream: orderCartBloc
+                                                              .checkoutPhysicalLocation,
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            return Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: <
+                                                                  Widget>[
+                                                                Expanded(
+                                                                  child:
+                                                                      LocationSelector(
+                                                                    name:
+                                                                        "HOME",
+                                                                    isActive: snapshot.data ==
+                                                                            widget.user['home']['physicalLocation']
+                                                                        ? true
+                                                                        : false,
+                                                                    changeLocation: snapshot.data ==
+                                                                            widget.user['home']['physicalLocation']
+                                                                        ? () {}
+                                                                        : () {
+                                                                            orderCartBloc.getCheckoutLocation(
+                                                                              coordinates: {
+                                                                                "lat": widget.user['home']['lat'],
+                                                                                "lang": widget.user['home']['lang'],
+                                                                              },
+                                                                              phycialLocation: widget.user['home']['physicalLocation'],
+                                                                            );
+                                                                          },
+                                                                    margins:
+                                                                        EdgeInsets
+                                                                            .only(
+                                                                      right: 5,
+                                                                    ),
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                              ListView(
-                                                                shrinkWrap:
-                                                                    true,
-                                                                physics:
-                                                                    ClampingScrollPhysics(),
-                                                                children: order
-                                                                    .items
-                                                                    .map(
-                                                                      (item) =>
-                                                                          RichText(
-                                                                        text:
-                                                                            TextSpan(
-                                                                          text:
-                                                                              item.name,
-                                                                          children: [
-                                                                            TextSpan(
-                                                                              text: " x${item.quantity}",
+                                                                Expanded(
+                                                                  child:
+                                                                      LocationSelector(
+                                                                    name:
+                                                                        "OFFICE",
+                                                                    isActive: snapshot.data ==
+                                                                            widget.user['office']['physicalLocation']
+                                                                        ? true
+                                                                        : false,
+                                                                    changeLocation: snapshot.data ==
+                                                                            widget.user['office']['physicalLocation']
+                                                                        ? () {}
+                                                                        : () {
+                                                                            orderCartBloc.getCheckoutLocation(
+                                                                              coordinates: {
+                                                                                "lat": widget.user['office']['lat'],
+                                                                                "lang": widget.user['office']['lang'],
+                                                                              },
+                                                                              phycialLocation: widget.user['office']['physicalLocation'],
+                                                                            );
+                                                                          },
+                                                                    margins:
+                                                                        EdgeInsets
+                                                                            .only(
+                                                                      left: 5,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          })
+                                                      : Container(),
+                                                ],
+                                              ),
+                                            ),
+                                            ...snapshot.data
+                                                .map<Widget>((order) => Column(
+                                                      children: <Widget>[
+                                                        Divider(),
+                                                        Row(
+                                                          children: <Widget>[
+                                                            Expanded(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: <
+                                                                    Widget>[
+                                                                  Text(
+                                                                    order.vendor
+                                                                        .toUpperCase(),
+                                                                    style: GoogleFonts
+                                                                        .montserrat(
+                                                                      fontSize:
+                                                                          20,
+                                                                      letterSpacing:
+                                                                          1.5,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w800,
+                                                                    ),
+                                                                  ),
+                                                                  ListView(
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    physics:
+                                                                        ClampingScrollPhysics(),
+                                                                    children: order
+                                                                        .items
+                                                                        .map(
+                                                                          (item) =>
+                                                                              RichText(
+                                                                            text:
+                                                                                TextSpan(
+                                                                              text: item.name,
+                                                                              children: [
+                                                                                TextSpan(
+                                                                                  text: " x${item.quantity}",
+                                                                                  style: GoogleFonts.nunito(
+                                                                                    fontSize: 10,
+                                                                                    color: Colors.black,
+                                                                                    fontWeight: FontWeight.w800,
+                                                                                  ),
+                                                                                ),
+                                                                                TextSpan(
+                                                                                  text: ",",
+                                                                                ),
+                                                                              ],
                                                                               style: GoogleFonts.nunito(
                                                                                 fontSize: 10,
                                                                                 color: Colors.black,
-                                                                                fontWeight: FontWeight.w800,
                                                                               ),
                                                                             ),
-                                                                            TextSpan(
-                                                                              text: ",",
-                                                                            ),
-                                                                          ],
-                                                                          style:
-                                                                              GoogleFonts.nunito(
-                                                                            fontSize:
-                                                                                10,
-                                                                            color:
-                                                                                Colors.black,
                                                                           ),
+                                                                        )
+                                                                        .toList(),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: <
+                                                                  Widget>[
+                                                                Container(
+                                                                  margin:
+                                                                      EdgeInsets
+                                                                          .only(
+                                                                    bottom: 7.5,
+                                                                  ),
+                                                                  child:
+                                                                      Material(
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        800],
+                                                                    elevation:
+                                                                        5,
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(5),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets
+                                                                              .only(
+                                                                        left:
+                                                                            10,
+                                                                        right:
+                                                                            10,
+                                                                        top: 5,
+                                                                        bottom:
+                                                                            5,
+                                                                      ),
+                                                                      child:
+                                                                          Text(
+                                                                        "Total Items: ${order.cartLength}",
+                                                                        style: GoogleFonts
+                                                                            .nunito(
+                                                                          color:
+                                                                              Colors.white,
+                                                                          fontWeight:
+                                                                              FontWeight.w800,
                                                                         ),
                                                                       ),
-                                                                    )
-                                                                    .toList(),
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: <Widget>[
-                                                            Container(
-                                                              margin: EdgeInsets
-                                                                  .only(
-                                                                bottom: 7.5,
-                                                              ),
-                                                              child: Material(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    800],
-                                                                elevation: 5,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            5),
-                                                                child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                    left: 10,
-                                                                    right: 10,
-                                                                    top: 5,
-                                                                    bottom: 5,
-                                                                  ),
-                                                                  child: Text(
-                                                                    "Total Items: ${order.cartLength}",
-                                                                    style: GoogleFonts
-                                                                        .nunito(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w800,
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ),
-                                                            Container(
-                                                              child: Material(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    800],
-                                                                elevation: 5,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            5),
-                                                                child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                    left: 10,
-                                                                    right: 10,
-                                                                    top: 5,
-                                                                    bottom: 5,
-                                                                  ),
-                                                                  child: Text(
-                                                                    "Total Price: ${order.totalPrice}",
-                                                                    style: GoogleFonts
-                                                                        .nunito(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w800,
+                                                                Container(
+                                                                  child:
+                                                                      Material(
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        800],
+                                                                    elevation:
+                                                                        5,
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(5),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets
+                                                                              .only(
+                                                                        left:
+                                                                            10,
+                                                                        right:
+                                                                            10,
+                                                                        top: 5,
+                                                                        bottom:
+                                                                            5,
+                                                                      ),
+                                                                      child:
+                                                                          Text(
+                                                                        "Total Price: ${order.totalPrice}",
+                                                                        style: GoogleFonts
+                                                                            .nunito(
+                                                                          color:
+                                                                              Colors.white,
+                                                                          fontWeight:
+                                                                              FontWeight.w800,
+                                                                        ),
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ),
+                                                              ],
+                                                            )
                                                           ],
-                                                        )
+                                                        ),
+                                                        Divider(),
                                                       ],
-                                                    ),
-                                                    Divider(),
-                                                  ],
-                                                ))
-                                            .toList(),
-                                      ),
+                                                    ))
+                                                .toList(),
+                                          ]),
                                     )
                                   : Text("No data");
                             },
                           ),
+                        ),
+                        Divider(),
+                        Container(
+                          margin: EdgeInsets.only(
+                            left: 10,
+                            right: 10,
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.only(
+                                    right: 10,
+                                  ),
+                                  child: Material(
+                                    elevation: 5,
+                                    borderRadius: BorderRadius.circular(
+                                      5,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 10,
+                                        right: 10,
+                                      ),
+                                      child: StreamBuilder<String>(
+                                          stream: orderCartBloc.promoCode,
+                                          builder: (context, snapshot) {
+                                            return TextField(
+                                              onChanged:
+                                                  orderCartBloc.changePromoCode,
+                                              decoration: InputDecoration(
+                                                hintText:
+                                                    "Enter the promo code here...",
+                                                hintStyle: GoogleFonts.nunito(
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              StreamBuilder<bool>(
+                                  stream: orderCartBloc.promoCodeIsUsed,
+                                  builder: (context, snapshot) {
+                                    return RawMaterialButton(
+                                      fillColor: snapshot.data
+                                          ? Colors.grey
+                                          : Colors.blue[800],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          5,
+                                        ),
+                                      ),
+                                      onPressed: snapshot.data
+                                          ? null
+                                          : () {
+                                              orderCartBloc.applyPromoCode(
+                                                  widget.user['email']);
+                                            },
+                                      child: Text(
+                                        "Apply Code",
+                                        style: GoogleFonts.nunito(
+                                          color: snapshot.data
+                                              ? Colors.black26
+                                              : Colors.white,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                            ],
+                          ),
+                        ),
+                        StreamBuilder<bool>(
+                          stream: orderCartBloc.promoCodeIsUsed,
+                          builder: (context, snapshot) {
+                            return snapshot.data
+                                ? Text(
+                                    "You have used a promo code!",
+                                    style: GoogleFonts.nunito(
+                                      color: Colors.green,
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                : Container();
+                          },
                         ),
                         Divider(),
                         StreamBuilder<int>(
@@ -515,94 +636,55 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ],
                           ),
                         ),
-                        Container(
-                          margin: EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                            top: 5,
-                            bottom: 5,
-                          ),
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(
-                                  "VAT",
-                                  style: GoogleFonts.nunito(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                "13%",
-                                style: GoogleFonts.nunito(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 16,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                            top: 5,
-                            bottom: 5,
-                          ),
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(
-                                  "Service Charge",
-                                  style: GoogleFonts.nunito(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                "10%",
-                                style: GoogleFonts.nunito(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 16,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
                         StreamBuilder<int>(
-                            stream: orderCartBloc.cartsTotal,
-                            builder: (context, snapshot) {
-                              return Container(
-                                margin: EdgeInsets.only(
-                                  left: 10,
-                                  right: 10,
-                                  top: 5,
-                                  bottom: 5,
-                                ),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Text(
-                                        "Total",
+                          stream: orderCartBloc.cartsTotal,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError)
+                              return Text("Error: ${snapshot.error}");
+                            switch (snapshot.connectionState) {
+                              case ConnectionState.none:
+                                return Text("Awaiting bids....");
+                                break;
+                              case ConnectionState.waiting:
+                                return LinearProgressIndicator();
+                                break;
+                              case ConnectionState.active:
+                                return Container(
+                                  margin: EdgeInsets.only(
+                                    left: 10,
+                                    right: 10,
+                                    top: 5,
+                                    bottom: 5,
+                                  ),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Text(
+                                          "Total",
+                                          style: GoogleFonts.nunito(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        "Rs.${snapshot.data + 20}",
                                         style: GoogleFonts.nunito(
                                           fontWeight: FontWeight.w800,
                                           fontSize: 16,
                                         ),
-                                      ),
-                                    ),
-                                    Text(
-                                      "Rs.${snapshot.data + (snapshot.data * 0.1) + (snapshot.data * 0.13) + 20}",
-                                      style: GoogleFonts.nunito(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 16,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
-                            }),
+                                      )
+                                    ],
+                                  ),
+                                );
+                                break;
+                              case ConnectionState.done:
+                                return Text("The task has completed");
+                                break;
+                            }
+                            return null;
+                          },
+                        ),
                         Divider(),
                         Container(
                           height: 65,
@@ -616,29 +698,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     .saveOrder(
                                   widget.user,
                                 )
-                                    .whenComplete(() {
-                                  orderCartBloc.changeTransactionStatus(false);
-                                  orderCartBloc.changeCheckoutStatus(true);
-                                });
+                                    .whenComplete(
+                                  () {
+                                    orderCartBloc
+                                        .changeTransactionStatus(false);
+                                    orderCartBloc.changeCheckoutStatus(true);
+                                  },
+                                );
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child: Center(
                                   child: StreamBuilder<bool>(
-                                      stream: orderCartBloc.transactionStatus,
-                                      builder: (context, snapshot) {
-                                        return snapshot.data
-                                            ? CircularProgressIndicator(
-                                                backgroundColor: Colors.green,
-                                              )
-                                            : Text(
-                                                "Check Out!",
-                                                style: GoogleFonts.oswald(
-                                                  color: Colors.white,
-                                                  fontSize: 25,
-                                                ),
-                                              );
-                                      }),
+                                    initialData: false,
+                                    stream: orderCartBloc.transactionStatus,
+                                    builder: (context, snapshot) {
+                                      return snapshot.data
+                                          ? CircularProgressIndicator(
+                                              backgroundColor: Colors.green,
+                                            )
+                                          : Text(
+                                              "Check Out!",
+                                              style: GoogleFonts.oswald(
+                                                color: Colors.white,
+                                                fontSize: 25,
+                                              ),
+                                            );
+                                    },
+                                  ),
                                 ),
                               ),
                             ),

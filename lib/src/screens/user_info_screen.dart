@@ -1,7 +1,10 @@
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:fastuserapp/src/bloc/login_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_map_location_picker/google_map_location_picker.dart';
+
 import 'package:provider/provider.dart';
 
 class UserInfoScreen extends StatefulWidget {
@@ -103,6 +106,249 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                                 ),
                               );
                             }),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey[300],
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  5,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 10,
+                                  right: 10,
+                                  top: 5,
+                                  bottom: 5,
+                                ),
+                                child: Text(
+                                  "HOME",
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20,
+                                    color: Colors.grey[300],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 15,
+                            ),
+                            StreamBuilder<Map<String, dynamic>>(
+                                stream: _loginBloc.homeLocation,
+                                builder: (context, snapshot) {
+                                  return snapshot.hasData
+                                      ? Expanded(
+                                          child: Row(
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: Text(
+                                                  snapshot
+                                                      .data['physicalLocation']
+                                                      .toString()
+                                                      .toUpperCase(),
+                                                  style: GoogleFonts.nunito(
+                                                    color: Colors.orange,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon:
+                                                    Icon(EvaIcons.edit2Outline),
+                                                onPressed: () async {
+                                                  LocationResult result =
+                                                      await showLocationPicker(
+                                                    context,
+                                                    "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                                    automaticallyAnimateToCurrentLocation:
+                                                        true,
+                                                    myLocationButtonEnabled:
+                                                        true,
+                                                    layersButtonEnabled: true,
+                                                  );
+                                                  _loginBloc.changeHomeLocation(
+                                                    {
+                                                      "lat": result
+                                                          .latLng.latitude,
+                                                      "lang": result
+                                                          .latLng.longitude,
+                                                      "physicalLocation":
+                                                          result.address,
+                                                    },
+                                                  );
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      : RawMaterialButton(
+                                          onPressed: () async {
+                                            LocationResult result =
+                                                await showLocationPicker(
+                                              context,
+                                              "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                              automaticallyAnimateToCurrentLocation:
+                                                  true,
+                                              myLocationButtonEnabled: true,
+                                              layersButtonEnabled: true,
+                                            );
+                                            _loginBloc.changeHomeLocation(
+                                              {
+                                                "lat": result.latLng.latitude,
+                                                "lang": result.latLng.longitude,
+                                                "physicalLocation":
+                                                    result.address,
+                                              },
+                                            );
+                                          },
+                                          padding: EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              5,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            "SELECT A LOCATION",
+                                            style: GoogleFonts.nunito(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                          fillColor: Colors.orange,
+                                        );
+                                })
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey[300],
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  5,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 10,
+                                  right: 10,
+                                  top: 5,
+                                  bottom: 5,
+                                ),
+                                child: Text(
+                                  "OFFICE",
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20,
+                                    color: Colors.grey[300],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 15,
+                            ),
+                            StreamBuilder<Map<String, dynamic>>(
+                                stream: _loginBloc.officeLocation,
+                                builder: (context, snapshot) {
+                                  return snapshot.hasData
+                                      ? Expanded(
+                                          child: Row(
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: Text(
+                                                  snapshot
+                                                      .data['physicalLocation']
+                                                      .toString()
+                                                      .toUpperCase(),
+                                                  style: GoogleFonts.nunito(
+                                                    color: Colors.orange,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon:
+                                                    Icon(EvaIcons.edit2Outline),
+                                                onPressed: () async {
+                                                  LocationResult result =
+                                                      await showLocationPicker(
+                                                    context,
+                                                    "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                                    automaticallyAnimateToCurrentLocation:
+                                                        true,
+                                                    myLocationButtonEnabled:
+                                                        true,
+                                                    layersButtonEnabled: true,
+                                                  );
+                                                  _loginBloc
+                                                      .changeOfficeLocation(
+                                                    {
+                                                      "lat": result
+                                                          .latLng.latitude,
+                                                      "lang": result
+                                                          .latLng.longitude,
+                                                      "physicalLocation":
+                                                          result.address,
+                                                    },
+                                                  );
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      : RawMaterialButton(
+                                          onPressed: () async {
+                                            LocationResult result =
+                                                await showLocationPicker(
+                                              context,
+                                              "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                              automaticallyAnimateToCurrentLocation:
+                                                  true,
+                                              myLocationButtonEnabled: true,
+                                              layersButtonEnabled: true,
+                                            );
+                                            _loginBloc.changeOfficeLocation(
+                                              {
+                                                "lat": result.latLng.latitude,
+                                                "lang": result.latLng.longitude,
+                                                "physicalLocation":
+                                                    result.address,
+                                              },
+                                            );
+                                          },
+                                          padding: EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              5,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            "SELECT A LOCATION",
+                                            style: GoogleFonts.nunito(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                          fillColor: Colors.orange,
+                                        );
+                                })
+                          ],
+                        ),
                         StreamBuilder<bool>(
                           stream: _loginBloc.canSubmitData,
                           builder: (context, snapshot) {

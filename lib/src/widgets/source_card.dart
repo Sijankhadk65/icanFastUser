@@ -10,8 +10,11 @@ import 'package:provider/provider.dart';
 class SourceCard extends StatefulWidget {
   final Vendor vendor;
   final Map<String, dynamic> user;
-  const SourceCard({Key key, @required this.vendor, this.user})
-      : super(key: key);
+  const SourceCard({
+    Key key,
+    @required this.vendor,
+    this.user,
+  }) : super(key: key);
 
   @override
   _SourceCardState createState() => _SourceCardState();
@@ -22,30 +25,32 @@ class _SourceCardState extends State<SourceCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 180,
+      height: 200,
       margin: EdgeInsets.all(10),
       child: Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(5),
         child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => Provider(
-                  create: (_) => CartMenuBloc(),
-                  dispose: (context, CartMenuBloc bloc) => bloc.dispose(),
-                  child: VendorScreen(
-                    vendorRating: widget.vendor.averageRating,
-                    vendorName: widget.vendor.name,
-                    categories: widget.vendor.categories.toList(),
-                    user: widget.user,
-                    minOrder: widget.vendor.minOrder,
-                  ),
-                ),
-              ),
-            );
-          },
+          onTap: widget.vendor.isAway
+              ? () {}
+              : () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => Provider(
+                        create: (_) => CartMenuBloc(),
+                        dispose: (context, CartMenuBloc bloc) => bloc.dispose(),
+                        child: VendorScreen(
+                          vendorRating: widget.vendor.averageRating,
+                          vendorName: widget.vendor.name,
+                          categories: widget.vendor.categories.toList(),
+                          user: widget.user,
+                          minOrder: widget.vendor.minOrder,
+                        ),
+                      ),
+                    ),
+                  );
+                },
           child: Stack(
             alignment: Alignment.topLeft,
             children: [
@@ -76,7 +81,6 @@ class _SourceCardState extends State<SourceCard> {
                     },
                   );
                   return Container(
-                    // height: 150,
                     decoration: BoxDecoration(
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(5)),
@@ -90,7 +94,6 @@ class _SourceCardState extends State<SourceCard> {
               ),
               !hasError
                   ? Container(
-                      height: 180,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
                         gradient: LinearGradient(
@@ -191,6 +194,28 @@ class _SourceCardState extends State<SourceCard> {
                               Expanded(
                                 child: Text(
                                   "The vendor is currently busy which may lead to delayed delivery.",
+                                  style: GoogleFonts.montserrat(
+                                    color: Colors.red[700],
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Container(),
+                    widget.vendor.isAway
+                        ? Row(
+                            children: <Widget>[
+                              Icon(
+                                EvaIcons.alertCircle,
+                                color: Colors.red[700],
+                                size: 20,
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "The vendor is currently unavailable..",
                                   style: GoogleFonts.montserrat(
                                     color: Colors.red[700],
                                     fontSize: 10,

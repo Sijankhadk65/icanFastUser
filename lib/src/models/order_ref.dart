@@ -20,6 +20,8 @@ abstract class OrderRef implements Built<OrderRef, OrderRefBuilder> {
   @nullable
   BuiltList<String> get status;
   @nullable
+  BuiltList<String> get vendors;
+  @nullable
   String get physicalLocation;
   @nullable
   User get isAssignedTo;

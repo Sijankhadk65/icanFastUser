@@ -42,12 +42,11 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
         ..add(serializers.serialize(object.quantity,
             specifiedType: const FullType(int)));
     }
-    if (object.addOn != null) {
+    if (object.note != null) {
       result
-        ..add('addOn')
-        ..add(serializers.serialize(object.addOn,
-            specifiedType:
-                const FullType(BuiltList, const [const FullType(String)])));
+        ..add('note')
+        ..add(serializers.serialize(object.note,
+            specifiedType: const FullType(String)));
     }
     return result;
   }
@@ -79,11 +78,9 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
           result.quantity = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
           break;
-        case 'addOn':
-          result.addOn.replace(serializers.deserialize(value,
-                  specifiedType:
-                      const FullType(BuiltList, const [const FullType(String)]))
-              as BuiltList<dynamic>);
+        case 'note':
+          result.note = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
           break;
       }
     }
@@ -102,13 +99,13 @@ class _$CartItem extends CartItem {
   @override
   final int quantity;
   @override
-  final BuiltList<String> addOn;
+  final String note;
 
   factory _$CartItem([void Function(CartItemBuilder) updates]) =>
       (new CartItemBuilder()..update(updates)).build();
 
   _$CartItem._(
-      {this.name, this.price, this.totalPrice, this.quantity, this.addOn})
+      {this.name, this.price, this.totalPrice, this.quantity, this.note})
       : super._();
 
   @override
@@ -126,7 +123,7 @@ class _$CartItem extends CartItem {
         price == other.price &&
         totalPrice == other.totalPrice &&
         quantity == other.quantity &&
-        addOn == other.addOn;
+        note == other.note;
   }
 
   @override
@@ -136,7 +133,7 @@ class _$CartItem extends CartItem {
             $jc($jc($jc(0, name.hashCode), price.hashCode),
                 totalPrice.hashCode),
             quantity.hashCode),
-        addOn.hashCode));
+        note.hashCode));
   }
 
   @override
@@ -146,7 +143,7 @@ class _$CartItem extends CartItem {
           ..add('price', price)
           ..add('totalPrice', totalPrice)
           ..add('quantity', quantity)
-          ..add('addOn', addOn))
+          ..add('note', note))
         .toString();
   }
 }
@@ -170,9 +167,9 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
   int get quantity => _$this._quantity;
   set quantity(int quantity) => _$this._quantity = quantity;
 
-  ListBuilder<String> _addOn;
-  ListBuilder<String> get addOn => _$this._addOn ??= new ListBuilder<String>();
-  set addOn(ListBuilder<String> addOn) => _$this._addOn = addOn;
+  String _note;
+  String get note => _$this._note;
+  set note(String note) => _$this._note = note;
 
   CartItemBuilder();
 
@@ -182,7 +179,7 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
       _price = _$v.price;
       _totalPrice = _$v.totalPrice;
       _quantity = _$v.quantity;
-      _addOn = _$v.addOn?.toBuilder();
+      _note = _$v.note;
       _$v = null;
     }
     return this;
@@ -203,26 +200,13 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
 
   @override
   _$CartItem build() {
-    _$CartItem _$result;
-    try {
-      _$result = _$v ??
-          new _$CartItem._(
-              name: name,
-              price: price,
-              totalPrice: totalPrice,
-              quantity: quantity,
-              addOn: _addOn?.build());
-    } catch (_) {
-      String _$failedField;
-      try {
-        _$failedField = 'addOn';
-        _addOn?.build();
-      } catch (e) {
-        throw new BuiltValueNestedFieldError(
-            'CartItem', _$failedField, e.toString());
-      }
-      rethrow;
-    }
+    final _$result = _$v ??
+        new _$CartItem._(
+            name: name,
+            price: price,
+            totalPrice: totalPrice,
+            quantity: quantity,
+            note: note);
     replace(_$result);
     return _$result;
   }

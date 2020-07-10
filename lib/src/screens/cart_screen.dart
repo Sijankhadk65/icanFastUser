@@ -198,7 +198,10 @@ class _CartScreenState extends State<CartScreen> {
                     )
                   : Container(
                       child: Center(
-                        child: Text("No Orders Yet"),
+                        child: Text(
+                          "No orders in the cart yet, check the order section if any orders were placed.",
+                          style: GoogleFonts.oswald(),
+                        ),
                       ),
                     );
               break;

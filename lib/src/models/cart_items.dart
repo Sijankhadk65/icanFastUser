@@ -1,4 +1,3 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import './item.dart';
@@ -17,7 +16,7 @@ abstract class CartItem implements Built<CartItem, CartItemBuilder> {
   @nullable
   int get quantity;
   @nullable
-  BuiltList<String> get addOn;
+  String get note;
   CartItem._();
   factory CartItem([updates(CartItemBuilder b)]) = _$CartItem;
   static Serializer<CartItem> get serializer => _$cartItemSerializer;
@@ -26,7 +25,7 @@ abstract class CartItem implements Built<CartItem, CartItemBuilder> {
         "price": this.price,
         "quantity": this.quantity,
         "totalPrice": this.totalPrice,
-        "addOn": this.addOn.toList(),
+        "note": this.note,
       };
 }
 

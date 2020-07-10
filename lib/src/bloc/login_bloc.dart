@@ -35,7 +35,20 @@ class LoginBloc {
           sink.addError("Enter a valid number");
         }
       }));
+
+  final BehaviorSubject<Map<String, dynamic>> _homeLocationSubject =
+      BehaviorSubject<Map<String, dynamic>>();
+  Stream<Map<String, dynamic>> get homeLocation => _homeLocationSubject.stream;
+  Function(Map<String, dynamic>) get changeHomeLocation =>
+      _homeLocationSubject.sink.add;
   Function(String) get changePhoneNumber => _phoneNumberSubject.sink.add;
+
+  final BehaviorSubject<Map<String, dynamic>> _officeLocationSubject =
+      BehaviorSubject<Map<String, dynamic>>();
+  Stream<Map<String, dynamic>> get officeLocation =>
+      _officeLocationSubject.stream;
+  Function(Map<String, dynamic>) get changeOfficeLocation =>
+      _officeLocationSubject.sink.add;
 
   saveUserNumber(int phoneNumber) {}
 
@@ -82,9 +95,26 @@ class LoginBloc {
         "name": _name,
         "email": user.email,
         "UID": user.uid,
+        "promoCodes": [],
         "phoneNumber": int.parse(_phoneNumber),
         "photoURI": user.photoUrl,
         "type": "client",
+        "home": _homeLocationSubject.value != null
+            ? {
+                "lat": _homeLocationSubject.value['lat'],
+                "lang": _homeLocationSubject.value['lang'],
+                "physicalLocation":
+                    _homeLocationSubject.value['physicalLocation'],
+              }
+            : {},
+        "office": _officeLocationSubject.value != null
+            ? {
+                "lat": _officeLocationSubject.value['lat'],
+                "lang": _officeLocationSubject.value['lang'],
+                "physicalLocation":
+                    _officeLocationSubject.value['physicalLocation'],
+              }
+            : {},
       },
     ).then(
       (value) async {
@@ -102,8 +132,24 @@ class LoginBloc {
 
   Future<void> signOut() => _repo.signOut();
 
+  Future<void> updateUserHomeLocation(
+          Map<String, dynamic> home, String email) =>
+      _repo.updateUserHomeLocation(
+        home: home,
+        email: email,
+      );
+
+  Future<void> updateUserOfficeLocation(
+          Map<String, dynamic> office, String email) =>
+      _repo.updateUserOfficeLocation(
+        office: office,
+        email: email,
+      );
+
   void dispose() {
     _nameSubject.close();
     _phoneNumberSubject.close();
+    _homeLocationSubject.close();
+    _officeLocationSubject.close();
   }
 }

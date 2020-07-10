@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
 import 'package:fastuserapp/src/models/cart_items.dart';
 import 'package:fastuserapp/src/models/item.dart';
@@ -23,9 +25,9 @@ class AddToCartDialouge extends StatefulWidget {
 }
 
 class _AddToCartDialougeState extends State<AddToCartDialouge> {
-  List<String> _addOn = [];
   int itemQuantity = 1;
   int totalCost = 0;
+  String _note = "";
 
   @override
   void initState() {
@@ -43,21 +45,37 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
           10,
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Center(
-              child: Container(
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey,
-                      offset: Offset(0, 5),
-                      blurRadius: 10,
+              child: CachedNetworkImage(
+                imageUrl: widget.item.photoURI,
+                progressIndicatorBuilder: (context, msg, progess) => Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, msg, error) => Center(
+                  child: Text(
+                    error.toString(),
+                  ),
+                ),
+                imageBuilder: (context, imageBuilder) => Container(
+                  height: 250,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      5,
                     ),
-                  ],
+                    image: DecorationImage(
+                      image: imageBuilder,
+                      fit: BoxFit.cover,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey,
+                        offset: Offset(0, 5),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -71,50 +89,126 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                 fontWeight: FontWeight.w700,
               ),
             ),
+            widget.item.description != null
+                ? Text(
+                    widget.item.description.toUpperCase(),
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 10,
+                    ),
+                  )
+                : Container(),
+            Divider(),
             Text(
-              widget.item.description.toUpperCase(),
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.w500,
-                fontSize: 10,
+              "Note *",
+              style: GoogleFonts.nunito(
+                color: Colors.orange[800],
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Divider(),
-            Expanded(child: Container()),
+            Expanded(
+              child: Container(
+                height: 50,
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                padding: EdgeInsets.only(
+                  left: 5,
+                  right: 5,
+                  bottom: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(
+                    5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    )
+                  ],
+                ),
+                child: TextField(
+                  maxLength: 200,
+                  maxLines: 50,
+                  onChanged: (value) {
+                    this.setState(
+                      () {
+                        _note = value;
+                      },
+                    );
+                  },
+                  decoration: InputDecoration(
+                    isDense: true,
+                    hintText:
+                        "Type your special instructions here.\n Less Spicy or more spicy",
+                  ),
+                ),
+              ),
+            ),
+            Row(
+              children: <Widget>[
+                SizedBox(
+                  width: 50,
+                  child: RawMaterialButton(
+                    fillColor: Colors.orange[800],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        5,
+                      ),
+                    ),
+                    onPressed: itemQuantity == 0
+                        ? null
+                        : () {
+                            this.setState(() {
+                              itemQuantity--;
+                            });
+                          },
+                    child: Icon(
+                      EvaIcons.arrowheadLeftOutline,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      "$itemQuantity plates",
+                      style: GoogleFonts.oswald(
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 50,
+                  child: RawMaterialButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        5,
+                      ),
+                    ),
+                    fillColor: Colors.orange[800],
+                    onPressed: () {
+                      this.setState(
+                        () {
+                          itemQuantity++;
+                        },
+                      );
+                    },
+                    child: Icon(
+                      EvaIcons.arrowheadRightOutline,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                Expanded(
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: RawMaterialButton(
-                          onPressed: () {
-                            this.setState(() {
-                              itemQuantity++;
-                            });
-                          },
-                          child: Icon(Icons.add),
-                        ),
-                      ),
-                      Text(
-                        itemQuantity.toString(),
-                      ),
-                      Expanded(
-                        child: RawMaterialButton(
-                          onPressed: itemQuantity == 0
-                              ? null
-                              : () {
-                                  this.setState(() {
-                                    itemQuantity--;
-                                  });
-                                },
-                          child: Icon(Icons.remove),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 RawMaterialButton(
                   elevation: 0,
                   fillColor: Colors.grey,
@@ -160,7 +254,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                                 "totalPrice": widget.item.price * itemQuantity,
                                 "quantity": itemQuantity,
                                 "price": widget.item.price,
-                                "addOn": _addOn,
+                                "note": _note,
                               },
                             ),
                             widget.user,

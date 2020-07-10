@@ -248,6 +248,24 @@ class Repository {
           },
         ),
       );
+  Stream<int> getPromoCode(String code) =>
+      _firestoreProvider.getPromoCode(code).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (DocumentSnapshot snapshot, sink) {
+            if (snapshot.exists) {
+              sink.add(snapshot.data['discountRate']);
+            }
+          },
+        ),
+      );
+  Future<void> addPromoCode(String email, String code, List<String> codes) =>
+      _firestoreProvider.addPromoCode(email, code, codes);
   Future<void> saveUserToken(String email, Map<String, dynamic> tokenData) =>
       _firestoreProvider.saveUserToken(email, tokenData);
+  Future<void> updateUserHomeLocation(
+          {Map<String, dynamic> home, String email}) =>
+      _firestoreProvider.updateUserHomeLocation(home: home, email: email);
+  Future<void> updateUserOfficeLocation(
+          {Map<String, dynamic> office, String email}) =>
+      _firestoreProvider.updateUserOfficeLocation(office: office, email: email);
 }

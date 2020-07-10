@@ -42,6 +42,25 @@ class _$UserSerializer implements StructuredSerializer<User> {
         ..add(serializers.serialize(object.phoneNumber,
             specifiedType: const FullType(int)));
     }
+    if (object.home != null) {
+      result
+        ..add('home')
+        ..add(serializers.serialize(object.home,
+            specifiedType: const FullType(UserLocation)));
+    }
+    if (object.office != null) {
+      result
+        ..add('office')
+        ..add(serializers.serialize(object.office,
+            specifiedType: const FullType(UserLocation)));
+    }
+    if (object.promoCodes != null) {
+      result
+        ..add('promoCodes')
+        ..add(serializers.serialize(object.promoCodes,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
+    }
     return result;
   }
 
@@ -72,6 +91,20 @@ class _$UserSerializer implements StructuredSerializer<User> {
           result.phoneNumber = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
           break;
+        case 'home':
+          result.home.replace(serializers.deserialize(value,
+              specifiedType: const FullType(UserLocation)) as UserLocation);
+          break;
+        case 'office':
+          result.office.replace(serializers.deserialize(value,
+              specifiedType: const FullType(UserLocation)) as UserLocation);
+          break;
+        case 'promoCodes':
+          result.promoCodes.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(String)]))
+              as BuiltList<dynamic>);
+          break;
       }
     }
 
@@ -88,11 +121,24 @@ class _$User extends User {
   final String photoURI;
   @override
   final int phoneNumber;
+  @override
+  final UserLocation home;
+  @override
+  final UserLocation office;
+  @override
+  final BuiltList<String> promoCodes;
 
   factory _$User([void Function(UserBuilder) updates]) =>
       (new UserBuilder()..update(updates)).build();
 
-  _$User._({this.email, this.name, this.photoURI, this.phoneNumber})
+  _$User._(
+      {this.email,
+      this.name,
+      this.photoURI,
+      this.phoneNumber,
+      this.home,
+      this.office,
+      this.promoCodes})
       : super._();
 
   @override
@@ -109,14 +155,24 @@ class _$User extends User {
         email == other.email &&
         name == other.name &&
         photoURI == other.photoURI &&
-        phoneNumber == other.phoneNumber;
+        phoneNumber == other.phoneNumber &&
+        home == other.home &&
+        office == other.office &&
+        promoCodes == other.promoCodes;
   }
 
   @override
   int get hashCode {
     return $jf($jc(
-        $jc($jc($jc(0, email.hashCode), name.hashCode), photoURI.hashCode),
-        phoneNumber.hashCode));
+        $jc(
+            $jc(
+                $jc(
+                    $jc($jc($jc(0, email.hashCode), name.hashCode),
+                        photoURI.hashCode),
+                    phoneNumber.hashCode),
+                home.hashCode),
+            office.hashCode),
+        promoCodes.hashCode));
   }
 
   @override
@@ -125,7 +181,10 @@ class _$User extends User {
           ..add('email', email)
           ..add('name', name)
           ..add('photoURI', photoURI)
-          ..add('phoneNumber', phoneNumber))
+          ..add('phoneNumber', phoneNumber)
+          ..add('home', home)
+          ..add('office', office)
+          ..add('promoCodes', promoCodes))
         .toString();
   }
 }
@@ -149,6 +208,21 @@ class UserBuilder implements Builder<User, UserBuilder> {
   int get phoneNumber => _$this._phoneNumber;
   set phoneNumber(int phoneNumber) => _$this._phoneNumber = phoneNumber;
 
+  UserLocationBuilder _home;
+  UserLocationBuilder get home => _$this._home ??= new UserLocationBuilder();
+  set home(UserLocationBuilder home) => _$this._home = home;
+
+  UserLocationBuilder _office;
+  UserLocationBuilder get office =>
+      _$this._office ??= new UserLocationBuilder();
+  set office(UserLocationBuilder office) => _$this._office = office;
+
+  ListBuilder<String> _promoCodes;
+  ListBuilder<String> get promoCodes =>
+      _$this._promoCodes ??= new ListBuilder<String>();
+  set promoCodes(ListBuilder<String> promoCodes) =>
+      _$this._promoCodes = promoCodes;
+
   UserBuilder();
 
   UserBuilder get _$this {
@@ -157,6 +231,9 @@ class UserBuilder implements Builder<User, UserBuilder> {
       _name = _$v.name;
       _photoURI = _$v.photoURI;
       _phoneNumber = _$v.phoneNumber;
+      _home = _$v.home?.toBuilder();
+      _office = _$v.office?.toBuilder();
+      _promoCodes = _$v.promoCodes?.toBuilder();
       _$v = null;
     }
     return this;
@@ -177,12 +254,32 @@ class UserBuilder implements Builder<User, UserBuilder> {
 
   @override
   _$User build() {
-    final _$result = _$v ??
-        new _$User._(
-            email: email,
-            name: name,
-            photoURI: photoURI,
-            phoneNumber: phoneNumber);
+    _$User _$result;
+    try {
+      _$result = _$v ??
+          new _$User._(
+              email: email,
+              name: name,
+              photoURI: photoURI,
+              phoneNumber: phoneNumber,
+              home: _home?.build(),
+              office: _office?.build(),
+              promoCodes: _promoCodes?.build());
+    } catch (_) {
+      String _$failedField;
+      try {
+        _$failedField = 'home';
+        _home?.build();
+        _$failedField = 'office';
+        _office?.build();
+        _$failedField = 'promoCodes';
+        _promoCodes?.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            'User', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }
