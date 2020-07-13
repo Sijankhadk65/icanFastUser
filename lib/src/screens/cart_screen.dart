@@ -27,7 +27,6 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     orderCartBloc.getCartsTotal();
     orderCartBloc.getLocalOrder();
-    orderCartBloc.getDeliveryCharge();
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -84,41 +83,25 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                           height: 65,
                           color: snapshot.data
-                                      .map((order) => order.totalPrice)
-                                      .toList()
-                                      .fold(
-                                          0,
-                                          (previousValue, element) =>
-                                              element + previousValue) >
-                                  snapshot.data
-                                      .map((order) => order.minOrder)
-                                      .toList()
-                                      .fold(
-                                        0,
-                                        (previousValue, element) =>
-                                            previousValue + element,
-                                      )
-                              ? Colors.blue[800]
-                              : Colors.red[800],
+                                  .map((order) {
+                                    return order.totalPrice > order.minOrder;
+                                  })
+                                  .toList()
+                                  .contains(false)
+                              ? Colors.red[800]
+                              : Colors.blue[800],
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: snapshot.data
-                                          .map((order) => order.totalPrice)
-                                          .toList()
-                                          .fold(
-                                              0,
-                                              (previousValue, element) =>
-                                                  element + previousValue) >
-                                      snapshot.data
-                                          .map((order) => order.minOrder)
-                                          .toList()
-                                          .fold(
-                                            0,
-                                            (previousValue, element) =>
-                                                previousValue + element,
-                                          )
-                                  ? () {
+                                      .map((order) {
+                                        return order.totalPrice >
+                                            order.minOrder;
+                                      })
+                                      .toList()
+                                      .contains(false)
+                                  ? null
+                                  : () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -127,8 +110,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                       );
-                                    }
-                                  : null,
+                                    },
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child: Column(
@@ -156,30 +138,19 @@ class _CartScreenState extends State<CartScreen> {
                                       ),
                                     ),
                                     snapshot.data
-                                                .map(
-                                                    (order) => order.totalPrice)
-                                                .toList()
-                                                .fold(
-                                                    0,
-                                                    (previousValue, element) =>
-                                                        element +
-                                                        previousValue) >
-                                            snapshot.data
-                                                .map((order) => order.minOrder)
-                                                .toList()
-                                                .fold(
-                                                  0,
-                                                  (previousValue, element) =>
-                                                      previousValue + element,
-                                                )
-                                        ? Container()
-                                        : Expanded(
+                                            .map((order) {
+                                              return order.totalPrice >
+                                                  order.minOrder;
+                                            })
+                                            .toList()
+                                            .contains(false)
+                                        ? Expanded(
                                             child: AnimatedContainer(
                                               duration: Duration(
                                                 milliseconds: 300,
                                               ),
                                               child: Text(
-                                                "Minimum Order Not Met !",
+                                                "Minimum Order Not ${snapshot.data.where((order) => order.minOrder > order.totalPrice).toList().map((faultyOrder) => faultyOrder.vendor)} Met !",
                                                 style: GoogleFonts.montserrat(
                                                   fontStyle: FontStyle.italic,
                                                   color: Colors.white38,
@@ -187,7 +158,8 @@ class _CartScreenState extends State<CartScreen> {
                                                 ),
                                               ),
                                             ),
-                                          ),
+                                          )
+                                        : Container(),
                                   ],
                                 ),
                               ),

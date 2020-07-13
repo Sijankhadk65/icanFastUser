@@ -8,13 +8,13 @@ part 'order_ref.g.dart';
 
 abstract class OrderRef implements Built<OrderRef, OrderRefBuilder> {
   @nullable
-  int get totalCost;
+  double get totalCost;
   @nullable
   User get user;
   @nullable
   String get refID;
   @nullable
-  int get deliveryCharge;
+  double get deliveryCharge;
   @nullable
   String get createdAt;
   @nullable

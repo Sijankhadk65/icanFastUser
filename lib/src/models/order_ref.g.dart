@@ -22,7 +22,7 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
       result
         ..add('totalCost')
         ..add(serializers.serialize(object.totalCost,
-            specifiedType: const FullType(int)));
+            specifiedType: const FullType(double)));
     }
     if (object.user != null) {
       result
@@ -40,7 +40,7 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
       result
         ..add('deliveryCharge')
         ..add(serializers.serialize(object.deliveryCharge,
-            specifiedType: const FullType(int)));
+            specifiedType: const FullType(double)));
     }
     if (object.createdAt != null) {
       result
@@ -102,7 +102,7 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
       switch (key) {
         case 'totalCost':
           result.totalCost = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(double)) as double;
           break;
         case 'user':
           result.user.replace(serializers.deserialize(value,
@@ -114,7 +114,7 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
           break;
         case 'deliveryCharge':
           result.deliveryCharge = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(double)) as double;
           break;
         case 'createdAt':
           result.createdAt = serializers.deserialize(value,
@@ -157,13 +157,13 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
 
 class _$OrderRef extends OrderRef {
   @override
-  final int totalCost;
+  final double totalCost;
   @override
   final User user;
   @override
   final String refID;
   @override
-  final int deliveryCharge;
+  final double deliveryCharge;
   @override
   final String createdAt;
   @override
@@ -265,9 +265,9 @@ class _$OrderRef extends OrderRef {
 class OrderRefBuilder implements Builder<OrderRef, OrderRefBuilder> {
   _$OrderRef _$v;
 
-  int _totalCost;
-  int get totalCost => _$this._totalCost;
-  set totalCost(int totalCost) => _$this._totalCost = totalCost;
+  double _totalCost;
+  double get totalCost => _$this._totalCost;
+  set totalCost(double totalCost) => _$this._totalCost = totalCost;
 
   UserBuilder _user;
   UserBuilder get user => _$this._user ??= new UserBuilder();
@@ -277,9 +277,9 @@ class OrderRefBuilder implements Builder<OrderRef, OrderRefBuilder> {
   String get refID => _$this._refID;
   set refID(String refID) => _$this._refID = refID;
 
-  int _deliveryCharge;
-  int get deliveryCharge => _$this._deliveryCharge;
-  set deliveryCharge(int deliveryCharge) =>
+  double _deliveryCharge;
+  double get deliveryCharge => _$this._deliveryCharge;
+  set deliveryCharge(double deliveryCharge) =>
       _$this._deliveryCharge = deliveryCharge;
 
   String _createdAt;

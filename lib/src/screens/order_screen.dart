@@ -14,15 +14,7 @@ class OrderScreen extends StatefulWidget {
   _OrderScreenState createState() => _OrderScreenState();
 }
 
-class _OrderScreenState extends State<OrderScreen>
-    with SingleTickerProviderStateMixin {
-  TabController _tabController;
-  @override
-  void initState() {
-    _tabController = TabController(length: 2, vsync: this);
-    super.initState();
-  }
-
+class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     orderCartBloc.getOrderRefs(widget.user);
@@ -34,33 +26,42 @@ class _OrderScreenState extends State<OrderScreen>
               left: 10,
               right: 10,
             ),
-            child: TabBar(
-              controller: _tabController,
-              tabs: [
-                Text("Pending Orders"),
-                Text("Closed Orders"),
-              ],
+            child: Text(
+              "PENDING ORDERS",
+              style: GoogleFonts.montserrat(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange[800].withAlpha(
+                  100,
+                ),
+              ),
             ),
           ),
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: <Widget>[
-                Container(
-                  child: StreamBuilder<List<OrderRef>>(
-                    stream: orderCartBloc.orderRefrence,
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.none:
-                          return Text("Awaiting Bids.....");
-                          break;
-                        case ConnectionState.waiting:
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                          break;
-                        case ConnectionState.active:
-                          return ListView(
+            child: StreamBuilder<List<OrderRef>>(
+              stream: orderCartBloc.orderRefrence,
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    return Text("Awaiting Bids.....");
+                    break;
+                  case ConnectionState.waiting:
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                    break;
+                  case ConnectionState.active:
+                    return snapshot.data.isEmpty
+                        ? Center(
+                            child: Text(
+                              "No Order have been made yet!",
+                              style: GoogleFonts.pacifico(
+                                fontSize: 25,
+                                color: Colors.orange[600],
+                              ),
+                            ),
+                          )
+                        : ListView(
                             shrinkWrap: true,
                             children: snapshot.data
                                 .map(
@@ -84,42 +85,6 @@ class _OrderScreenState extends State<OrderScreen>
                                               color: Colors.red,
                                               icon: Icons.delete,
                                               onTap: () {
-                                                // showDialog(
-                                                //   context: context,
-                                                //   builder: (context) => Dialog(
-                                                //     child: Container(
-                                                //       height: 150,
-                                                //       padding: EdgeInsets.only(
-                                                //         top: 10,
-                                                //       ),
-                                                //       child: Column(
-                                                //         children: <Widget>[
-                                                //           Text(
-                                                //               "Do you want to delete this order?"),
-                                                //           Row(
-                                                //             children: <Widget>[
-                                                //               RawMaterialButton(
-                                                //                 onPressed: () =>
-                                                //                     Navigator.pop(
-                                                //                         context),
-                                                //                 child: Text(
-                                                //                     "Cancle"),
-                                                //               ),
-                                                //               RawMaterialButton(
-                                                //                 onPressed: () =>
-                                                //                     orderCartBloc
-                                                //                         .deleteOrderRef(
-                                                //                             order.refID),
-                                                //                 child: Text(
-                                                //                     "Cancle"),
-                                                //               ),
-                                                //             ],
-                                                //           )
-                                                //         ],
-                                                //       ),
-                                                //     ),
-                                                //   ),
-                                                // );
                                                 orderCartBloc.deleteOrderRef(
                                                     order.refID);
                                               },
@@ -129,85 +94,13 @@ class _OrderScreenState extends State<OrderScreen>
                                 )
                                 .toList(),
                           );
-                          break;
-                        case ConnectionState.done:
-                          return Text(snapshot.data.toString());
-                          break;
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Container(
-                  child: StreamBuilder<List<OrderRef>>(
-                    stream: orderCartBloc.closedRefrence,
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.none:
-                          return Text("Awaiting Bids.....");
-                          break;
-                        case ConnectionState.waiting:
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                          break;
-                        case ConnectionState.active:
-                          return snapshot.data != []
-                              ? ListView(
-                                  shrinkWrap: true,
-                                  children: snapshot.data
-                                      .map(
-                                        (order) => order.status.isNotEmpty
-                                            ? OrderRefCard(
-                                                orderRef: order,
-                                              )
-                                            : Dismissible(
-                                                key: UniqueKey(),
-                                                onDismissed: (direction) {
-                                                  orderCartBloc.deleteOrderRef(
-                                                      order.refID);
-                                                },
-                                                background: Container(
-                                                  margin: EdgeInsets.all(10),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                    color: Colors.red[800],
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "The item will be deleted!",
-                                                      style: GoogleFonts
-                                                          .montserrat(
-                                                        fontSize: 20,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                child: OrderRefCard(
-                                                  orderRef: order,
-                                                ),
-                                              ),
-                                      )
-                                      .toList(),
-                                )
-                              : Container(
-                                  child: Center(
-                                    child: Text("No Orders Yet!"),
-                                  ),
-                                );
-                          break;
-                        case ConnectionState.done:
-                          return Text(snapshot.data.toString());
-                          break;
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ],
+                    break;
+                  case ConnectionState.done:
+                    return Text(snapshot.data.toString());
+                    break;
+                }
+                return null;
+              },
             ),
           ),
         ],

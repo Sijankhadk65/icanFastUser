@@ -38,6 +38,17 @@ class Repository {
         }
       }));
 
+  Stream<List<int>> getDistanceRates() => _firestoreProvider
+          .getDistanceRates()
+          .transform(StreamTransformer.fromHandlers(
+              handleData: (QuerySnapshot snapshot, sink) {
+        List<int> rates = [];
+        snapshot.documents.forEach((element) {
+          rates.add(element.data['rate']);
+        });
+        sink.add(rates);
+      }));
+
   Stream<List<String>> getVendorCategories(String vendor) =>
       _firestoreProvider.getVendorCategory(vendor).transform(
         StreamTransformer.fromHandlers(

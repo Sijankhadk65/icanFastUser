@@ -49,8 +49,12 @@ class FirestoreProvider {
     return _firestore
         .collection("liveOnlineOrders")
         .where(
-          "user",
-          isEqualTo: user,
+          "user.email",
+          isEqualTo: user['email'],
+        )
+        .where(
+          "isPaid",
+          isEqualTo: false,
         )
         .snapshots();
   }
@@ -59,8 +63,12 @@ class FirestoreProvider {
     return _firestore
         .collection("closedOnlineOrders")
         .where(
-          "user",
-          isEqualTo: user,
+          "user.email",
+          isEqualTo: user['email'],
+        )
+        .where(
+          "isPaid",
+          isEqualTo: true,
         )
         .snapshots();
   }
@@ -93,6 +101,9 @@ class FirestoreProvider {
         .where("name", isEqualTo: name)
         .snapshots();
   }
+
+  Stream<QuerySnapshot> getDistanceRates() =>
+      _firestore.collection("distanceRates").snapshots();
 
   Stream<QuerySnapshot> getVendors(String tag) {
     if (tag == "all") return _firestore.collection("vendors").snapshots();

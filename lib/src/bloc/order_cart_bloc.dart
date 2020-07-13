@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:latlong/latlong.dart';
 import 'package:location/location.dart';
 
 import '../models/order_ref.dart';
@@ -63,9 +64,9 @@ class OrderCartBloc {
   Stream<int> get totalLength => _totalLengthSubject.stream;
   Function(int) get changeTotalLenght => _totalLengthSubject.sink.add;
 
-  final BehaviorSubject<int> _cartsTotalSubject = BehaviorSubject<int>();
-  Stream<int> get cartsTotal => _cartsTotalSubject.stream;
-  Function(int) get changeCartsTotal => _cartsTotalSubject.sink.add;
+  final BehaviorSubject<double> _cartsTotalSubject = BehaviorSubject<double>();
+  Stream<double> get cartsTotal => _cartsTotalSubject.stream;
+  Function(double) get changeCartsTotal => _cartsTotalSubject.sink.add;
 
   final BehaviorSubject<Map<String, dynamic>> _currentLocationSubject =
       BehaviorSubject<Map<String, dynamic>>();
@@ -149,6 +150,7 @@ class OrderCartBloc {
     _repository.getOrderRefs(user).listen(
       (orderRefs) {
         changeOrderRefrence(orderRefs);
+        print(orderRefs);
       },
     );
   }
@@ -214,8 +216,7 @@ class OrderCartBloc {
                   .map((order) => order['totalPrice'])
                   .toList()
                   .fold(0, (previousValue, element) => previousValue + element);
-              changeCartsTotal(
-                  _cartsTotal - (_cartsTotal * (disRate / 100)).toInt());
+              changeCartsTotal(_cartsTotal - (_cartsTotal * (disRate / 100)));
               await _repository.addPromoCode(
                 email,
                 _promoCodeSubject.value,
@@ -369,7 +370,7 @@ class OrderCartBloc {
         .map((order) => order['totalPrice'])
         .toList()
         .fold(0, (previousValue, element) => previousValue + element);
-    changeCartsTotal(_cartsTotal);
+    changeCartsTotal(_cartsTotal.toDouble());
   }
 
   getCartLenth(String vendor) {
@@ -407,12 +408,15 @@ class OrderCartBloc {
         "email": "",
       },
       "refID": _refID,
-      "user": user,
+      "user": {
+        "name": user['name'],
+        "email": user['email'],
+      },
       "isPaid": false,
       "isDelivered": false,
       "createdAt": DateTime.now().toIso8601String(),
-      "totalCost": _cartsTotalSubject.value,
-      "deliveryCharge": 20,
+      "totalCost": _cartsTotalSubject.value + _deliveryChargeSubject.value,
+      "deliveryCharge": _deliveryChargeSubject.value,
     }).whenComplete(() {
       _localOrders.forEach((order) async {
         order['refID'] = _refID;
@@ -423,45 +427,38 @@ class OrderCartBloc {
   }
 
   getDeliveryCharge() {
-    // List<Map<String, dynamic>> locations = [];
-    // const R = 6371000;
-    // double lat1 = _currentLocationSubject.value.latitude;
-    // double lat2 = 0;
-    // double long1 = _currentLocationSubject.value.longitude;
-    // double long2 = 0;
-    // double longestDistance = 0.0;
-    // _localOrders.forEach((localOrder) {
-    //   _repository.getVendorLocation(localOrder['vendor']).listen((location) {
-    //     // locations.add(location);
-    //     lat2 = location['lat'];
-    //     print(lat2);
-    //     long2 = location['lang'];
-    //     print(long2);
-    //     double deltaLat1 = lat1 * (pi / 180);
-    //     print(deltaLat1);
-    //     double deltaLat2 = lat2 * (pi / 180);
-    //     print(deltaLat2);
-    //     double deltaLat = (lat2 - lat1) * (pi / 180);
-    //     print(deltaLat);
-    //     double deltaLong = (long2 - long1) * (pi / 180);
-    //     print(deltaLong);
-    //     double a = (sin(deltaLat / 2) * sin(deltaLat / 2)) +
-    //         (cos(deltaLat1 / 2) * cos(deltaLat2 / 2)) +
-    //         (sin(deltaLong / 2) * sin(deltaLong / 2));
-    //     print(a);
-    //     double c = atan2(sqrt(a), sqrt(1 - a));
-    //     print(c);
-    //     double distance = R * c;
-    //     print(distance);
-    //     if (distance > longestDistance) {
-    //       longestDistance = distance;
-    //       print(longestDistance / 1000);
-    //     }
-    //   });
-    // });
+    double farthestLocation = 0.0;
+    double addableAmount = 0.0;
+    Distance _distance = Distance();
+    if (_localOrders.length == 1) {
+    } else {
+      _localOrders.forEach((order) {
+        _repository.getVendorLocation(order['vendor']).listen((latlong) {
+          double distance = _distance.as(
+              LengthUnit.Meter,
+              LatLng(_checkoutCoordinatesSubject.value['lat'],
+                  _checkoutCoordinatesSubject.value['lang']),
+              LatLng(latlong['lat'], latlong['lang']));
+          print("Distance: $distance");
+          if (distance > farthestLocation) {
+            farthestLocation = distance;
+          }
+          print("Farthest Location: $farthestLocation");
+          if (farthestLocation > 2000.0) {
+            _repository.getDistanceRates().listen((rates) {
+              addableAmount = (farthestLocation - 2000) * (rates.first / 1000);
+              print("Addabe Amount:$addableAmount");
+              changeDeliveryCharge(addableAmount);
+            });
+          } else {
+            changeDeliveryCharge(20.0);
+          }
+        });
+      });
 
-    // locations.forEach((location) {});
-    // changeDeliveryCharge(100 * longestDistance);
+      // print("Farthest Location: $farthestLocation");
+
+    }
   }
 
   Future<void> createRef(Map<String, dynamic> refObj) {

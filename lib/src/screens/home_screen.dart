@@ -238,73 +238,7 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ]),
-      // Container(
-      //   height: 50,
-      //   width: 200,
-      //   margin: EdgeInsets.only(top: 10, bottom: 10, left: 50, right: 50),
-      //   child: Material(
-      //     child: Padding(
-      //       padding: const EdgeInsets.only(left: 10, right: 10),
-      //       child: Row(
-      //         children: [
-      //           Expanded(
-      //             child: IconButton(
-      //               icon: Icon(
-      //                 EvaIcons.home,
-      //                 color: Colors.orange[500],
-      //               ),
-      //               onPressed: () {
-      //                 _pageController.animateToPage(
-      //                   0,
-      //                   duration: Duration(
-      //                     milliseconds: 300,
-      //                   ),
-      //                   curve: Curves.easeIn,
-      //                 );
-      //               },
-      //             ),
-      //           ),
-      //           Expanded(
-      //             child: IconButton(
-      //               icon: Icon(
-      //                 Icons.shopping_cart,
-      //                 color: Colors.orange[500],
-      //               ),
-      //               onPressed: () {
-      //                 _pageController.animateToPage(
-      //                   1,
-      //                   duration: Duration(
-      //                     milliseconds: 300,
-      //                   ),
-      //                   curve: Curves.easeIn,
-      //                 );
-      //               },
-      //             ),
-      //           ),
-      //           Expanded(
-      //             child: IconButton(
-      //               icon: Icon(
-      //                 EvaIcons.person,
-      //                 color: Colors.orange[500],
-      //               ),
-      //               onPressed: () {
-      //                 _pageController.animateToPage(
-      //                   2,
-      //                   duration: Duration(
-      //                     milliseconds: 300,
-      //                   ),
-      //                   curve: Curves.easeIn,
-      //                 );
-      //               },
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // ),
       body: Column(
-        // alignment: Alignment.bottomCenter,
         children: [
           Expanded(
             child: PageView(

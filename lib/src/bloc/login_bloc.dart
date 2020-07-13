@@ -118,6 +118,9 @@ class LoginBloc {
       },
     ).then(
       (value) async {
+        if (token == null) {
+          token = await FirebaseMessaging().getToken();
+        }
         await _repo.saveUserToken(
           user.email,
           {

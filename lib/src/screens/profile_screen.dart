@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
+import 'package:fastuserapp/src/models/order_ref.dart';
 import 'package:fastuserapp/src/models/user.dart';
 import 'package:fastuserapp/src/models/user_location.dart';
+import 'package:fastuserapp/src/widgets/order_ref_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,6 +59,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     userSnapshot.data.office,
                   ),
                 );
+
+                orderCartBloc.getClosedOrderRefs({
+                  "name": userSnapshot.data.name,
+                  "email": userSnapshot.data.email,
+                });
                 return Column(
                   children: <Widget>[
                     Row(
@@ -583,6 +590,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(
+                          top: 10,
+                          bottom: 10,
+                        ),
+                        child: Material(
+                          elevation: 5.0,
+                          borderRadius: BorderRadius.circular(
+                            5,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              children: <Widget>[
+                                Text(
+                                  "CLOSED ORDERS",
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange[800].withAlpha(100),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: StreamBuilder<List<OrderRef>>(
+                                    stream: orderCartBloc.closedRefrence,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasError)
+                                        return Text("Error: ${snapshot.error}");
+                                      switch (snapshot.connectionState) {
+                                        case ConnectionState.none:
+                                          return Text('Awaiting bids...');
+                                          break;
+                                        case ConnectionState.waiting:
+                                          return Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                          break;
+                                        case ConnectionState.active:
+                                          return snapshot.data.isEmpty
+                                              ? Center(
+                                                  child: Text(
+                                                    "No Order have been paid yet!",
+                                                    style: GoogleFonts.pacifico(
+                                                      fontSize: 25,
+                                                      color: Colors.orange[600],
+                                                    ),
+                                                  ),
+                                                )
+                                              : ListView(
+                                                  shrinkWrap: true,
+                                                  children: snapshot.data
+                                                      .map(
+                                                        (order) => OrderRefCard(
+                                                          orderRef: order,
+                                                        ),
+                                                      )
+                                                      .toList(),
+                                                );
+                                          break;
+                                        case ConnectionState.done:
+                                          return Text(
+                                              "The task has completed.");
+                                          break;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
                   ],
                 );
                 break;

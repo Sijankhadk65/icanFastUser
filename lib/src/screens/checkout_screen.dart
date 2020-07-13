@@ -52,6 +52,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     orderCartBloc.getLocalOrder();
     orderCartBloc.getCartsTotal();
     orderCartBloc.getCheckoutLocation();
+    orderCartBloc.getDeliveryCharge();
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -59,681 +60,735 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
       body: Container(
         child: StreamBuilder<bool>(
-            stream: orderCartBloc.checkedOut,
-            builder: (context, snapshot) {
-              return snapshot.data == true
-                  ? Container(
-                      child: Center(
-                        child: Column(
-                          children: <Widget>[
-                            Expanded(
-                              flex: 4,
-                              child: FlareActor(
-                                "assets/flare/check.flr",
-                                animation: "check",
-                                alignment: Alignment.center,
-                                fit: BoxFit.cover,
+          stream: orderCartBloc.checkedOut,
+          builder: (context, snapshot) {
+            return snapshot.data == true
+                ? Container(
+                    child: Center(
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            flex: 4,
+                            child: FlareActor(
+                              "assets/flare/check.flr",
+                              animation: "check",
+                              alignment: Alignment.center,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Text(
+                            "Your Order has been placed, go to the order section to check it out.",
+                            style: GoogleFonts.oswald(),
+                          ),
+                          RawMaterialButton(
+                            onPressed: () {
+                              showBottomSheet(
+                                context: context,
+                                builder: (context) => OrderBottomSheet(),
+                              );
+                            },
+                            padding: EdgeInsets.only(
+                              left: 10,
+                              right: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                5,
                               ),
                             ),
-                            Text(
-                              "Your Order has been placed, go to the order section to check it out.",
-                              style: GoogleFonts.oswald(),
+                            child: Text(
+                              "Look at your orders",
+                              style: GoogleFonts.nunito(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            RawMaterialButton(
-                              onPressed: () {
-                                showBottomSheet(
-                                  context: context,
-                                  builder: (context) => OrderBottomSheet(),
+                            fillColor: Colors.orange[800],
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(
+                          left: 10,
+                          right: 10,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text("Delivery To:"),
+                            Text(
+                              "${widget.user['name']},",
+                              style: GoogleFonts.nunito(
+                                fontSize: 23,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            StreamBuilder<String>(
+                              stream: orderCartBloc.userPhoneNumber,
+                              builder: (context, snapshot) {
+                                return ChangableDisplayer(
+                                  primaryText: snapshot.data.toString(),
+                                  secondaryText: " ( change phone number ) ",
+                                  displayChanger: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          ChangePhoneNumberDialog(
+                                        phoneNumberController:
+                                            _phoneNumberController,
+                                        onPhoneNumberChanged: _changeNewNumber,
+                                        onChangePressed: () {
+                                          orderCartBloc.changeUserPhoneNumber(
+                                              _newNumber);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    );
+                                  },
                                 );
                               },
-                              padding: EdgeInsets.only(
-                                left: 10,
-                                right: 10,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  5,
-                                ),
-                              ),
-                              child: Text(
-                                "Look at your orders",
-                                style: GoogleFonts.nunito(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              fillColor: Colors.orange[800],
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: Container(),
+                            StreamBuilder<String>(
+                              stream: orderCartBloc.checkoutPhysicalLocation,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError)
+                                  return Text("Error: ${snapshot.error}");
+                                switch (snapshot.connectionState) {
+                                  case ConnectionState.none:
+                                    return Text("Awaiting Bids...");
+                                    break;
+                                  case ConnectionState.waiting:
+                                    return Center(
+                                      child: LinearProgressIndicator(),
+                                    );
+                                    break;
+                                  case ConnectionState.active:
+                                    return ChangableDisplayer(
+                                      primaryText: snapshot.data,
+                                      secondaryText: " ( change location )",
+                                      displayChanger: () async {
+                                        LocationResult result =
+                                            await showLocationPicker(
+                                          context,
+                                          "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                          automaticallyAnimateToCurrentLocation:
+                                              true,
+                                          myLocationButtonEnabled: true,
+                                          layersButtonEnabled: true,
+                                        );
+                                        orderCartBloc.getCheckoutLocation(
+                                          coordinates: {
+                                            "lat": result.latLng.latitude,
+                                            "lang": result.latLng.longitude,
+                                          },
+                                          phycialLocation: result.address,
+                                        );
+                                      },
+                                    );
+
+                                    break;
+                                  case ConnectionState.done:
+                                    return Text("The task has completed");
+                                    break;
+                                }
+                                return null;
+                              },
                             ),
                           ],
                         ),
                       ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text("Delivery To:"),
-                              Text(
-                                "${widget.user['name']},",
-                                style: GoogleFonts.nunito(
-                                  fontSize: 23,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              StreamBuilder<String>(
-                                stream: orderCartBloc.userPhoneNumber,
-                                builder: (context, snapshot) {
-                                  return ChangableDisplayer(
-                                    primaryText: snapshot.data.toString(),
-                                    secondaryText: " ( change phone number ) ",
-                                    displayChanger: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) =>
-                                            ChangePhoneNumberDialog(
-                                          phoneNumberController:
-                                              _phoneNumberController,
-                                          onPhoneNumberChanged:
-                                              _changeNewNumber,
-                                          onChangePressed: () {
-                                            orderCartBloc.changeUserPhoneNumber(
-                                                _newNumber);
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                              StreamBuilder<String>(
-                                stream: orderCartBloc.checkoutPhysicalLocation,
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasError)
-                                    return Text("Error: ${snapshot.error}");
-                                  switch (snapshot.connectionState) {
-                                    case ConnectionState.none:
-                                      return Text("Awaiting Bids...");
-                                      break;
-                                    case ConnectionState.waiting:
-                                      return Center(
-                                        child: LinearProgressIndicator(),
-                                      );
-                                      break;
-                                    case ConnectionState.active:
-                                      return ChangableDisplayer(
-                                        primaryText: snapshot.data,
-                                        secondaryText: " ( change location )",
-                                        displayChanger: () async {
-                                          LocationResult result =
-                                              await showLocationPicker(
-                                            context,
-                                            "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                            automaticallyAnimateToCurrentLocation:
-                                                true,
-                                            myLocationButtonEnabled: true,
-                                            layersButtonEnabled: true,
-                                          );
-                                          orderCartBloc.getCheckoutLocation(
-                                            coordinates: {
-                                              "lat": result.latLng.latitude,
-                                              "lang": result.latLng.longitude,
-                                            },
-                                            phycialLocation: result.address,
-                                          );
-                                        },
-                                      );
-
-                                      break;
-                                    case ConnectionState.done:
-                                      return Text("The task has completed");
-                                      break;
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        Divider(),
-                        Expanded(
-                          child: StreamBuilder<List<OnlineOrder>>(
-                            stream: orderCartBloc.localOrder,
-                            builder: (context, snapshot) {
-                              return snapshot.hasData
-                                  ? Container(
-                                      margin: EdgeInsets.only(
-                                        left: 10,
-                                        right: 10,
-                                      ),
-                                      child: ListView(
-                                          shrinkWrap: true,
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(
-                                                left: 10,
-                                                right: 10,
-                                              ),
-                                              child: Column(
-                                                children: <Widget>[
-                                                  Row(
-                                                    children: <Widget>[
-                                                      Text(
-                                                        "Choose a saved location",
-                                                        style:
-                                                            GoogleFonts.nunito(
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.w800,
-                                                        ),
-                                                      ),
-                                                      Switch.adaptive(
-                                                        value: _chooseLocation,
-                                                        onChanged:
-                                                            _switchToFavouredLocation,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  _chooseLocation
-                                                      ? StreamBuilder<String>(
-                                                          stream: orderCartBloc
-                                                              .checkoutPhysicalLocation,
-                                                          builder: (context,
-                                                              snapshot) {
-                                                            return Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: <
-                                                                  Widget>[
-                                                                Expanded(
-                                                                  child:
-                                                                      LocationSelector(
-                                                                    name:
-                                                                        "HOME",
-                                                                    isActive: snapshot.data ==
-                                                                            widget.user['home']['physicalLocation']
-                                                                        ? true
-                                                                        : false,
-                                                                    changeLocation: snapshot.data ==
-                                                                            widget.user['home']['physicalLocation']
-                                                                        ? () {}
-                                                                        : () {
-                                                                            orderCartBloc.getCheckoutLocation(
-                                                                              coordinates: {
-                                                                                "lat": widget.user['home']['lat'],
-                                                                                "lang": widget.user['home']['lang'],
-                                                                              },
-                                                                              phycialLocation: widget.user['home']['physicalLocation'],
-                                                                            );
-                                                                          },
-                                                                    margins:
-                                                                        EdgeInsets
-                                                                            .only(
-                                                                      right: 5,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                Expanded(
-                                                                  child:
-                                                                      LocationSelector(
-                                                                    name:
-                                                                        "OFFICE",
-                                                                    isActive: snapshot.data ==
-                                                                            widget.user['office']['physicalLocation']
-                                                                        ? true
-                                                                        : false,
-                                                                    changeLocation: snapshot.data ==
-                                                                            widget.user['office']['physicalLocation']
-                                                                        ? () {}
-                                                                        : () {
-                                                                            orderCartBloc.getCheckoutLocation(
-                                                                              coordinates: {
-                                                                                "lat": widget.user['office']['lat'],
-                                                                                "lang": widget.user['office']['lang'],
-                                                                              },
-                                                                              phycialLocation: widget.user['office']['physicalLocation'],
-                                                                            );
-                                                                          },
-                                                                    margins:
-                                                                        EdgeInsets
-                                                                            .only(
-                                                                      left: 5,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            );
-                                                          })
-                                                      : Container(),
-                                                ],
-                                              ),
+                      Divider(),
+                      Expanded(
+                        child: StreamBuilder<List<OnlineOrder>>(
+                          stream: orderCartBloc.localOrder,
+                          builder: (context, snapshot) {
+                            return snapshot.hasData
+                                ? Container(
+                                    margin: EdgeInsets.only(
+                                      left: 10,
+                                      right: 10,
+                                    ),
+                                    child: ListView(
+                                        shrinkWrap: true,
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                              left: 10,
+                                              right: 10,
                                             ),
-                                            ...snapshot.data
-                                                .map<Widget>((order) => Column(
-                                                      children: <Widget>[
-                                                        Divider(),
-                                                        Row(
-                                                          children: <Widget>[
-                                                            Expanded(
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: <
-                                                                    Widget>[
-                                                                  Text(
-                                                                    order.vendor
-                                                                        .toUpperCase(),
-                                                                    style: GoogleFonts
-                                                                        .montserrat(
-                                                                      fontSize:
-                                                                          20,
-                                                                      letterSpacing:
-                                                                          1.5,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w800,
-                                                                    ),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Row(
+                                                  children: <Widget>[
+                                                    Text(
+                                                      "Choose a saved location",
+                                                      style: GoogleFonts.nunito(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                      ),
+                                                    ),
+                                                    Switch.adaptive(
+                                                      value: _chooseLocation,
+                                                      onChanged:
+                                                          _switchToFavouredLocation,
+                                                    ),
+                                                  ],
+                                                ),
+                                                _chooseLocation
+                                                    ? StreamBuilder<String>(
+                                                        stream: orderCartBloc
+                                                            .checkoutPhysicalLocation,
+                                                        builder: (context,
+                                                            snapshot) {
+                                                          return Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: <Widget>[
+                                                              Expanded(
+                                                                child:
+                                                                    LocationSelector(
+                                                                  name: "HOME",
+                                                                  isActive: snapshot
+                                                                              .data ==
+                                                                          widget.user['home']
+                                                                              [
+                                                                              'physicalLocation']
+                                                                      ? true
+                                                                      : false,
+                                                                  changeLocation:
+                                                                      snapshot.data ==
+                                                                              widget.user['home']['physicalLocation']
+                                                                          ? () {}
+                                                                          : () {
+                                                                              orderCartBloc.getCheckoutLocation(
+                                                                                coordinates: {
+                                                                                  "lat": widget.user['home']['lat'],
+                                                                                  "lang": widget.user['home']['lang'],
+                                                                                },
+                                                                                phycialLocation: widget.user['home']['physicalLocation'],
+                                                                              );
+                                                                            },
+                                                                  margins:
+                                                                      EdgeInsets
+                                                                          .only(
+                                                                    right: 5,
                                                                   ),
-                                                                  ListView(
-                                                                    shrinkWrap:
-                                                                        true,
-                                                                    physics:
-                                                                        ClampingScrollPhysics(),
-                                                                    children: order
-                                                                        .items
-                                                                        .map(
-                                                                          (item) =>
-                                                                              RichText(
-                                                                            text:
-                                                                                TextSpan(
-                                                                              text: item.name,
-                                                                              children: [
-                                                                                TextSpan(
-                                                                                  text: " x${item.quantity}",
-                                                                                  style: GoogleFonts.nunito(
-                                                                                    fontSize: 10,
-                                                                                    color: Colors.black,
-                                                                                    fontWeight: FontWeight.w800,
-                                                                                  ),
-                                                                                ),
-                                                                                TextSpan(
-                                                                                  text: ",",
-                                                                                ),
-                                                                              ],
-                                                                              style: GoogleFonts.nunito(
-                                                                                fontSize: 10,
-                                                                                color: Colors.black,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        )
-                                                                        .toList(),
-                                                                  )
-                                                                ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Column(
+                                                              Expanded(
+                                                                child:
+                                                                    LocationSelector(
+                                                                  name:
+                                                                      "OFFICE",
+                                                                  isActive: snapshot
+                                                                              .data ==
+                                                                          widget.user['office']
+                                                                              [
+                                                                              'physicalLocation']
+                                                                      ? true
+                                                                      : false,
+                                                                  changeLocation:
+                                                                      snapshot.data ==
+                                                                              widget.user['office']['physicalLocation']
+                                                                          ? () {}
+                                                                          : () {
+                                                                              orderCartBloc.getCheckoutLocation(
+                                                                                coordinates: {
+                                                                                  "lat": widget.user['office']['lat'],
+                                                                                  "lang": widget.user['office']['lang'],
+                                                                                },
+                                                                                phycialLocation: widget.user['office']['physicalLocation'],
+                                                                              );
+                                                                            },
+                                                                  margins:
+                                                                      EdgeInsets
+                                                                          .only(
+                                                                    left: 5,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        })
+                                                    : Container(),
+                                              ],
+                                            ),
+                                          ),
+                                          ...snapshot.data
+                                              .map<Widget>((order) => Column(
+                                                    children: <Widget>[
+                                                      Divider(),
+                                                      Row(
+                                                        children: <Widget>[
+                                                          Expanded(
+                                                            child: Column(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: <
                                                                   Widget>[
-                                                                Container(
-                                                                  margin:
-                                                                      EdgeInsets
-                                                                          .only(
-                                                                    bottom: 7.5,
-                                                                  ),
-                                                                  child:
-                                                                      Material(
-                                                                    color: Colors
-                                                                            .orange[
-                                                                        800],
-                                                                    elevation:
-                                                                        5,
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .circular(5),
-                                                                    child:
-                                                                        Padding(
-                                                                      padding:
-                                                                          const EdgeInsets
-                                                                              .only(
-                                                                        left:
-                                                                            10,
-                                                                        right:
-                                                                            10,
-                                                                        top: 5,
-                                                                        bottom:
-                                                                            5,
-                                                                      ),
-                                                                      child:
-                                                                          Text(
-                                                                        "Total Items: ${order.cartLength}",
-                                                                        style: GoogleFonts
-                                                                            .nunito(
-                                                                          color:
-                                                                              Colors.white,
-                                                                          fontWeight:
-                                                                              FontWeight.w800,
-                                                                        ),
-                                                                      ),
-                                                                    ),
+                                                                Text(
+                                                                  order.vendor
+                                                                      .toUpperCase(),
+                                                                  style: GoogleFonts
+                                                                      .montserrat(
+                                                                    fontSize:
+                                                                        20,
+                                                                    letterSpacing:
+                                                                        1.5,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w800,
                                                                   ),
                                                                 ),
-                                                                Container(
-                                                                  child:
-                                                                      Material(
-                                                                    color: Colors
-                                                                            .orange[
-                                                                        800],
-                                                                    elevation:
-                                                                        5,
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .circular(5),
-                                                                    child:
-                                                                        Padding(
-                                                                      padding:
-                                                                          const EdgeInsets
-                                                                              .only(
-                                                                        left:
-                                                                            10,
-                                                                        right:
-                                                                            10,
-                                                                        top: 5,
-                                                                        bottom:
-                                                                            5,
-                                                                      ),
-                                                                      child:
-                                                                          Text(
-                                                                        "Total Price: ${order.totalPrice}",
-                                                                        style: GoogleFonts
-                                                                            .nunito(
-                                                                          color:
-                                                                              Colors.white,
-                                                                          fontWeight:
-                                                                              FontWeight.w800,
+                                                                ListView(
+                                                                  shrinkWrap:
+                                                                      true,
+                                                                  physics:
+                                                                      ClampingScrollPhysics(),
+                                                                  children: order
+                                                                      .items
+                                                                      .map(
+                                                                        (item) =>
+                                                                            RichText(
+                                                                          text:
+                                                                              TextSpan(
+                                                                            text:
+                                                                                item.name,
+                                                                            children: [
+                                                                              TextSpan(
+                                                                                text: " x${item.quantity}",
+                                                                                style: GoogleFonts.nunito(
+                                                                                  fontSize: 10,
+                                                                                  color: Colors.black,
+                                                                                  fontWeight: FontWeight.w800,
+                                                                                ),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: ",",
+                                                                              ),
+                                                                            ],
+                                                                            style:
+                                                                                GoogleFonts.nunito(
+                                                                              fontSize: 10,
+                                                                              color: Colors.black,
+                                                                            ),
+                                                                          ),
                                                                         ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
+                                                                      )
+                                                                      .toList(),
+                                                                )
                                                               ],
-                                                            )
-                                                          ],
-                                                        ),
-                                                        Divider(),
-                                                      ],
-                                                    ))
-                                                .toList(),
-                                          ]),
-                                    )
-                                  : Text("No data");
-                            },
-                          ),
-                        ),
-                        Divider(),
-                        Container(
-                          margin: EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                          ),
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                    right: 10,
-                                  ),
-                                  child: Material(
-                                    elevation: 5,
-                                    borderRadius: BorderRadius.circular(
-                                      5,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 10,
-                                        right: 10,
-                                      ),
-                                      child: StreamBuilder<String>(
-                                          stream: orderCartBloc.promoCode,
-                                          builder: (context, snapshot) {
-                                            return TextField(
-                                              onChanged:
-                                                  orderCartBloc.changePromoCode,
-                                              decoration: InputDecoration(
-                                                hintText:
-                                                    "Enter the promo code here...",
-                                                hintStyle: GoogleFonts.nunito(
-                                                  fontStyle: FontStyle.italic,
-                                                ),
-                                              ),
-                                            );
-                                          }),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              StreamBuilder<bool>(
-                                  stream: orderCartBloc.promoCodeIsUsed,
-                                  builder: (context, snapshot) {
-                                    return RawMaterialButton(
-                                      fillColor: snapshot.data
-                                          ? Colors.grey
-                                          : Colors.blue[800],
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          5,
-                                        ),
-                                      ),
-                                      onPressed: snapshot.data
-                                          ? null
-                                          : () {
-                                              orderCartBloc.applyPromoCode(
-                                                  widget.user['email']);
-                                            },
-                                      child: Text(
-                                        "Apply Code",
-                                        style: GoogleFonts.nunito(
-                                          color: snapshot.data
-                                              ? Colors.black26
-                                              : Colors.white,
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                            ],
-                          ),
-                        ),
-                        StreamBuilder<bool>(
-                          stream: orderCartBloc.promoCodeIsUsed,
-                          builder: (context, snapshot) {
-                            return snapshot.data
-                                ? Text(
-                                    "You have used a promo code!",
-                                    style: GoogleFonts.nunito(
-                                      color: Colors.green,
-                                      fontStyle: FontStyle.italic,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                                            ),
+                                                          ),
+                                                          Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: <Widget>[
+                                                              Container(
+                                                                margin:
+                                                                    EdgeInsets
+                                                                        .only(
+                                                                  bottom: 7.5,
+                                                                ),
+                                                                child: Material(
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      800],
+                                                                  elevation: 5,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              5),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .only(
+                                                                      left: 10,
+                                                                      right: 10,
+                                                                      top: 5,
+                                                                      bottom: 5,
+                                                                    ),
+                                                                    child: Text(
+                                                                      "Total Items: ${order.cartLength}",
+                                                                      style: GoogleFonts
+                                                                          .nunito(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontWeight:
+                                                                            FontWeight.w800,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Container(
+                                                                child: Material(
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      800],
+                                                                  elevation: 5,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              5),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .only(
+                                                                      left: 10,
+                                                                      right: 10,
+                                                                      top: 5,
+                                                                      bottom: 5,
+                                                                    ),
+                                                                    child: Text(
+                                                                      "Total Price: ${order.totalPrice}",
+                                                                      style: GoogleFonts
+                                                                          .nunito(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontWeight:
+                                                                            FontWeight.w800,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Divider(),
+                                                    ],
+                                                  ))
+                                              .toList(),
+                                        ]),
                                   )
-                                : Container();
+                                : Text("No data");
                           },
                         ),
-                        Divider(),
-                        StreamBuilder<int>(
-                            stream: orderCartBloc.cartsTotal,
-                            builder: (context, snapshot) {
-                              return Container(
+                      ),
+                      Divider(),
+                      Container(
+                        margin: EdgeInsets.only(
+                          left: 10,
+                          right: 10,
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
                                 margin: EdgeInsets.only(
-                                  left: 10,
                                   right: 10,
-                                  top: 5,
-                                  bottom: 5,
                                 ),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Text(
-                                        "Subtotal",
-                                        style: GoogleFonts.nunito(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 16,
-                                        ),
-                                      ),
+                                child: Material(
+                                  elevation: 5,
+                                  borderRadius: BorderRadius.circular(
+                                    5,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 10,
+                                      right: 10,
                                     ),
-                                    Text(
-                                      "Rs.${snapshot.data.toString()}",
-                                      style: GoogleFonts.nunito(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 16,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
-                            }),
-                        Container(
-                          margin: EdgeInsets.only(
-                            left: 10,
-                            right: 10,
-                            top: 5,
-                            bottom: 5,
-                          ),
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(
-                                  "Delivery Charge",
-                                  style: GoogleFonts.nunito(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                "Rs.20",
-                                style: GoogleFonts.nunito(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 16,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        StreamBuilder<int>(
-                          stream: orderCartBloc.cartsTotal,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError)
-                              return Text("Error: ${snapshot.error}");
-                            switch (snapshot.connectionState) {
-                              case ConnectionState.none:
-                                return Text("Awaiting bids....");
-                                break;
-                              case ConnectionState.waiting:
-                                return LinearProgressIndicator();
-                                break;
-                              case ConnectionState.active:
-                                return Container(
-                                  margin: EdgeInsets.only(
-                                    left: 10,
-                                    right: 10,
-                                    top: 5,
-                                    bottom: 5,
-                                  ),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Text(
-                                          "Total",
-                                          style: GoogleFonts.nunito(
-                                            fontWeight: FontWeight.w800,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        "Rs.${snapshot.data + 20}",
-                                        style: GoogleFonts.nunito(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 16,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                );
-                                break;
-                              case ConnectionState.done:
-                                return Text("The task has completed");
-                                break;
-                            }
-                            return null;
-                          },
-                        ),
-                        Divider(),
-                        Container(
-                          height: 65,
-                          child: Material(
-                            color: Colors.blue[800],
-                            elevation: 10,
-                            child: InkWell(
-                              onTap: () {
-                                orderCartBloc.changeTransactionStatus(true);
-                                orderCartBloc
-                                    .saveOrder(
-                                  widget.user,
-                                )
-                                    .whenComplete(
-                                  () {
-                                    orderCartBloc
-                                        .changeTransactionStatus(false);
-                                    orderCartBloc.changeCheckoutStatus(true);
-                                  },
-                                );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Center(
-                                  child: StreamBuilder<bool>(
-                                    initialData: false,
-                                    stream: orderCartBloc.transactionStatus,
-                                    builder: (context, snapshot) {
-                                      return snapshot.data
-                                          ? CircularProgressIndicator(
-                                              backgroundColor: Colors.green,
-                                            )
-                                          : Text(
-                                              "Check Out!",
-                                              style: GoogleFonts.oswald(
-                                                color: Colors.white,
-                                                fontSize: 25,
+                                    child: StreamBuilder<String>(
+                                        stream: orderCartBloc.promoCode,
+                                        builder: (context, snapshot) {
+                                          return TextField(
+                                            onChanged:
+                                                orderCartBloc.changePromoCode,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  "Enter the promo code here...",
+                                              hintStyle: GoogleFonts.nunito(
+                                                fontStyle: FontStyle.italic,
                                               ),
-                                            );
-                                    },
+                                            ),
+                                          );
+                                        }),
                                   ),
                                 ),
                               ),
                             ),
+                            StreamBuilder<bool>(
+                                stream: orderCartBloc.promoCodeIsUsed,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError)
+                                    return Text("Error: ${snapshot.error}");
+                                  switch (snapshot.connectionState) {
+                                    case ConnectionState.none:
+                                      return Text("Awaiting bids....");
+                                      break;
+                                    case ConnectionState.waiting:
+                                      return Center(
+                                          child: CircularProgressIndicator());
+                                      break;
+                                    case ConnectionState.active:
+                                      return RawMaterialButton(
+                                        fillColor: snapshot.data
+                                            ? Colors.grey
+                                            : Colors.blue[800],
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        onPressed: snapshot.data
+                                            ? null
+                                            : () {
+                                                orderCartBloc.applyPromoCode(
+                                                    widget.user['email']);
+                                              },
+                                        child: Text(
+                                          "Apply Code",
+                                          style: GoogleFonts.nunito(
+                                            color: snapshot.data
+                                                ? Colors.black26
+                                                : Colors.white,
+                                          ),
+                                        ),
+                                      );
+                                      break;
+                                    case ConnectionState.done:
+                                      return Text("The task has completed");
+                                      break;
+                                  }
+                                }),
+                          ],
+                        ),
+                      ),
+                      StreamBuilder<bool>(
+                        stream: orderCartBloc.promoCodeIsUsed,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError)
+                            return Text("Error: ${snapshot.error}");
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.none:
+                              return Text("Awaiting Bids...");
+                              break;
+                            case ConnectionState.waiting:
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                              break;
+                            case ConnectionState.active:
+                              return snapshot.data
+                                  ? Text(
+                                      "You have used a promo code!",
+                                      style: GoogleFonts.nunito(
+                                        color: Colors.green,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : Container();
+                              break;
+                            case ConnectionState.done:
+                              return Text("The task has completed");
+                              break;
+                          }
+                          return null;
+                        },
+                      ),
+                      Divider(),
+                      StreamBuilder<double>(
+                          stream: orderCartBloc.cartsTotal,
+                          builder: (context, snapshot) {
+                            return Container(
+                              margin: EdgeInsets.only(
+                                left: 10,
+                                right: 10,
+                                top: 5,
+                                bottom: 5,
+                              ),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      "Subtotal",
+                                      style: GoogleFonts.nunito(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "Rs.${snapshot.data.toString()}",
+                                    style: GoogleFonts.nunito(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          }),
+                      Container(
+                        margin: EdgeInsets.only(
+                          left: 10,
+                          right: 10,
+                          top: 5,
+                          bottom: 5,
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                "Delivery Charge",
+                                style: GoogleFonts.nunito(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            StreamBuilder<double>(
+                                stream: orderCartBloc.deliveryCharge,
+                                builder: (context, snapshot) {
+                                  return Text(
+                                    "Rs.${snapshot.data}",
+                                    style: GoogleFonts.nunito(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                    ),
+                                  );
+                                })
+                          ],
+                        ),
+                      ),
+                      StreamBuilder<double>(
+                        stream: orderCartBloc.cartsTotal,
+                        builder: (context, totalAmount) {
+                          if (totalAmount.hasError)
+                            return Text("Error: ${totalAmount.error}");
+                          switch (totalAmount.connectionState) {
+                            case ConnectionState.none:
+                              return Text("Awaiting bids....");
+                              break;
+                            case ConnectionState.waiting:
+                              return LinearProgressIndicator();
+                              break;
+                            case ConnectionState.active:
+                              return StreamBuilder<double>(
+                                  stream: orderCartBloc.deliveryCharge,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasError)
+                                      return (Text("Error: ${snapshot.error}"));
+                                    switch (snapshot.connectionState) {
+                                      case ConnectionState.none:
+                                        return Text("Awaiting bids....");
+                                        break;
+                                      case ConnectionState.waiting:
+                                        return Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                        break;
+                                      case ConnectionState.active:
+                                        return Container(
+                                          margin: EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                            top: 5,
+                                            bottom: 5,
+                                          ),
+                                          child: Row(
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: Text(
+                                                  "Total",
+                                                  style: GoogleFonts.nunito(
+                                                    fontWeight: FontWeight.w800,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                "Rs.${snapshot.data + totalAmount.data}",
+                                                style: GoogleFonts.nunito(
+                                                  fontWeight: FontWeight.w800,
+                                                  fontSize: 16,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        );
+                                        break;
+                                      case ConnectionState.done:
+                                        return Text("The task has completed.");
+                                        break;
+                                    }
+                                  });
+                              break;
+                            case ConnectionState.done:
+                              return Text("The task has completed");
+                              break;
+                          }
+                          return null;
+                        },
+                      ),
+                      Divider(),
+                      Container(
+                        height: 65,
+                        child: Material(
+                          color: Colors.blue[800],
+                          elevation: 10,
+                          child: InkWell(
+                            onTap: () {
+                              orderCartBloc.changeTransactionStatus(true);
+                              orderCartBloc
+                                  .saveOrder(
+                                widget.user,
+                              )
+                                  .whenComplete(
+                                () {
+                                  orderCartBloc.changeTransactionStatus(false);
+                                  orderCartBloc.changeCheckoutStatus(true);
+                                },
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Center(
+                                child: StreamBuilder<bool>(
+                                  initialData: false,
+                                  stream: orderCartBloc.transactionStatus,
+                                  builder: (context, snapshot) {
+                                    return snapshot.data
+                                        ? CircularProgressIndicator(
+                                            backgroundColor: Colors.green,
+                                          )
+                                        : Text(
+                                            "Check Out!",
+                                            style: GoogleFonts.oswald(
+                                              color: Colors.white,
+                                              fontSize: 25,
+                                            ),
+                                          );
+                                  },
+                                ),
+                              ),
+                            ),
                           ),
-                        )
-                      ],
-                    );
-            }),
+                        ),
+                      )
+                    ],
+                  );
+          },
+        ),
       ),
     );
   }
