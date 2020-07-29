@@ -1,4 +1,6 @@
 import 'package:fastuserapp/src/models/offers_item.dart';
+import 'package:latlong/latlong.dart';
+import 'package:location/location.dart';
 
 import '../models/vendor.dart';
 import '../models/item.dart';
@@ -10,6 +12,7 @@ class CartMenuBloc {
   List<MenuItem> _cartMenu = [];
   final _repository = Repository();
   List<Vendor> taggedVenors = [];
+  Distance _distance = Distance();
 
   final BehaviorSubject<List<Vendor>> _vendorsSubject =
       BehaviorSubject<List<Vendor>>();
@@ -69,11 +72,41 @@ class CartMenuBloc {
   }
 
   getVendors(String tag) {
-    _repository.getVendors(tag).listen(
-      (vendors) {
-        changeVendors(vendors);
-      },
-    );
+    if (tag == "nearby") {
+      _repository.getVendors("all").listen(
+        (vendors) {
+          Location _location = Location();
+          _location.onLocationChanged.listen(
+            (changedLocation) {
+              vendors = vendors
+                  .where(
+                    (vendor) =>
+                        _distance.as(
+                          LengthUnit.Meter,
+                          LatLng(
+                            changedLocation.latitude,
+                            changedLocation.longitude,
+                          ),
+                          LatLng(
+                            vendor.lat,
+                            vendor.lang,
+                          ),
+                        ) <=
+                        3000,
+                  )
+                  .toList();
+              changeVendors(vendors);
+            },
+          );
+        },
+      );
+    } else {
+      _repository.getVendors(tag).listen(
+        (vendors) {
+          changeVendors(vendors);
+        },
+      );
+    }
   }
 
   Stream<List<MenuItem>> getMenu(String category, String vendor) {
@@ -91,6 +124,7 @@ class CartMenuBloc {
   getTags() {
     _repository.getTags().listen(
       (tags) {
+        tags = ["nearby", ...tags];
         changeTags(tags);
       },
     );

@@ -118,6 +118,15 @@ class OrderCartBloc {
   Function(String) get changeCheckoutPhysicalLocation =>
       _checkoutPhysicalLocationSubject.sink.add;
 
+  final BehaviorSubject<bool> _isScheduledSubject = BehaviorSubject<bool>();
+  Stream<bool> get isScheduled => _isScheduledSubject.stream;
+  Function(bool) get changeSchedulingStatus => _isScheduledSubject.sink.add;
+
+  final BehaviorSubject<String> _scheduledTimeSubject =
+      BehaviorSubject<String>();
+  Stream<String> get scheduledTime => _scheduledTimeSubject.stream;
+  Function(String) get changeScheduledTime => _scheduledTimeSubject.sink.add;
+
   final BehaviorSubject<String> _promoCodeSubject = BehaviorSubject<String>();
   Stream<String> get promoCode => _promoCodeSubject.stream.transform(
           StreamTransformer.fromHandlers(handleData: (String promoCode, sink) {
@@ -144,6 +153,7 @@ class OrderCartBloc {
     getCurrentLocation();
     changeTransactionStatus(false);
     changePromoUsedStateUsed(false);
+    changeSchedulingStatus(false);
   }
 
   getOrderRefs(Map<String, dynamic> user) {
@@ -403,6 +413,10 @@ class OrderCartBloc {
       "lang": _checkoutCoordinatesSubject.value['lang'],
       "physicalLocation": _checkoutPhysicalLocationSubject.value,
       "status": [],
+      "isScheduled": _isScheduledSubject.value,
+      "scheduleTime": _scheduledTimeSubject.value != null
+          ? _scheduledTimeSubject.value
+          : "",
       "isAssignedTo": {
         "name": "",
         "email": "",
@@ -428,37 +442,36 @@ class OrderCartBloc {
 
   getDeliveryCharge() {
     double farthestLocation = 0.0;
-    double addableAmount = 0.0;
+    double addableAmount = 20.0;
     Distance _distance = Distance();
-    if (_localOrders.length == 1) {
-    } else {
-      _localOrders.forEach((order) {
-        _repository.getVendorLocation(order['vendor']).listen((latlong) {
-          double distance = _distance.as(
-              LengthUnit.Meter,
-              LatLng(_checkoutCoordinatesSubject.value['lat'],
-                  _checkoutCoordinatesSubject.value['lang']),
-              LatLng(latlong['lat'], latlong['lang']));
-          print("Distance: $distance");
-          if (distance > farthestLocation) {
-            farthestLocation = distance;
-          }
-          print("Farthest Location: $farthestLocation");
-          if (farthestLocation > 2000.0) {
-            _repository.getDistanceRates().listen((rates) {
-              addableAmount = (farthestLocation - 2000) * (rates.first / 1000);
-              print("Addabe Amount:$addableAmount");
-              changeDeliveryCharge(addableAmount);
-            });
-          } else {
-            changeDeliveryCharge(20.0);
-          }
-        });
+
+    _localOrders.forEach((order) {
+      _repository.getVendorLocation(order['vendor']).listen((latlong) {
+        double distance = _distance.as(
+            LengthUnit.Meter,
+            LatLng(_checkoutCoordinatesSubject.value['lat'],
+                _checkoutCoordinatesSubject.value['lang']),
+            LatLng(latlong['lat'], latlong['lang']));
+        print("Distance: $distance");
+        if (distance > farthestLocation) {
+          farthestLocation = distance;
+        }
+        print("Farthest Location: $farthestLocation");
+        if (farthestLocation > 5000.0) {
+          _repository.getDistanceRates().listen((rates) {
+            addableAmount += (farthestLocation - 2000) * (rates.first / 1000);
+            print("Addabe Amount:$addableAmount");
+            changeDeliveryCharge(addableAmount);
+          });
+        } else {
+          changeDeliveryCharge(
+            addableAmount,
+          );
+        }
       });
+    });
 
-      // print("Farthest Location: $farthestLocation");
-
-    }
+    // print("Farthest Location: $farthestLocation");
   }
 
   Future<void> createRef(Map<String, dynamic> refObj) {

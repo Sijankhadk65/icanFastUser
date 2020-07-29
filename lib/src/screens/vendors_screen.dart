@@ -1,4 +1,6 @@
+import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../bloc/cart_menu_bloc.dart';
 import '../models/vendor.dart';
 import '../widgets/source_card.dart';
@@ -39,21 +41,33 @@ class _VendorsScreenState extends State<VendorsScreen> {
                 child: CircularProgressIndicator(),
               );
             case ConnectionState.active:
-              return ListView(
-                shrinkWrap: true,
-                children: snapshot.data
-                    .map<Widget>(
-                      (vendor) => Provider(
-                        create: (_) => CartMenuBloc(),
-                        dispose: (context, CartMenuBloc bloc) => bloc.dispose(),
-                        child: SourceCard(
-                          vendor: vendor,
-                          user: widget.user,
+              print(widget.tag);
+              return snapshot.data.isNotEmpty
+                  ? ListView(
+                      shrinkWrap: true,
+                      children: snapshot.data
+                          .map<Widget>(
+                            (vendor) => Provider(
+                              create: (_) => CartMenuBloc(),
+                              dispose: (context, CartMenuBloc bloc) =>
+                                  bloc.dispose(),
+                              child: SourceCard(
+                                vendor: vendor,
+                                user: widget.user,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    )
+                  : Center(
+                      child: Text(
+                        "No Vendors Found.",
+                        style: GoogleFonts.oswald(
+                          color: Colors.orange[800],
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                    )
-                    .toList(),
-              );
+                    );
             case ConnectionState.done:
               return Text('${snapshot.data} (closed)');
           }

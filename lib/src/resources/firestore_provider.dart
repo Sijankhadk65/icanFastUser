@@ -61,7 +61,7 @@ class FirestoreProvider {
 
   Stream<QuerySnapshot> getClosedOrderRefs(Map<String, dynamic> user) {
     return _firestore
-        .collection("closedOnlineOrders")
+        .collection("liveOnlineOrders")
         .where(
           "user.email",
           isEqualTo: user['email'],

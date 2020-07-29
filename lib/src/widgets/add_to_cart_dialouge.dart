@@ -152,13 +152,14 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                 SizedBox(
                   width: 50,
                   child: RawMaterialButton(
-                    fillColor: Colors.orange[800],
+                    fillColor:
+                        itemQuantity == 1 ? Colors.grey : Colors.orange[800],
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         5,
                       ),
                     ),
-                    onPressed: itemQuantity == 0
+                    onPressed: itemQuantity == 1
                         ? null
                         : () {
                             this.setState(() {
@@ -166,7 +167,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                             });
                           },
                     child: Icon(
-                      EvaIcons.arrowheadLeftOutline,
+                      EvaIcons.minus,
                       color: Colors.white,
                     ),
                   ),
@@ -174,7 +175,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                 Expanded(
                   child: Center(
                     child: Text(
-                      "$itemQuantity plates",
+                      "$itemQuantity",
                       style: GoogleFonts.oswald(
                         fontSize: 20,
                       ),
@@ -198,7 +199,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                       );
                     },
                     child: Icon(
-                      EvaIcons.arrowheadRightOutline,
+                      EvaIcons.plus,
                       color: Colors.white,
                     ),
                   ),

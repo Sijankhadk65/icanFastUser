@@ -6,6 +6,7 @@ import 'package:fastuserapp/src/widgets/location_selectors.dart';
 import 'package:fastuserapp/src/widgets/order_bottom_sheet.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_map_location_picker/google_map_location_picker.dart';
 
@@ -193,6 +194,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                           },
                                           phycialLocation: result.address,
                                         );
+                                        orderCartBloc.getDeliveryCharge();
                                       },
                                     );
 
@@ -204,6 +206,79 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 return null;
                               },
                             ),
+                            StreamBuilder<bool>(
+                              stream: orderCartBloc.isScheduled,
+                              builder: (context, snapshot) {
+                                return snapshot.data
+                                    ? StreamBuilder<String>(
+                                        stream: orderCartBloc.scheduledTime,
+                                        builder: (context, snapshot) {
+                                          DateTime date =
+                                              DateTime.parse(snapshot.data);
+                                          return ChangableDisplayer(
+                                            primaryText:
+                                                "${date.year}/${date.month}/${date.day} at ${date.hour}:${date.minute}",
+                                            secondaryText:
+                                                "( change date or time )",
+                                            displayChanger: () {
+                                              DatePicker.showDateTimePicker(
+                                                  context,
+                                                  showTitleActions: true,
+                                                  minTime: DateTime(2018, 3, 5),
+                                                  maxTime: DateTime(2019, 6, 7),
+                                                  onChanged: (date) {
+                                                orderCartBloc
+                                                    .changeScheduledTime(
+                                                  date.toIso8601String(),
+                                                );
+                                              }, onConfirm: (date) {
+                                                orderCartBloc
+                                                    .changeSchedulingStatus(
+                                                        true);
+                                              },
+                                                  currentTime: DateTime.now(),
+                                                  locale: LocaleType.en);
+                                            },
+                                          );
+                                        },
+                                      )
+                                    : RawMaterialButton(
+                                        onPressed: () {
+                                          DatePicker.showDateTimePicker(context,
+                                              showTitleActions: true,
+                                              minTime: DateTime(2018, 3, 5),
+                                              maxTime: DateTime(2019, 6, 7),
+                                              onChanged: (date) {
+                                            orderCartBloc.changeScheduledTime(
+                                              date.toIso8601String(),
+                                            );
+                                          }, onConfirm: (date) {
+                                            orderCartBloc
+                                                .changeSchedulingStatus(true);
+                                          },
+                                              currentTime: DateTime.now(),
+                                              locale: LocaleType.en);
+                                        },
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        padding: EdgeInsets.only(
+                                          left: 5,
+                                          right: 5,
+                                        ),
+                                        child: Text(
+                                          "Schedule This Order",
+                                          style: GoogleFonts.nunito(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        fillColor: Colors.orange[800],
+                                      );
+                              },
+                            )
                           ],
                         ),
                       ),
@@ -279,6 +354,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                                                 },
                                                                                 phycialLocation: widget.user['home']['physicalLocation'],
                                                                               );
+                                                                              orderCartBloc.getDeliveryCharge();
                                                                             },
                                                                   margins:
                                                                       EdgeInsets
@@ -311,6 +387,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                                                 },
                                                                                 phycialLocation: widget.user['office']['physicalLocation'],
                                                                               );
+                                                                              orderCartBloc.getDeliveryCharge();
                                                                             },
                                                                   margins:
                                                                       EdgeInsets
