@@ -32,6 +32,8 @@ abstract class Vendor implements Built<Vendor, VendorBuilder> {
   bool get isBusy;
   @nullable
   bool get isAway;
+  @nullable
+  bool get isFeatured;
 
   factory Vendor([void Function(VendorBuilder) updates]) = _$Vendor;
   Vendor._();

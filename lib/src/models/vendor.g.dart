@@ -98,6 +98,12 @@ class _$VendorSerializer implements StructuredSerializer<Vendor> {
         ..add(serializers.serialize(object.isAway,
             specifiedType: const FullType(bool)));
     }
+    if (object.isFeatured != null) {
+      result
+        ..add('isFeatured')
+        ..add(serializers.serialize(object.isFeatured,
+            specifiedType: const FullType(bool)));
+    }
     return result;
   }
 
@@ -168,6 +174,10 @@ class _$VendorSerializer implements StructuredSerializer<Vendor> {
           result.isAway = serializers.deserialize(value,
               specifiedType: const FullType(bool)) as bool;
           break;
+        case 'isFeatured':
+          result.isFeatured = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool;
+          break;
       }
     }
 
@@ -202,6 +212,8 @@ class _$Vendor extends Vendor {
   final bool isBusy;
   @override
   final bool isAway;
+  @override
+  final bool isFeatured;
 
   factory _$Vendor([void Function(VendorBuilder) updates]) =>
       (new VendorBuilder()..update(updates)).build();
@@ -219,7 +231,8 @@ class _$Vendor extends Vendor {
       this.tags,
       this.categories,
       this.isBusy,
-      this.isAway})
+      this.isAway,
+      this.isFeatured})
       : super._();
 
   @override
@@ -245,7 +258,8 @@ class _$Vendor extends Vendor {
         tags == other.tags &&
         categories == other.categories &&
         isBusy == other.isBusy &&
-        isAway == other.isAway;
+        isAway == other.isAway &&
+        isFeatured == other.isFeatured;
   }
 
   @override
@@ -261,19 +275,21 @@ class _$Vendor extends Vendor {
                                     $jc(
                                         $jc(
                                             $jc(
-                                                $jc($jc(0, name.hashCode),
-                                                    photoURI.hashCode),
-                                                closeTime.hashCode),
-                                            openTime.hashCode),
-                                        minOrder.hashCode),
-                                    physicalLocation.hashCode),
-                                lat.hashCode),
-                            lang.hashCode),
-                        averageRating.hashCode),
-                    tags.hashCode),
-                categories.hashCode),
-            isBusy.hashCode),
-        isAway.hashCode));
+                                                $jc(
+                                                    $jc($jc(0, name.hashCode),
+                                                        photoURI.hashCode),
+                                                    closeTime.hashCode),
+                                                openTime.hashCode),
+                                            minOrder.hashCode),
+                                        physicalLocation.hashCode),
+                                    lat.hashCode),
+                                lang.hashCode),
+                            averageRating.hashCode),
+                        tags.hashCode),
+                    categories.hashCode),
+                isBusy.hashCode),
+            isAway.hashCode),
+        isFeatured.hashCode));
   }
 
   @override
@@ -291,7 +307,8 @@ class _$Vendor extends Vendor {
           ..add('tags', tags)
           ..add('categories', categories)
           ..add('isBusy', isBusy)
-          ..add('isAway', isAway))
+          ..add('isAway', isAway)
+          ..add('isFeatured', isFeatured))
         .toString();
   }
 }
@@ -355,6 +372,10 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
   bool get isAway => _$this._isAway;
   set isAway(bool isAway) => _$this._isAway = isAway;
 
+  bool _isFeatured;
+  bool get isFeatured => _$this._isFeatured;
+  set isFeatured(bool isFeatured) => _$this._isFeatured = isFeatured;
+
   VendorBuilder();
 
   VendorBuilder get _$this {
@@ -372,6 +393,7 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
       _categories = _$v.categories?.toBuilder();
       _isBusy = _$v.isBusy;
       _isAway = _$v.isAway;
+      _isFeatured = _$v.isFeatured;
       _$v = null;
     }
     return this;
@@ -408,7 +430,8 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
               tags: _tags?.build(),
               categories: _categories?.build(),
               isBusy: isBusy,
-              isAway: isAway);
+              isAway: isAway,
+              isFeatured: isFeatured);
     } catch (_) {
       String _$failedField;
       try {

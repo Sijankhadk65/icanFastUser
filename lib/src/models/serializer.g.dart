@@ -9,6 +9,7 @@ part of serializers;
 Serializers _$serializers = (new Serializers().toBuilder()
       ..add(CarouselItem.serializer)
       ..add(CartItem.serializer)
+      ..add(Liquor.serializer)
       ..add(MenuItem.serializer)
       ..add(OffersItem.serializer)
       ..add(OnlineOrder.serializer)

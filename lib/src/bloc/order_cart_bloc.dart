@@ -322,6 +322,15 @@ class OrderCartBloc {
         }
       },
     );
+
+    if (_localOrders
+            .where((element) => element['vendor'] == vendor)
+            .toList()
+            .first['items']
+            .toString() ==
+        "[]") {
+      removeCart(vendor);
+    }
   }
 
   void increaseItemCount(String vendor, CartItem newItem) {
@@ -440,38 +449,65 @@ class OrderCartBloc {
     });
   }
 
+  removeCart(String vendorName) {
+    _localOrders.removeWhere((cart) => cart['vendor'] == vendorName);
+    print("After Delete $_localOrders");
+    getLocalOrder();
+    getCurrentOrder(null);
+  }
+
   getDeliveryCharge() {
     double farthestLocation = 0.0;
     double addableAmount = 20.0;
     Distance _distance = Distance();
 
-    _localOrders.forEach((order) {
-      _repository.getVendorLocation(order['vendor']).listen((latlong) {
-        double distance = _distance.as(
-            LengthUnit.Meter,
-            LatLng(_checkoutCoordinatesSubject.value['lat'],
-                _checkoutCoordinatesSubject.value['lang']),
-            LatLng(latlong['lat'], latlong['lang']));
-        print("Distance: $distance");
-        if (distance > farthestLocation) {
-          farthestLocation = distance;
-        }
-        print("Farthest Location: $farthestLocation");
-        if (farthestLocation > 5000.0) {
-          _repository.getDistanceRates().listen((rates) {
-            addableAmount += (farthestLocation - 2000) * (rates.first / 1000);
+    if (_localOrders.length == 1 && _localOrders.first['vendor'] == "Liquor") {
+      double distance = _distance.as(
+        LengthUnit.Meter,
+        LatLng(_checkoutCoordinatesSubject.value['lat'],
+            _checkoutCoordinatesSubject.value['lang']),
+        LatLng(27.704015260871312, 83.46299696713686),
+      );
+      print("Distance $distance");
+      if (distance >= 5000) {
+        _repository.getDistanceRates().listen(
+          (rates) {
+            addableAmount += (distance - 5000) * (rates.first / 1000);
             print("Addabe Amount:$addableAmount");
             changeDeliveryCharge(addableAmount);
-          });
-        } else {
-          changeDeliveryCharge(
-            addableAmount,
-          );
-        }
+          },
+        );
+      } else {
+        changeDeliveryCharge(
+          addableAmount,
+        );
+      }
+    } else {
+      _localOrders.forEach((order) {
+        _repository.getVendorLocation(order['vendor']).listen((latlong) {
+          double distance = _distance.as(
+              LengthUnit.Meter,
+              LatLng(_checkoutCoordinatesSubject.value['lat'],
+                  _checkoutCoordinatesSubject.value['lang']),
+              LatLng(latlong['lat'], latlong['lang']));
+          print("Distance: $distance");
+          if (distance > farthestLocation) {
+            farthestLocation = distance;
+          }
+          if (farthestLocation > 5000.0) {
+            _repository.getDistanceRates().listen((rates) {
+              addableAmount += (farthestLocation - 5000) * (rates.first / 1000);
+              print("Addabe Amount:$addableAmount");
+              changeDeliveryCharge(addableAmount);
+            });
+          } else {
+            changeDeliveryCharge(
+              addableAmount,
+            );
+          }
+        });
       });
-    });
-
-    // print("Farthest Location: $farthestLocation");
+    }
   }
 
   Future<void> createRef(Map<String, dynamic> refObj) {

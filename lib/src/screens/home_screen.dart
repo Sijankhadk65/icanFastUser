@@ -103,9 +103,17 @@ class _HomeScreenState extends State<HomeScreen>
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => Provider(
-                    create: (_) => SearchBloc(),
-                    dispose: (context, SearchBloc bloc) => bloc.dispose(),
+                  builder: (_) => MultiProvider(
+                    providers: [
+                      Provider(
+                        create: (_) => SearchBloc(),
+                        dispose: (context, SearchBloc bloc) => bloc.dispose(),
+                      ),
+                      Provider(
+                        create: (_) => CartMenuBloc(),
+                        dispose: (context, CartMenuBloc bloc) => bloc.dispose(),
+                      ),
+                    ],
                     child: FoodSearchDelegate(
                       user: widget.user,
                     ),

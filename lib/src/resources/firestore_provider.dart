@@ -29,6 +29,9 @@ class FirestoreProvider {
     return _firestore.document("vendors/$vendorName").snapshots();
   }
 
+  Stream<DocumentSnapshot> getMenuItem(String createdAt) =>
+      _firestore.collection("menu").document(createdAt).snapshots();
+
   Stream<QuerySnapshot> getVendorMenu(String category, String vendor) {
     if (category == "all") return _firestore.collection("menu").snapshots();
     return _firestore
@@ -37,6 +40,12 @@ class FirestoreProvider {
         .where("vendor", isEqualTo: vendor)
         .snapshots();
   }
+
+  Stream<QuerySnapshot> getVendorFeaturedMenu(String vendorName) => _firestore
+      .collection("menu")
+      .where("vendor", isEqualTo: vendorName)
+      .where("isFeatured", isEqualTo: true)
+      .snapshots();
 
   Stream<QuerySnapshot> getVendorCategory(String vendor) {
     return _firestore
@@ -106,12 +115,17 @@ class FirestoreProvider {
       _firestore.collection("distanceRates").snapshots();
 
   Stream<QuerySnapshot> getVendors(String tag) {
-    if (tag == "all") return _firestore.collection("vendors").snapshots();
+    // if (tag == "all") return _firestore.collection("vendors").snapshots();
     return _firestore
         .collection("vendors")
         .where("tags", arrayContains: tag)
         .snapshots();
   }
+
+  Stream<QuerySnapshot> getFeaturedVendor() => _firestore
+      .collection("vendors")
+      .where("isFeatured", isEqualTo: true)
+      .snapshots();
 
   Future<void> updateCart(String docID, Map<String, dynamic> newData) {
     return _firestore
@@ -184,4 +198,88 @@ class FirestoreProvider {
 
   Stream<DocumentSnapshot> getPromoCode(String code) =>
       _firestore.document("promoCodes/$code").snapshots();
+
+  Stream<QuerySnapshot> getFavourites(String type, String email) {
+    if (type == "resturant")
+      return _firestore
+          .document("users/$email")
+          .collection("favourite resturants")
+          .snapshots();
+
+    if (type == "food")
+      return _firestore
+          .document("users/$email")
+          .collection("favourite foods")
+          .snapshots();
+  }
+
+  Stream<QuerySnapshot> getFavouritesFood(String email) => _firestore
+      .document("users/$email")
+      .collection("favourite foods")
+      .snapshots();
+
+  Stream<QuerySnapshot> getVegFood() {
+    return _firestore
+        .collection("menu")
+        .where("isVeg", isEqualTo: true)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getVegVendors() {
+    return _firestore
+        .collection("vendors")
+        .where("isVeg", isEqualTo: true)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getHalalFood() {
+    return _firestore
+        .collection("menu")
+        .where("isHalal", isEqualTo: true)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getHalalVendors() {
+    return _firestore
+        .collection("vendors")
+        .where("isHalal", isEqualTo: true)
+        .snapshots();
+  }
+
+  Future<void> addToFavourite(
+      String type, String email, Map<String, dynamic> itemData) {
+    if (type == "resturant")
+      return _firestore
+          .document("users/$email")
+          .collection("favourite resturants")
+          .document(itemData['name'])
+          .setData(itemData);
+    if (type == "food")
+      return _firestore
+          .document("users/$email")
+          .collection("favourite foods")
+          .document(itemData['createdAt'])
+          .setData(itemData);
+  }
+
+  Future<void> removeFavourites(
+      String type, String email, Map<String, dynamic> itemData) {
+    if (type == "resturant")
+      return _firestore
+          .document("users/$email")
+          .collection("favourite resturants")
+          .document(itemData['name'])
+          .delete();
+    if (type == "food")
+      return _firestore
+          .document("users/$email")
+          .collection("favourite foods")
+          .document(itemData['createdAt'])
+          .delete();
+  }
+
+  Stream<QuerySnapshot> getLiquor(String category) => _firestore
+      .collection("liquor")
+      .where("type", isEqualTo: category)
+      .snapshots();
 }

@@ -83,23 +83,31 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                           height: 65,
                           color: snapshot.data
-                                  .map((order) {
-                                    return order.totalPrice > order.minOrder;
-                                  })
+                                  .map(
+                                    (order) {
+                                      return order.totalPrice >= order.minOrder;
+                                    },
+                                  )
                                   .toList()
-                                  .contains(false)
+                                  .contains(
+                                    false,
+                                  )
                               ? Colors.red[800]
                               : Colors.blue[800],
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: snapshot.data
-                                      .map((order) {
-                                        return order.totalPrice >
-                                            order.minOrder;
-                                      })
+                                      .map(
+                                        (order) {
+                                          return order.totalPrice >=
+                                              order.minOrder;
+                                        },
+                                      )
                                       .toList()
-                                      .contains(false)
+                                      .contains(
+                                        false,
+                                      )
                                   ? null
                                   : () {
                                       Navigator.push(
@@ -139,7 +147,7 @@ class _CartScreenState extends State<CartScreen> {
                                     ),
                                     snapshot.data
                                             .map((order) {
-                                              return order.totalPrice >
+                                              return order.totalPrice >=
                                                   order.minOrder;
                                             })
                                             .toList()

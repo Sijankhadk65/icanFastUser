@@ -269,7 +269,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                           right: 5,
                                         ),
                                         child: Text(
-                                          "Schedule This Order",
+                                          "Schedule for later",
                                           style: GoogleFonts.nunito(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w800,
@@ -737,7 +737,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 stream: orderCartBloc.deliveryCharge,
                                 builder: (context, snapshot) {
                                   return Text(
-                                    "Rs.${snapshot.data}",
+                                    "Rs.${snapshot.data.toStringAsFixed(2)}",
                                     style: GoogleFonts.nunito(
                                       fontWeight: FontWeight.w800,
                                       fontSize: 16,
@@ -794,7 +794,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                "Rs.${snapshot.data + totalAmount.data}",
+                                                "Rs.${double.parse((snapshot.data + totalAmount.data).toStringAsFixed(2))}",
                                                 style: GoogleFonts.nunito(
                                                   fontWeight: FontWeight.w800,
                                                   fontSize: 16,

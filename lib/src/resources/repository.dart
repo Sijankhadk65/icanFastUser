@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fastuserapp/src/models/carousel_item.dart';
+import 'package:fastuserapp/src/models/liquor.dart';
 import 'package:fastuserapp/src/models/offers_item.dart';
 import 'package:fastuserapp/src/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,6 +22,39 @@ class Repository {
   Stream<FirebaseUser> get onAuthStateChanged =>
       _authProvider.onAuthStateChanged
           .map((user) => user != null ? user : null);
+
+  Stream<MenuItem> getMenuItem(String createdAt) =>
+      _firestoreProvider.getMenuItem(createdAt).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (DocumentSnapshot snapshot, sink) {
+            sink.add(
+              parseToMenuItemModel(snapshot.data),
+            );
+          },
+        ),
+      );
+
+  Stream<Vendor> getVendor(String name) =>
+      _firestoreProvider.getVendor(name).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (DocumentSnapshot snapshot, sink) {
+            sink.add(
+              parseJsonToVendor(snapshot.data),
+            );
+          },
+        ),
+      );
+
+  Stream<int> vendorMinOrder(String name) =>
+      _firestoreProvider.getVendor(name).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (DocumentSnapshot snapshot, sink) {
+            sink.add(
+              snapshot.data['minOrder'],
+            );
+          },
+        ),
+      );
 
   Stream<Map<String, dynamic>> getVendorLocation(String vendorName) =>
       _firestoreProvider.getVendor(vendorName).transform(
@@ -175,6 +209,40 @@ class Repository {
         ),
       );
 
+  Stream<Vendor> getFeaturedVendor() =>
+      _firestoreProvider.getFeaturedVendor().transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<Vendor> featuredVendors = [];
+            snapshot.documents.forEach(
+              (document) {
+                featuredVendors.add(
+                  parseJsonToVendor(document.data),
+                );
+              },
+            );
+            sink.add(featuredVendors.first);
+          },
+        ),
+      );
+
+  Stream<List<MenuItem>> getVendorFeaturedMenu(String vendorName) =>
+      _firestoreProvider.getVendorFeaturedMenu(vendorName).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<MenuItem> featuredItems = [];
+            snapshot.documents.forEach(
+              (document) {
+                featuredItems.add(
+                  parseToMenuItemModel(document.data),
+                );
+              },
+            );
+            sink.add(featuredItems);
+          },
+        ),
+      );
+
   Future<void> createRefrence(Map<String, dynamic> refObj) =>
       _firestoreProvider.createRefrence(refObj);
   Future<void> saveOrder(Map<String, dynamic> order) =>
@@ -239,6 +307,73 @@ class Repository {
         sink.add(offers);
       }));
 
+  Stream<List<Vendor>> getVegVendors() =>
+      _firestoreProvider.getVegVendors().transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<Vendor> vendors = [];
+            snapshot.documents.forEach(
+              (document) {
+                vendors.add(
+                  parseJsonToVendor(document.data),
+                );
+              },
+            );
+            sink.add(vendors);
+          },
+        ),
+      );
+  Stream<List<Vendor>> getHalalVendors() =>
+      _firestoreProvider.getHalalVendors().transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<Vendor> vendors = [];
+            snapshot.documents.forEach(
+              (document) {
+                vendors.add(
+                  parseJsonToVendor(document.data),
+                );
+              },
+            );
+            sink.add(vendors);
+          },
+        ),
+      );
+
+  Stream<List<MenuItem>> getVegFood() =>
+      _firestoreProvider.getVegFood().transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<MenuItem> vendors = [];
+            snapshot.documents.forEach(
+              (document) {
+                vendors.add(
+                  parseToMenuItemModel(document.data),
+                );
+              },
+            );
+            sink.add(vendors);
+          },
+        ),
+      );
+
+  Stream<List<MenuItem>> getHalalFood() =>
+      _firestoreProvider.getHalalFood().transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<MenuItem> vendors = [];
+            snapshot.documents.forEach(
+              (document) {
+                vendors.add(
+                  parseToMenuItemModel(document.data),
+                );
+              },
+            );
+            sink.add(vendors);
+          },
+        ),
+      );
+
   Stream<bool> getUserStatus(String email) =>
       _firestoreProvider.getUser(email).transform(
         StreamTransformer.fromHandlers(
@@ -269,6 +404,57 @@ class Repository {
           },
         ),
       );
+  Stream<List<String>> getFavourites(String type, String email) =>
+      _firestoreProvider.getFavourites(type, email).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<String> favourites = [];
+            snapshot.documents.forEach(
+              (document) {
+                favourites.add(
+                  document.data['name'],
+                );
+              },
+            );
+            sink.add(favourites);
+          },
+        ),
+      );
+
+  Stream<List<String>> getFavouritesFood(String email) =>
+      _firestoreProvider.getFavouritesFood(email).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<String> favourites = [];
+            snapshot.documents.forEach(
+              (document) {
+                favourites.add(
+                  document.data['createdAt'],
+                );
+              },
+            );
+            sink.add(favourites);
+          },
+        ),
+      );
+
+  Stream<List<Liquor>> getLiquor(String category) =>
+      _firestoreProvider.getLiquor(category).transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<Liquor> liquors = [];
+            snapshot.documents.forEach(
+              (document) {
+                liquors.add(
+                  parseToLiquorModel(document.data),
+                );
+              },
+            );
+            sink.add(liquors);
+          },
+        ),
+      );
+
   Future<void> addPromoCode(String email, String code, List<String> codes) =>
       _firestoreProvider.addPromoCode(email, code, codes);
   Future<void> saveUserToken(String email, Map<String, dynamic> tokenData) =>
@@ -279,4 +465,10 @@ class Repository {
   Future<void> updateUserOfficeLocation(
           {Map<String, dynamic> office, String email}) =>
       _firestoreProvider.updateUserOfficeLocation(office: office, email: email);
+  Future<void> addToFavourites(
+          String type, String email, Map<String, dynamic> itemData) =>
+      _firestoreProvider.addToFavourite(type, email, itemData);
+  Future<void> removeFavourites(
+          String type, String email, Map<String, dynamic> itemName) =>
+      _firestoreProvider.removeFavourites(type, email, itemName);
 }

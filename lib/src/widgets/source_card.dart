@@ -10,10 +10,14 @@ import 'package:provider/provider.dart';
 class SourceCard extends StatefulWidget {
   final Vendor vendor;
   final Map<String, dynamic> user;
+  final Function() onTap;
+  final bool isFeatured;
   const SourceCard({
     Key key,
     @required this.vendor,
     this.user,
+    this.onTap,
+    this.isFeatured,
   }) : super(key: key);
 
   @override
@@ -158,14 +162,29 @@ class _SourceCardState extends State<SourceCard> {
                       ),
                     ),
                     Expanded(child: Container()),
-                    Text(
-                      widget.vendor.name.toUpperCase(),
-                      style: GoogleFonts.oswald(
-                        fontSize: 23,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 2,
-                      ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            widget.vendor.name.toUpperCase(),
+                            style: GoogleFonts.oswald(
+                              fontSize: 23,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            widget.isFeatured
+                                ? EvaIcons.bookmark
+                                : EvaIcons.bookmarkOutline,
+                            color: Colors.white,
+                          ),
+                          onPressed: widget.onTap,
+                        )
+                      ],
                     ),
                     Text(
                       "${widget.vendor.physicalLocation}",

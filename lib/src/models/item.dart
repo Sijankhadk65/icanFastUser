@@ -10,6 +10,8 @@ abstract class MenuItem implements Built<MenuItem, MenuItemBuilder> {
   @nullable
   String get category;
   @nullable
+  String get createdAt;
+  @nullable
   String get name;
   @nullable
   String get photoURI;
@@ -19,6 +21,8 @@ abstract class MenuItem implements Built<MenuItem, MenuItemBuilder> {
   bool get isAvailable;
   @nullable
   bool get isHotAndNew;
+  @nullable
+  bool get isFeatured;
   @nullable
   String get description;
   @nullable

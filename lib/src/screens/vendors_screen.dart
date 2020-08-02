@@ -43,21 +43,63 @@ class _VendorsScreenState extends State<VendorsScreen> {
             case ConnectionState.active:
               print(widget.tag);
               return snapshot.data.isNotEmpty
-                  ? ListView(
-                      shrinkWrap: true,
-                      children: snapshot.data
-                          .map<Widget>(
-                            (vendor) => Provider(
-                              create: (_) => CartMenuBloc(),
-                              dispose: (context, CartMenuBloc bloc) =>
-                                  bloc.dispose(),
-                              child: SourceCard(
-                                vendor: vendor,
-                                user: widget.user,
-                              ),
-                            ),
-                          )
-                          .toList(),
+                  ? StreamBuilder<List<String>>(
+                      stream: _cartMenuBloc.getFavourites(
+                        "resturant",
+                        widget.user['email'],
+                      ),
+                      builder: (context, favouriteSnapshot) {
+                        if (favouriteSnapshot.hasError)
+                          return Text("${favouriteSnapshot.error}");
+                        switch (favouriteSnapshot.connectionState) {
+                          case ConnectionState.none:
+                            return Text("Awaiting bids...");
+                            break;
+                          case ConnectionState.waiting:
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                            break;
+                          case ConnectionState.active:
+                            return ListView(
+                              shrinkWrap: true,
+                              children: snapshot.data
+                                  .map<Widget>(
+                                    (vendor) => Provider(
+                                      create: (_) => CartMenuBloc(),
+                                      dispose: (context, CartMenuBloc bloc) =>
+                                          bloc.dispose(),
+                                      child: SourceCard(
+                                        isFeatured:
+                                            favouriteSnapshot.data.contains(
+                                          vendor.name,
+                                        ),
+                                        vendor: vendor,
+                                        user: widget.user,
+                                        onTap: () {
+                                          _cartMenuBloc.toogleFavourite(
+                                            favouriteSnapshot.data.contains(
+                                              vendor.name,
+                                            ),
+                                            "resturant",
+                                            widget.user['email'],
+                                            {
+                                              "name": vendor.name,
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            );
+                            break;
+                          case ConnectionState.done:
+                            return Text("The Task has complted");
+                            break;
+                        }
+                        return null;
+                      },
                     )
                   : Center(
                       child: Text(

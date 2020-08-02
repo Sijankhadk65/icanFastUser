@@ -1,12 +1,12 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:fastuserapp/src/bloc/cart_menu_bloc.dart';
+import 'package:fastuserapp/src/models/item.dart';
 import 'package:fastuserapp/src/widgets/add_to_cart_dialouge.dart';
 import 'package:fastuserapp/src/widgets/custom_tab_bar.dart';
 import 'package:fastuserapp/src/widgets/menu_item_displayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:toast/toast.dart';
 import '../bloc/ratings_bloc.dart';
 import '../models/online_order.dart';
 import '../screens/cart_screen.dart';
@@ -100,7 +100,7 @@ class _VendorScreenState extends State<VendorScreen>
             child: CustomTabView(
               itemCount: widget.categories.length,
               tabBuilder: (context, index) => Text(widget.categories[index]),
-              pageBuilder: (context, index) => StreamBuilder(
+              pageBuilder: (context, index) => StreamBuilder<List<MenuItem>>(
                 stream: _cartMenuBloc.getMenu(
                     widget.categories[index], widget.vendorName),
                 builder: (context, snapshot) {
@@ -117,28 +117,67 @@ class _VendorScreenState extends State<VendorScreen>
                       break;
                     case ConnectionState.active:
                       return snapshot.data.isNotEmpty
-                          ? GridView.count(
-                              crossAxisCount: 2,
-                              shrinkWrap: true,
-                              children: snapshot.data
-                                  .map<Widget>(
-                                    (f) => MenuItemDisplayer(
-                                      item: f,
-                                      onTapped: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) =>
-                                              AddToCartDialouge(
-                                            item: f,
-                                            user: widget.user,
-                                            vendorName: widget.vendorName,
-                                            minOrder: widget.minOrder,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  )
-                                  .toList(),
+                          ? StreamBuilder<List<String>>(
+                              stream: _cartMenuBloc.getFavourites(
+                                  "food", widget.user['email']),
+                              builder: (context, favouriteSnapshot) {
+                                if (favouriteSnapshot.hasError)
+                                  return Text("${favouriteSnapshot.error}");
+                                switch (favouriteSnapshot.connectionState) {
+                                  case ConnectionState.none:
+                                    return Text("Awaiting Bids...");
+                                    break;
+                                  case ConnectionState.waiting:
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                    break;
+                                  case ConnectionState.active:
+                                    return GridView.count(
+                                      crossAxisCount: 2,
+                                      shrinkWrap: true,
+                                      children: snapshot.data
+                                          .map<Widget>(
+                                            (f) => MenuItemDisplayer(
+                                              item: f,
+                                              isFeatured: favouriteSnapshot.data
+                                                  .contains(f.name),
+                                              onTap: () {
+                                                _cartMenuBloc.toogleFavourite(
+                                                  favouriteSnapshot.data
+                                                      .contains(f.name),
+                                                  "food",
+                                                  widget.user['email'],
+                                                  {
+                                                    "name": f.name,
+                                                    "createdAt": f.createdAt,
+                                                  },
+                                                );
+                                              },
+                                              onTapped: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) =>
+                                                      AddToCartDialouge(
+                                                    item: f,
+                                                    user: widget.user,
+                                                    vendorName:
+                                                        widget.vendorName,
+                                                    minOrder: widget.minOrder,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          )
+                                          .toList(),
+                                    );
+                                    break;
+                                  case ConnectionState.done:
+                                    return Text("The task has completed");
+                                    break;
+                                }
+                                return null;
+                              },
                             )
                           : Center(
                               child: Text(

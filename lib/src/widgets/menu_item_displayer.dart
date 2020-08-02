@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/item.dart';
@@ -7,10 +8,14 @@ import 'package:toast/toast.dart';
 class MenuItemDisplayer extends StatefulWidget {
   final MenuItem item;
   final Function() onTapped;
+  final bool isFeatured;
+  final Function onTap;
   const MenuItemDisplayer({
     Key key,
     @required this.item,
     @required this.onTapped,
+    this.isFeatured,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -19,17 +24,6 @@ class MenuItemDisplayer extends StatefulWidget {
 
 class _MenuItemDisplayerState extends State<MenuItemDisplayer> {
   bool hasNoError = true;
-  double _height = 150;
-
-  toogleHeight() {
-    this.setState(() {
-      if (_height == 150) {
-        _height = 200;
-      } else {
-        _height = 150;
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,14 +121,29 @@ class _MenuItemDisplayerState extends State<MenuItemDisplayer> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              widget.item.name,
-                              style: GoogleFonts.oswald(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic,
-                              ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Text(
+                                    widget.item.name,
+                                    style: GoogleFonts.oswald(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    widget.isFeatured
+                                        ? EvaIcons.bookmark
+                                        : EvaIcons.bookmarkOutline,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: widget.onTap,
+                                )
+                              ],
                             ),
                             Text(
                               "Price: Rs.${widget.item.price}",
