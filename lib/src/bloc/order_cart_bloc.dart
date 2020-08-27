@@ -9,7 +9,6 @@ import '../models/order_ref.dart';
 import '../models/cart_items.dart';
 import '../models/online_order.dart';
 import '../resources/repository.dart';
-
 import 'package:rxdart/rxdart.dart';
 
 class OrderCartBloc {
@@ -18,7 +17,7 @@ class OrderCartBloc {
   int _totalLength = 0;
   int _cartsTotal = 0;
   String _refID = "";
-  String _physicaLocation = "";
+  // String _physicaLocation = "";
 
   final _repository = Repository();
 
@@ -144,6 +143,33 @@ class OrderCartBloc {
       _promoCodeIsUsedSubject.sink.add;
 
   String get orderRefrenceID => _refID;
+
+  void dispose() {
+    _cartItemsSubject.close();
+    _liveOrdersSubject.close();
+    _totalLengthSubject.close();
+    _totalPriceSubject.close();
+    _localOrderSubject.close();
+    _currentOrderSubject.close();
+    _currentLocationSubject.close();
+    _physicalLocationSubject.close();
+    _isSavingSubject.close();
+    _currentLocationSubject.close();
+    _cartItemsSubject.close();
+    _cartsTotalSubject.close();
+    _orderRefrenceSubject.close();
+    _deliveryChargeSubject.close();
+    _checkedOutSubject.close();
+    _transactionStatusSubject.close();
+    _userPhoneNumberSubject.close();
+    _checkoutCoordinatesSubject.close();
+    _isScheduledSubject.close();
+    _checkoutPhysicalLocationSubject.close();
+    _scheduledTimeSubject.close();
+    _promoCodeSubject.close();
+    _promoCodeIsUsedSubject.close();
+    _closedRefrenceSubject.close();
+  }
 
   OrderCartBloc() {
     changeTotalLenght(0);
@@ -416,37 +442,43 @@ class OrderCartBloc {
     Map<String, dynamic> user,
   ) async {
     _refID = UniqueKey().toString();
-    return createRef({
-      "vendors": _localOrders.map((e) => e['vendor']).toList(),
-      "lat": _checkoutCoordinatesSubject.value['lat'],
-      "lang": _checkoutCoordinatesSubject.value['lang'],
-      "physicalLocation": _checkoutPhysicalLocationSubject.value,
-      "status": [],
-      "isScheduled": _isScheduledSubject.value,
-      "scheduleTime": _scheduledTimeSubject.value != null
-          ? _scheduledTimeSubject.value
-          : "",
-      "isAssignedTo": {
-        "name": "",
-        "email": "",
+    return createRef(
+      {
+        "vendors": _localOrders.map((e) => e['vendor']).toList(),
+        "lat": _checkoutCoordinatesSubject.value['lat'],
+        "lang": _checkoutCoordinatesSubject.value['lang'],
+        "physicalLocation": _checkoutPhysicalLocationSubject.value,
+        "status": [],
+        "isScheduled": _isScheduledSubject.value,
+        "scheduleTime": _scheduledTimeSubject.value != null
+            ? _scheduledTimeSubject.value
+            : "",
+        "isAssignedTo": {
+          "name": "",
+          "email": "",
+        },
+        "refID": _refID,
+        "user": {
+          "name": user['name'],
+          "email": user['email'],
+        },
+        "isPaid": false,
+        "isDelivered": false,
+        "createdAt": DateTime.now().toIso8601String(),
+        "totalCost": _cartsTotalSubject.value + _deliveryChargeSubject.value,
+        "deliveryCharge": _deliveryChargeSubject.value,
       },
-      "refID": _refID,
-      "user": {
-        "name": user['name'],
-        "email": user['email'],
+    ).whenComplete(
+      () {
+        _localOrders.forEach(
+          (order) async {
+            order['refID'] = _refID;
+            await _repository.saveOrder(order);
+          },
+        );
+        _cleanUp();
       },
-      "isPaid": false,
-      "isDelivered": false,
-      "createdAt": DateTime.now().toIso8601String(),
-      "totalCost": _cartsTotalSubject.value + _deliveryChargeSubject.value,
-      "deliveryCharge": _deliveryChargeSubject.value,
-    }).whenComplete(() {
-      _localOrders.forEach((order) async {
-        order['refID'] = _refID;
-        await _repository.saveOrder(order);
-      });
-      _cleanUp();
-    });
+    );
   }
 
   removeCart(String vendorName) {
@@ -577,7 +609,7 @@ class OrderCartBloc {
         addresses =
             await Geocoder.local.findAddressesFromCoordinates(coordinates);
         var first = addresses.first;
-        _physicaLocation = first.addressLine;
+        // _physicaLocation = first.addressLine;
         changePhysicalLocation(first.addressLine);
       } catch (e) {
         print(e);
@@ -585,24 +617,6 @@ class OrderCartBloc {
     } else {
       changePhysicalLocation(addressLine);
     }
-  }
-
-  void dispose() {
-    _cartItemsSubject.close();
-    _liveOrdersSubject.close();
-    _totalLengthSubject.close();
-    _totalPriceSubject.close();
-    _localOrderSubject.close();
-    _currentOrderSubject.close();
-    _currentLocationSubject.close();
-    _physicalLocationSubject.close();
-    _isSavingSubject.close();
-    _currentLocationSubject.close();
-    _cartItemsSubject.close();
-    _cartsTotalSubject.close();
-    _orderRefrenceSubject.close();
-    _deliveryChargeSubject.close();
-    _checkedOutSubject.close();
   }
 }
 

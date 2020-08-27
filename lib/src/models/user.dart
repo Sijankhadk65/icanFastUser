@@ -20,6 +20,8 @@ abstract class User implements Built<User, UserBuilder> {
   @nullable
   UserLocation get office;
   @nullable
+  bool get isVerified;
+  @nullable
   BuiltList<String> get promoCodes;
 
   factory User([void Function(UserBuilder) updates]) = _$User;

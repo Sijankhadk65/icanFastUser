@@ -24,6 +24,20 @@ class _$MenuItemSerializer implements StructuredSerializer<MenuItem> {
         ..add(serializers.serialize(object.category,
             specifiedType: const FullType(String)));
     }
+    if (object.addOns != null) {
+      result
+        ..add('addOns')
+        ..add(serializers.serialize(object.addOns,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(AddOn)])));
+    }
+    if (object.varients != null) {
+      result
+        ..add('varients')
+        ..add(serializers.serialize(object.varients,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(Varient)])));
+    }
     if (object.createdAt != null) {
       result
         ..add('createdAt')
@@ -78,12 +92,17 @@ class _$MenuItemSerializer implements StructuredSerializer<MenuItem> {
         ..add(serializers.serialize(object.vendor,
             specifiedType: const FullType(String)));
     }
-    if (object.addOn != null) {
+    if (object.increaseBy != null) {
       result
-        ..add('addOn')
-        ..add(serializers.serialize(object.addOn,
-            specifiedType:
-                const FullType(BuiltList, const [const FullType(String)])));
+        ..add('increaseBy')
+        ..add(serializers.serialize(object.increaseBy,
+            specifiedType: const FullType(double)));
+    }
+    if (object.unit != null) {
+      result
+        ..add('unit')
+        ..add(serializers.serialize(object.unit,
+            specifiedType: const FullType(String)));
     }
     return result;
   }
@@ -102,6 +121,18 @@ class _$MenuItemSerializer implements StructuredSerializer<MenuItem> {
         case 'category':
           result.category = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
+          break;
+        case 'addOns':
+          result.addOns.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(AddOn)]))
+              as BuiltList<dynamic>);
+          break;
+        case 'varients':
+          result.varients.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(Varient)]))
+              as BuiltList<dynamic>);
           break;
         case 'createdAt':
           result.createdAt = serializers.deserialize(value,
@@ -139,11 +170,13 @@ class _$MenuItemSerializer implements StructuredSerializer<MenuItem> {
           result.vendor = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'addOn':
-          result.addOn.replace(serializers.deserialize(value,
-                  specifiedType:
-                      const FullType(BuiltList, const [const FullType(String)]))
-              as BuiltList<dynamic>);
+        case 'increaseBy':
+          result.increaseBy = serializers.deserialize(value,
+              specifiedType: const FullType(double)) as double;
+          break;
+        case 'unit':
+          result.unit = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
           break;
       }
     }
@@ -155,6 +188,10 @@ class _$MenuItemSerializer implements StructuredSerializer<MenuItem> {
 class _$MenuItem extends MenuItem {
   @override
   final String category;
+  @override
+  final BuiltList<AddOn> addOns;
+  @override
+  final BuiltList<Varient> varients;
   @override
   final String createdAt;
   @override
@@ -174,13 +211,17 @@ class _$MenuItem extends MenuItem {
   @override
   final String vendor;
   @override
-  final BuiltList<String> addOn;
+  final double increaseBy;
+  @override
+  final String unit;
 
   factory _$MenuItem([void Function(MenuItemBuilder) updates]) =>
       (new MenuItemBuilder()..update(updates)).build();
 
   _$MenuItem._(
       {this.category,
+      this.addOns,
+      this.varients,
       this.createdAt,
       this.name,
       this.photoURI,
@@ -190,7 +231,8 @@ class _$MenuItem extends MenuItem {
       this.isFeatured,
       this.description,
       this.vendor,
-      this.addOn})
+      this.increaseBy,
+      this.unit})
       : super._();
 
   @override
@@ -205,6 +247,8 @@ class _$MenuItem extends MenuItem {
     if (identical(other, this)) return true;
     return other is MenuItem &&
         category == other.category &&
+        addOns == other.addOns &&
+        varients == other.varients &&
         createdAt == other.createdAt &&
         name == other.name &&
         photoURI == other.photoURI &&
@@ -214,7 +258,8 @@ class _$MenuItem extends MenuItem {
         isFeatured == other.isFeatured &&
         description == other.description &&
         vendor == other.vendor &&
-        addOn == other.addOn;
+        increaseBy == other.increaseBy &&
+        unit == other.unit;
   }
 
   @override
@@ -228,23 +273,33 @@ class _$MenuItem extends MenuItem {
                             $jc(
                                 $jc(
                                     $jc(
-                                        $jc($jc(0, category.hashCode),
-                                            createdAt.hashCode),
-                                        name.hashCode),
-                                    photoURI.hashCode),
-                                price.hashCode),
-                            isAvailable.hashCode),
-                        isHotAndNew.hashCode),
-                    isFeatured.hashCode),
-                description.hashCode),
-            vendor.hashCode),
-        addOn.hashCode));
+                                        $jc(
+                                            $jc(
+                                                $jc(
+                                                    $jc(
+                                                        $jc(0,
+                                                            category.hashCode),
+                                                        addOns.hashCode),
+                                                    varients.hashCode),
+                                                createdAt.hashCode),
+                                            name.hashCode),
+                                        photoURI.hashCode),
+                                    price.hashCode),
+                                isAvailable.hashCode),
+                            isHotAndNew.hashCode),
+                        isFeatured.hashCode),
+                    description.hashCode),
+                vendor.hashCode),
+            increaseBy.hashCode),
+        unit.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('MenuItem')
           ..add('category', category)
+          ..add('addOns', addOns)
+          ..add('varients', varients)
           ..add('createdAt', createdAt)
           ..add('name', name)
           ..add('photoURI', photoURI)
@@ -254,7 +309,8 @@ class _$MenuItem extends MenuItem {
           ..add('isFeatured', isFeatured)
           ..add('description', description)
           ..add('vendor', vendor)
-          ..add('addOn', addOn))
+          ..add('increaseBy', increaseBy)
+          ..add('unit', unit))
         .toString();
   }
 }
@@ -265,6 +321,15 @@ class MenuItemBuilder implements Builder<MenuItem, MenuItemBuilder> {
   String _category;
   String get category => _$this._category;
   set category(String category) => _$this._category = category;
+
+  ListBuilder<AddOn> _addOns;
+  ListBuilder<AddOn> get addOns => _$this._addOns ??= new ListBuilder<AddOn>();
+  set addOns(ListBuilder<AddOn> addOns) => _$this._addOns = addOns;
+
+  ListBuilder<Varient> _varients;
+  ListBuilder<Varient> get varients =>
+      _$this._varients ??= new ListBuilder<Varient>();
+  set varients(ListBuilder<Varient> varients) => _$this._varients = varients;
 
   String _createdAt;
   String get createdAt => _$this._createdAt;
@@ -302,15 +367,21 @@ class MenuItemBuilder implements Builder<MenuItem, MenuItemBuilder> {
   String get vendor => _$this._vendor;
   set vendor(String vendor) => _$this._vendor = vendor;
 
-  ListBuilder<String> _addOn;
-  ListBuilder<String> get addOn => _$this._addOn ??= new ListBuilder<String>();
-  set addOn(ListBuilder<String> addOn) => _$this._addOn = addOn;
+  double _increaseBy;
+  double get increaseBy => _$this._increaseBy;
+  set increaseBy(double increaseBy) => _$this._increaseBy = increaseBy;
+
+  String _unit;
+  String get unit => _$this._unit;
+  set unit(String unit) => _$this._unit = unit;
 
   MenuItemBuilder();
 
   MenuItemBuilder get _$this {
     if (_$v != null) {
       _category = _$v.category;
+      _addOns = _$v.addOns?.toBuilder();
+      _varients = _$v.varients?.toBuilder();
       _createdAt = _$v.createdAt;
       _name = _$v.name;
       _photoURI = _$v.photoURI;
@@ -320,7 +391,8 @@ class MenuItemBuilder implements Builder<MenuItem, MenuItemBuilder> {
       _isFeatured = _$v.isFeatured;
       _description = _$v.description;
       _vendor = _$v.vendor;
-      _addOn = _$v.addOn?.toBuilder();
+      _increaseBy = _$v.increaseBy;
+      _unit = _$v.unit;
       _$v = null;
     }
     return this;
@@ -346,6 +418,8 @@ class MenuItemBuilder implements Builder<MenuItem, MenuItemBuilder> {
       _$result = _$v ??
           new _$MenuItem._(
               category: category,
+              addOns: _addOns?.build(),
+              varients: _varients?.build(),
               createdAt: createdAt,
               name: name,
               photoURI: photoURI,
@@ -355,12 +429,15 @@ class MenuItemBuilder implements Builder<MenuItem, MenuItemBuilder> {
               isFeatured: isFeatured,
               description: description,
               vendor: vendor,
-              addOn: _addOn?.build());
+              increaseBy: increaseBy,
+              unit: unit);
     } catch (_) {
       String _$failedField;
       try {
-        _$failedField = 'addOn';
-        _addOn?.build();
+        _$failedField = 'addOns';
+        _addOns?.build();
+        _$failedField = 'varients';
+        _varients?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'MenuItem', _$failedField, e.toString());

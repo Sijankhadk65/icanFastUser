@@ -1,4 +1,5 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:fastuserapp/src/bloc/cart_item_bloc.dart';
 import 'package:fastuserapp/src/bloc/cart_menu_bloc.dart';
 import 'package:fastuserapp/src/models/item.dart';
 import 'package:fastuserapp/src/widgets/add_to_cart_dialouge.dart';
@@ -158,12 +159,20 @@ class _VendorScreenState extends State<VendorScreen>
                                                 showDialog(
                                                   context: context,
                                                   builder: (context) =>
-                                                      AddToCartDialouge(
-                                                    item: f,
-                                                    user: widget.user,
-                                                    vendorName:
-                                                        widget.vendorName,
-                                                    minOrder: widget.minOrder,
+                                                      Provider(
+                                                    create: (_) =>
+                                                        CartItemBloc(),
+                                                    dispose: (context,
+                                                            CartItemBloc
+                                                                bloc) =>
+                                                        bloc.dispose(),
+                                                    child: AddToCartDialouge(
+                                                      item: f,
+                                                      user: widget.user,
+                                                      vendorName:
+                                                          widget.vendorName,
+                                                      minOrder: widget.minOrder,
+                                                    ),
                                                   ),
                                                 );
                                               },

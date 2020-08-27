@@ -88,6 +88,17 @@ class LoginBloc {
         },
       );
 
+  void printUser() {
+    print(
+      {
+        "name": _name,
+        // "email": user.email,
+        // "UID": user.uid,
+        "promoCodes": [],
+      },
+    );
+  }
+
   Future<void> saveUser(FirebaseUser user) async {
     var token = await FirebaseMessaging().getToken();
     return _repo.addUser(
@@ -99,6 +110,7 @@ class LoginBloc {
         "phoneNumber": int.parse(_phoneNumber),
         "photoURI": user.photoUrl,
         "type": "client",
+        "isVerified": false,
         "home": _homeLocationSubject.value != null
             ? {
                 "lat": _homeLocationSubject.value['lat'],

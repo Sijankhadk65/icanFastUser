@@ -16,7 +16,9 @@ class MenuItemDisplayer extends StatefulWidget {
     @required this.onTapped,
     this.isFeatured,
     this.onTap,
-  }) : super(key: key);
+  }) : super(
+          key: key,
+        );
 
   @override
   _MenuItemDisplayerState createState() => _MenuItemDisplayerState();
@@ -145,14 +147,23 @@ class _MenuItemDisplayerState extends State<MenuItemDisplayer> {
                                 )
                               ],
                             ),
-                            Text(
-                              "Price: Rs.${widget.item.price}",
-                              style: GoogleFonts.montserrat(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
+                            widget.item.price != 0
+                                ? Text(
+                                    "Price: Rs.${widget.item.price}",
+                                    style: GoogleFonts.montserrat(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  )
+                                : Text(
+                                    "Choose From a varient",
+                                    style: GoogleFonts.montserrat(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  )
                           ],
                         ),
                       ),

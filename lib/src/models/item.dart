@@ -1,6 +1,8 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
+import 'package:fastuserapp/src/models/add_on.dart';
+import 'package:fastuserapp/src/models/varient.dart';
 
 import './serializer.dart';
 
@@ -9,6 +11,10 @@ part 'item.g.dart';
 abstract class MenuItem implements Built<MenuItem, MenuItemBuilder> {
   @nullable
   String get category;
+  @nullable
+  BuiltList<AddOn> get addOns;
+  @nullable
+  BuiltList<Varient> get varients;
   @nullable
   String get createdAt;
   @nullable
@@ -28,7 +34,10 @@ abstract class MenuItem implements Built<MenuItem, MenuItemBuilder> {
   @nullable
   String get vendor;
   @nullable
-  BuiltList<String> get addOn;
+  double get increaseBy;
+  @nullable
+  String get unit;
+
   MenuItem._();
   factory MenuItem([updates(MenuItemBuilder b)]) = _$MenuItem;
 

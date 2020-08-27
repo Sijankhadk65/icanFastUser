@@ -28,19 +28,19 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
       result
         ..add('price')
         ..add(serializers.serialize(object.price,
-            specifiedType: const FullType(int)));
+            specifiedType: const FullType(double)));
     }
     if (object.totalPrice != null) {
       result
         ..add('totalPrice')
         ..add(serializers.serialize(object.totalPrice,
-            specifiedType: const FullType(int)));
+            specifiedType: const FullType(double)));
     }
     if (object.quantity != null) {
       result
         ..add('quantity')
         ..add(serializers.serialize(object.quantity,
-            specifiedType: const FullType(int)));
+            specifiedType: const FullType(double)));
     }
     if (object.note != null) {
       result
@@ -68,15 +68,15 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
           break;
         case 'price':
           result.price = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(double)) as double;
           break;
         case 'totalPrice':
           result.totalPrice = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(double)) as double;
           break;
         case 'quantity':
           result.quantity = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(double)) as double;
           break;
         case 'note':
           result.note = serializers.deserialize(value,
@@ -93,11 +93,11 @@ class _$CartItem extends CartItem {
   @override
   final String name;
   @override
-  final int price;
+  final double price;
   @override
-  final int totalPrice;
+  final double totalPrice;
   @override
-  final int quantity;
+  final double quantity;
   @override
   final String note;
 
@@ -155,17 +155,17 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
   String get name => _$this._name;
   set name(String name) => _$this._name = name;
 
-  int _price;
-  int get price => _$this._price;
-  set price(int price) => _$this._price = price;
+  double _price;
+  double get price => _$this._price;
+  set price(double price) => _$this._price = price;
 
-  int _totalPrice;
-  int get totalPrice => _$this._totalPrice;
-  set totalPrice(int totalPrice) => _$this._totalPrice = totalPrice;
+  double _totalPrice;
+  double get totalPrice => _$this._totalPrice;
+  set totalPrice(double totalPrice) => _$this._totalPrice = totalPrice;
 
-  int _quantity;
-  int get quantity => _$this._quantity;
-  set quantity(int quantity) => _$this._quantity = quantity;
+  double _quantity;
+  double get quantity => _$this._quantity;
+  set quantity(double quantity) => _$this._quantity = quantity;
 
   String _note;
   String get note => _$this._note;

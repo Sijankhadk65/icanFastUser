@@ -7,6 +7,7 @@ part of serializers;
 // **************************************************************************
 
 Serializers _$serializers = (new Serializers().toBuilder()
+      ..add(AddOn.serializer)
       ..add(CarouselItem.serializer)
       ..add(CartItem.serializer)
       ..add(Liquor.serializer)
@@ -17,10 +18,14 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(Rating.serializer)
       ..add(User.serializer)
       ..add(UserLocation.serializer)
+      ..add(Varient.serializer)
       ..add(Vendor.serializer)
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => new ListBuilder<String>())
+          const FullType(BuiltList, const [const FullType(AddOn)]),
+          () => new ListBuilder<AddOn>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Varient)]),
+          () => new ListBuilder<Varient>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => new ListBuilder<String>())

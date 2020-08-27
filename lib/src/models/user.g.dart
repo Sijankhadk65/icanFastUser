@@ -54,6 +54,12 @@ class _$UserSerializer implements StructuredSerializer<User> {
         ..add(serializers.serialize(object.office,
             specifiedType: const FullType(UserLocation)));
     }
+    if (object.isVerified != null) {
+      result
+        ..add('isVerified')
+        ..add(serializers.serialize(object.isVerified,
+            specifiedType: const FullType(bool)));
+    }
     if (object.promoCodes != null) {
       result
         ..add('promoCodes')
@@ -99,6 +105,10 @@ class _$UserSerializer implements StructuredSerializer<User> {
           result.office.replace(serializers.deserialize(value,
               specifiedType: const FullType(UserLocation)) as UserLocation);
           break;
+        case 'isVerified':
+          result.isVerified = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool;
+          break;
         case 'promoCodes':
           result.promoCodes.replace(serializers.deserialize(value,
                   specifiedType:
@@ -126,6 +136,8 @@ class _$User extends User {
   @override
   final UserLocation office;
   @override
+  final bool isVerified;
+  @override
   final BuiltList<String> promoCodes;
 
   factory _$User([void Function(UserBuilder) updates]) =>
@@ -138,6 +150,7 @@ class _$User extends User {
       this.phoneNumber,
       this.home,
       this.office,
+      this.isVerified,
       this.promoCodes})
       : super._();
 
@@ -158,6 +171,7 @@ class _$User extends User {
         phoneNumber == other.phoneNumber &&
         home == other.home &&
         office == other.office &&
+        isVerified == other.isVerified &&
         promoCodes == other.promoCodes;
   }
 
@@ -167,11 +181,13 @@ class _$User extends User {
         $jc(
             $jc(
                 $jc(
-                    $jc($jc($jc(0, email.hashCode), name.hashCode),
-                        photoURI.hashCode),
-                    phoneNumber.hashCode),
-                home.hashCode),
-            office.hashCode),
+                    $jc(
+                        $jc($jc($jc(0, email.hashCode), name.hashCode),
+                            photoURI.hashCode),
+                        phoneNumber.hashCode),
+                    home.hashCode),
+                office.hashCode),
+            isVerified.hashCode),
         promoCodes.hashCode));
   }
 
@@ -184,6 +200,7 @@ class _$User extends User {
           ..add('phoneNumber', phoneNumber)
           ..add('home', home)
           ..add('office', office)
+          ..add('isVerified', isVerified)
           ..add('promoCodes', promoCodes))
         .toString();
   }
@@ -217,6 +234,10 @@ class UserBuilder implements Builder<User, UserBuilder> {
       _$this._office ??= new UserLocationBuilder();
   set office(UserLocationBuilder office) => _$this._office = office;
 
+  bool _isVerified;
+  bool get isVerified => _$this._isVerified;
+  set isVerified(bool isVerified) => _$this._isVerified = isVerified;
+
   ListBuilder<String> _promoCodes;
   ListBuilder<String> get promoCodes =>
       _$this._promoCodes ??= new ListBuilder<String>();
@@ -233,6 +254,7 @@ class UserBuilder implements Builder<User, UserBuilder> {
       _phoneNumber = _$v.phoneNumber;
       _home = _$v.home?.toBuilder();
       _office = _$v.office?.toBuilder();
+      _isVerified = _$v.isVerified;
       _promoCodes = _$v.promoCodes?.toBuilder();
       _$v = null;
     }
@@ -264,6 +286,7 @@ class UserBuilder implements Builder<User, UserBuilder> {
               phoneNumber: phoneNumber,
               home: _home?.build(),
               office: _office?.build(),
+              isVerified: isVerified,
               promoCodes: _promoCodes?.build());
     } catch (_) {
       String _$failedField;
@@ -272,6 +295,7 @@ class UserBuilder implements Builder<User, UserBuilder> {
         _home?.build();
         _$failedField = 'office';
         _office?.build();
+
         _$failedField = 'promoCodes';
         _promoCodes?.build();
       } catch (e) {
