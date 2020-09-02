@@ -21,18 +21,33 @@ class VarientButtonBar extends StatefulWidget {
 class _VarientButtonBarState extends State<VarientButtonBar> {
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: widget.varients
-          .map(
-            (varient) => VarientButtonItem(
-              varient: varient,
-              isSelected: widget.selectedVarient == varient,
-              onPressed: () {
-                widget.onChange(varient);
-              },
-            ),
-          )
-          .toList(),
+    return Container(
+      margin: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 10,
+      ),
+      child: Material(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 5,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: widget.varients
+                .map(
+                  (varient) => VarientButtonItem(
+                    varient: varient,
+                    isSelected: widget.selectedVarient == varient,
+                    onPressed: () {
+                      widget.onChange(varient);
+                    },
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -29,7 +29,7 @@ class QuickAccessCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(
-          10,
+          5,
         ),
         boxShadow: [
           BoxShadow(

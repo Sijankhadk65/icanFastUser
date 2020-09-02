@@ -63,12 +63,16 @@ class CartItemBloc {
         "totalPrice": _currentTotalPriceSubject.value,
         "quantity": _currentItemCountSubject.value,
         "price": _currentUnitPriceSubject.value,
-        "addOns": _currentSelectedAddonsSubject.value
-            .map(
-              (addOn) => addOn.toNewAddOnJson(),
-            )
-            .toList(),
-        "varient": _currentSelectedVarientSubject.value.toNewVarientJson(),
+        "addOns": _currentSelectedAddonsSubject.value != null
+            ? _currentSelectedAddonsSubject.value
+                .map(
+                  (addOn) => addOn.toNewAddOnJson(),
+                )
+                .toList()
+            : [],
+        "varient": _currentSelectedVarientSubject.value != null
+            ? _currentSelectedVarientSubject.value.toNewVarientJson()
+            : {},
       };
 
   dispose() {

@@ -24,18 +24,40 @@ class _VarientButtonItemState extends State<VarientButtonItem> {
       margin: EdgeInsets.only(left: 5, right: 5),
       child: RawMaterialButton(
         onPressed: widget.onPressed,
-        fillColor: widget.isSelected ? Colors.orange[800] : Colors.grey,
+        fillColor: Colors.white,
+        elevation: 0,
+        padding: EdgeInsets.symmetric(
+          vertical: 5,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
             5,
           ),
-        ),
-        child: Text(
-          widget.varient.name,
-          style: GoogleFonts.nunito(
-            fontWeight: FontWeight.w700,
-            color: widget.isSelected ? Colors.white : Colors.black38,
+          side: BorderSide(
+            color: widget.isSelected ? Colors.orange[500] : Colors.black38,
+            width: 2,
           ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Rs.${widget.varient.price}",
+              style: GoogleFonts.nunito(
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                color: widget.isSelected ? Colors.orange[500] : Colors.black38,
+              ),
+            ),
+            Text(
+              widget.varient.name,
+              style: GoogleFonts.nunito(
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+                color: widget.isSelected ? Colors.orange[500] : Colors.black38,
+              ),
+            ),
+          ],
         ),
       ),
     );

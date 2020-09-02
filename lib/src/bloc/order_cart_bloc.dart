@@ -13,9 +13,9 @@ import 'package:rxdart/rxdart.dart';
 
 class OrderCartBloc {
   List<Map<String, dynamic>> _localOrders = [];
-  int _totalPrice = 0;
-  int _totalLength = 0;
-  int _cartsTotal = 0;
+  double _totalPrice = 0;
+  double _totalLength = 0;
+  double _cartsTotal = 0;
   String _refID = "";
   // String _physicaLocation = "";
 
@@ -55,13 +55,13 @@ class OrderCartBloc {
   Stream<List<CartItem>> get cartItems => _cartItemsSubject.stream;
   Function(List<CartItem>) get changeCartItems => _cartItemsSubject.sink.add;
 
-  final BehaviorSubject<int> _totalPriceSubject = BehaviorSubject<int>();
-  Stream<int> get totalPrice => _totalPriceSubject.stream;
-  Function(int) get changeTotalPrice => _totalPriceSubject.sink.add;
+  final BehaviorSubject<double> _totalPriceSubject = BehaviorSubject<double>();
+  Stream<double> get totalPrice => _totalPriceSubject.stream;
+  Function(double) get changeTotalPrice => _totalPriceSubject.sink.add;
 
-  final BehaviorSubject<int> _totalLengthSubject = BehaviorSubject<int>();
-  Stream<int> get totalLength => _totalLengthSubject.stream;
-  Function(int) get changeTotalLenght => _totalLengthSubject.sink.add;
+  final BehaviorSubject<double> _totalLengthSubject = BehaviorSubject<double>();
+  Stream<double> get totalLength => _totalLengthSubject.stream;
+  Function(double) get changeTotalLenght => _totalLengthSubject.sink.add;
 
   final BehaviorSubject<double> _cartsTotalSubject = BehaviorSubject<double>();
   Stream<double> get cartsTotal => _cartsTotalSubject.stream;
@@ -419,11 +419,13 @@ class OrderCartBloc {
   }
 
   getCartLenth(String vendor) {
-    _localOrders.forEach((order) {
-      if (order['vendor'] == vendor) {
-        _totalLength = order['cartLength'];
-      }
-    });
+    _localOrders.forEach(
+      (order) {
+        if (order['vendor'] == vendor) {
+          _totalLength = order['cartLength'];
+        }
+      },
+    );
     changeTotalLenght(_totalLength);
   }
 

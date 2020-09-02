@@ -9,11 +9,11 @@ part 'online_order.g.dart';
 
 abstract class OnlineOrder implements Built<OnlineOrder, OnlineOrderBuilder> {
   @nullable
-  int get totalPrice;
+  double get totalPrice;
   @nullable
   String get refID;
   @nullable
-  int get cartLength;
+  double get cartLength;
   @nullable
   BuiltList<String> get status;
   @nullable

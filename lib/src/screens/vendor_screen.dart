@@ -251,7 +251,7 @@ class _VendorScreenState extends State<VendorScreen>
                                           child: Stack(
                                             alignment: Alignment.centerLeft,
                                             children: [
-                                              StreamBuilder<int>(
+                                              StreamBuilder<double>(
                                                   stream:
                                                       orderCartBloc.totalLength,
                                                   builder: (context, snapshot) {

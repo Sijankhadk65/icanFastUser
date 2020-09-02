@@ -4,7 +4,6 @@ import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
 import 'package:fastuserapp/src/models/liquor.dart';
 import 'package:fastuserapp/src/models/online_order.dart';
 import 'package:fastuserapp/src/widgets/add_liquor_to_cart.dart';
-import 'package:fastuserapp/src/widgets/add_to_cart_dialouge.dart';
 import 'package:fastuserapp/src/widgets/custom_tab_bar.dart';
 import 'package:fastuserapp/src/widgets/liquor_card.dart';
 import 'package:flutter/material.dart';
@@ -190,7 +189,7 @@ class _LiquorScreenState extends State<LiquorScreen> {
                                             child: Stack(
                                               alignment: Alignment.centerLeft,
                                               children: [
-                                                StreamBuilder<int>(
+                                                StreamBuilder<double>(
                                                     stream: orderCartBloc
                                                         .totalLength,
                                                     builder:

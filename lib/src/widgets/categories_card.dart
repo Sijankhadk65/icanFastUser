@@ -26,7 +26,7 @@ class CategoriesCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(
-          13,
+          5,
         ),
         boxShadow: [
           BoxShadow(

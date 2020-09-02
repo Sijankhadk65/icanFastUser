@@ -22,7 +22,7 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
       result
         ..add('totalPrice')
         ..add(serializers.serialize(object.totalPrice,
-            specifiedType: const FullType(int)));
+            specifiedType: const FullType(double)));
     }
     if (object.refID != null) {
       result
@@ -34,7 +34,7 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
       result
         ..add('cartLength')
         ..add(serializers.serialize(object.cartLength,
-            specifiedType: const FullType(int)));
+            specifiedType: const FullType(double)));
     }
     if (object.status != null) {
       result
@@ -84,7 +84,7 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
       switch (key) {
         case 'totalPrice':
           result.totalPrice = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(double)) as double;
           break;
         case 'refID':
           result.refID = serializers.deserialize(value,
@@ -92,7 +92,7 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
           break;
         case 'cartLength':
           result.cartLength = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(double)) as double;
           break;
         case 'status':
           result.status.replace(serializers.deserialize(value,
@@ -127,11 +127,11 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
 
 class _$OnlineOrder extends OnlineOrder {
   @override
-  final int totalPrice;
+  final double totalPrice;
   @override
   final String refID;
   @override
-  final int cartLength;
+  final double cartLength;
   @override
   final BuiltList<String> status;
   @override
@@ -212,17 +212,17 @@ class _$OnlineOrder extends OnlineOrder {
 class OnlineOrderBuilder implements Builder<OnlineOrder, OnlineOrderBuilder> {
   _$OnlineOrder _$v;
 
-  int _totalPrice;
-  int get totalPrice => _$this._totalPrice;
-  set totalPrice(int totalPrice) => _$this._totalPrice = totalPrice;
+  double _totalPrice;
+  double get totalPrice => _$this._totalPrice;
+  set totalPrice(double totalPrice) => _$this._totalPrice = totalPrice;
 
   String _refID;
   String get refID => _$this._refID;
   set refID(String refID) => _$this._refID = refID;
 
-  int _cartLength;
-  int get cartLength => _$this._cartLength;
-  set cartLength(int cartLength) => _$this._cartLength = cartLength;
+  double _cartLength;
+  double get cartLength => _$this._cartLength;
+  set cartLength(double cartLength) => _$this._cartLength = cartLength;
 
   ListBuilder<String> _status;
   ListBuilder<String> get status =>
