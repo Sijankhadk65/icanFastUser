@@ -37,10 +37,8 @@ dependencies:
   firebase_auth: ^0.16.1
   google_sign_in: ^4.5.1
   firebase_storage: ^3.1.6
-  image_picker: ^0.6.7+1
   cached_network_image: ^2.2.0+1
   toast: ^0.1.5
-  path_provider: ^1.6.10
   location: ^3.0.2
   geocoder: ^0.2.1
   eva_icons_flutter: ^2.0.0
@@ -56,12 +54,8 @@ dependencies:
   intro_views_flutter: ^2.8.1
   latlong: ^0.6.1
   flutter_datetime_picker: ^1.4.0
-  slimy_card: ^1.0.4
-  fraction: ^1.2.1
-  expansion_card: ^0.1.0
   dotted_line: ^2.0.1
   flutter_local_notifications: ^1.4.4+4
-  nominatim_location_picker: ^0.1.0+7
   google_maps_place_picker: ^0.9.5
 
 dev_dependencies:

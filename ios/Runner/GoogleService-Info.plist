@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>878906369174-rtb1qbgtkduqar8d6mur8019odv2oi5c.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.878906369174-rtb1qbgtkduqar8d6mur8019odv2oi5c</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>878906369174-akm736rfmahl1klpeq4qmm8bd5q68pjk.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCopLPgDqq0xzOMFxViobv4u0ngQbotlS4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>878906369174</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.fast977.fastuserapp</string>
+	<key>PROJECT_ID</key>
+	<string>fast-d2857</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fast-d2857.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:878906369174:ios:f8b475ae94f95ef8834eb7</string>
+	<key>DATABASE_URL</key>
+	<string>https://fast-d2857.firebaseio.com</string>
+</dict>
+</plist>
