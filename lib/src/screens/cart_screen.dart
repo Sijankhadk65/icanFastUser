@@ -81,19 +81,45 @@ class _CartScreenState extends State<CartScreen> {
                           duration: Duration(
                             milliseconds: 300,
                           ),
-                          height: 65,
-                          color: snapshot.data
-                                  .map(
-                                    (order) {
-                                      return order.totalPrice >= order.minOrder;
-                                    },
-                                  )
-                                  .toList()
-                                  .contains(
-                                    false,
-                                  )
-                              ? Colors.red[800]
-                              : Colors.blue[800],
+                          margin: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 15,
+                          ),
+                          decoration: BoxDecoration(
+                              color: Color(0xFF11998e),
+                              // gradient: LinearGradient(
+                              //   begin: Alignment.topLeft,
+                              //   end: Alignment.bottomRight,
+                              //   colors: [
+                              //     Color(0xFF11998e),
+                              //     Color(0xFF38ef7d),
+                              //   ],
+                              // ),
+                              borderRadius: BorderRadius.circular(
+                                5,
+                              ),
+                              boxShadow: snapshot.data
+                                      .map(
+                                        (order) {
+                                          return order.totalPrice >=
+                                              order.minOrder;
+                                        },
+                                      )
+                                      .toList()
+                                      .contains(
+                                        false,
+                                      )
+                                  ? []
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black38,
+                                        offset: Offset(
+                                          0,
+                                          3,
+                                        ),
+                                        blurRadius: 5,
+                                      )
+                                    ]),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
@@ -119,61 +145,130 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       );
                                     },
+                              borderRadius: BorderRadius.circular(
+                                5,
+                              ),
                               child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Column(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: AnimatedContainer(
-                                        duration: Duration(
-                                          milliseconds: 300,
-                                        ),
-                                        child: Center(
-                                          child: StreamBuilder(
-                                            stream: orderCartBloc.cartsTotal,
-                                            builder: (context, snapshot) {
-                                              return Text(
-                                                "Total Cost (Rs.${snapshot.data})",
-                                                style: GoogleFonts.montserrat(
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.white,
-                                                  fontSize: 18,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 25,
+                                  vertical: 15,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Next",
+                                      style: GoogleFonts.nunito(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 17,
                                       ),
                                     ),
-                                    snapshot.data
-                                            .map((order) {
-                                              return order.totalPrice >=
-                                                  order.minOrder;
-                                            })
-                                            .toList()
-                                            .contains(false)
-                                        ? Expanded(
-                                            child: AnimatedContainer(
-                                              duration: Duration(
-                                                milliseconds: 300,
-                                              ),
-                                              child: Text(
-                                                "Minimum Order Not ${snapshot.data.where((order) => order.minOrder > order.totalPrice).toList().map((faultyOrder) => faultyOrder.vendor)} Met !",
-                                                style: GoogleFonts.montserrat(
-                                                  fontStyle: FontStyle.italic,
-                                                  color: Colors.white38,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        : Container(),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                        )
+                        ),
+                        // AnimatedContainer(
+                        //   duration: Duration(
+                        //     milliseconds: 300,
+                        //   ),
+                        //   height: 65,
+                        //   color: snapshot.data
+                        //           .map(
+                        //             (order) {
+                        //               return order.totalPrice >= order.minOrder;
+                        //             },
+                        //           )
+                        //           .toList()
+                        //           .contains(
+                        //             false,
+                        //           )
+                        //       ? Colors.red[800]
+                        //       : Colors.blue[800],
+                        //   child: Material(
+                        //     color: Colors.transparent,
+                        //     child: InkWell(
+                        //       onTap: snapshot.data
+                        //               .map(
+                        //                 (order) {
+                        //                   return order.totalPrice >=
+                        //                       order.minOrder;
+                        //                 },
+                        //               )
+                        //               .toList()
+                        //               .contains(
+                        //                 false,
+                        //               )
+                        //           ? null
+                        //           : () {
+                        //               Navigator.push(
+                        //                 context,
+                        //                 MaterialPageRoute(
+                        //                   builder: (_) => CheckoutScreen(
+                        //                     user: widget.user,
+                        //                   ),
+                        //                 ),
+                        //               );
+                        //             },
+                        //       child: Padding(
+                        //         padding: const EdgeInsets.all(10.0),
+                        //         child: Column(
+                        //           children: <Widget>[
+                        //             Expanded(
+                        //               child: AnimatedContainer(
+                        //                 duration: Duration(
+                        //                   milliseconds: 300,
+                        //                 ),
+                        //                 child: Center(
+                        //                   child: StreamBuilder(
+                        //                     stream: orderCartBloc.cartsTotal,
+                        //                     builder: (context, snapshot) {
+                        //                       return Text(
+                        //                         "Total Cost (Rs.${snapshot.data})",
+                        //                         style: GoogleFonts.montserrat(
+                        //                           fontWeight: FontWeight.w600,
+                        //                           color: Colors.white,
+                        //                           fontSize: 18,
+                        //                         ),
+                        //                       );
+                        //                     },
+                        //                   ),
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //             snapshot.data
+                        //                     .map(
+                        //                       (order) {
+                        //                         return order.totalPrice >=
+                        //                             order.minOrder;
+                        //                       },
+                        //                     )
+                        //                     .toList()
+                        //                     .contains(false)
+                        //                 ? Expanded(
+                        //                     child: AnimatedContainer(
+                        //                       duration: Duration(
+                        //                         milliseconds: 300,
+                        //                       ),
+                        //                       child: Text(
+                        //                         "Minimum Order Not ${snapshot.data.where((order) => order.minOrder > order.totalPrice).toList().map((faultyOrder) => faultyOrder.vendor)} Met !",
+                        //                         style: GoogleFonts.montserrat(
+                        //                           fontStyle: FontStyle.italic,
+                        //                           color: Colors.white38,
+                        //                           fontSize: 12,
+                        //                         ),
+                        //                       ),
+                        //                     ),
+                        //                   )
+                        //                 : Container(),
+                        //           ],
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // )
                       ],
                     )
                   : Container(

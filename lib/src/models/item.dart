@@ -48,6 +48,7 @@ abstract class MenuItem implements Built<MenuItem, MenuItemBuilder> {
         "price": this.price,
         "quantity": 1,
         "totalPrice": this.price,
+        "photoURI": this.photoURI,
       };
 }
 

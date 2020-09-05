@@ -8,7 +8,7 @@ import 'package:fastuserapp/src/widgets/order_ref_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_map_location_picker/google_map_location_picker.dart';
+import 'package:google_maps_place_picker/google_maps_place_picker.dart';
 
 import '../bloc/login_bloc.dart';
 
@@ -24,6 +24,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   LoginBloc _loginBloc;
+  PickResult _result;
+
   @override
   void didChangeDependencies() {
     _loginBloc = Provider.of<LoginBloc>(context);
@@ -60,10 +62,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 );
 
-                orderCartBloc.getClosedOrderRefs({
-                  "name": userSnapshot.data.name,
-                  "email": userSnapshot.data.email,
-                });
+                orderCartBloc.getClosedOrderRefs(
+                  {
+                    "name": userSnapshot.data.name,
+                    "email": userSnapshot.data.email,
+                  },
+                );
                 return Column(
                   children: <Widget>[
                     Row(
@@ -289,27 +293,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         null
                                                 ? RawMaterialButton(
                                                     onPressed: () async {
-                                                      LocationResult result =
-                                                          await showLocationPicker(
+                                                      await Navigator.push(
                                                         context,
-                                                        "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                                        automaticallyAnimateToCurrentLocation:
-                                                            true,
-                                                        myLocationButtonEnabled:
-                                                            true,
-                                                        layersButtonEnabled:
-                                                            true,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              PlacePicker(
+                                                            apiKey:
+                                                                "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                                            onPlacePicked:
+                                                                (result) {
+                                                              this.setState(
+                                                                () {
+                                                                  _result =
+                                                                      result;
+                                                                },
+                                                              );
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            useCurrentLocation:
+                                                                true,
+                                                          ),
+                                                        ),
                                                       );
                                                       _loginBloc
                                                           .updateUserHomeLocation(
                                                               {
-                                                            "lat": result.latLng
-                                                                .latitude,
-                                                            "lang": result
-                                                                .latLng
-                                                                .longitude,
+                                                            "lat": _result
+                                                                .geometry
+                                                                .location
+                                                                .lat,
+                                                            "lang": _result
+                                                                .geometry
+                                                                .location
+                                                                .lng,
                                                             "physicalLocation":
-                                                                result.address,
+                                                                _result
+                                                                    .formattedAddress,
                                                           },
                                                               userSnapshot
                                                                   .data.email);
@@ -365,30 +386,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             size: 18,
                                                           ),
                                                           onPressed: () async {
-                                                            LocationResult
-                                                                result =
-                                                                await showLocationPicker(
+                                                            await Navigator
+                                                                .push(
                                                               context,
-                                                              "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                                              automaticallyAnimateToCurrentLocation:
-                                                                  true,
-                                                              myLocationButtonEnabled:
-                                                                  true,
-                                                              layersButtonEnabled:
-                                                                  true,
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        PlacePicker(
+                                                                  apiKey:
+                                                                      "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                                                  onPlacePicked:
+                                                                      (result) {
+                                                                    this.setState(
+                                                                      () {
+                                                                        _result =
+                                                                            result;
+                                                                      },
+                                                                    );
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                  },
+                                                                  useCurrentLocation:
+                                                                      true,
+                                                                ),
+                                                              ),
                                                             );
                                                             _loginBloc
                                                                 .updateUserHomeLocation(
                                                                     {
-                                                                  "lat": result
-                                                                      .latLng
-                                                                      .latitude,
-                                                                  "lang": result
-                                                                      .latLng
-                                                                      .longitude,
+                                                                  "lat": _result
+                                                                      .geometry
+                                                                      .location
+                                                                      .lat,
+                                                                  "lang": _result
+                                                                      .geometry
+                                                                      .location
+                                                                      .lng,
                                                                   "physicalLocation":
-                                                                      result
-                                                                          .address,
+                                                                      _result
+                                                                          .formattedAddress,
                                                                 },
                                                                     userSnapshot
                                                                         .data
@@ -464,27 +501,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         null
                                                 ? RawMaterialButton(
                                                     onPressed: () async {
-                                                      LocationResult result =
-                                                          await showLocationPicker(
+                                                      await Navigator.push(
                                                         context,
-                                                        "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                                        automaticallyAnimateToCurrentLocation:
-                                                            true,
-                                                        myLocationButtonEnabled:
-                                                            true,
-                                                        layersButtonEnabled:
-                                                            true,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              PlacePicker(
+                                                            apiKey:
+                                                                "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                                            onPlacePicked:
+                                                                (result) {
+                                                              this.setState(
+                                                                () {
+                                                                  _result =
+                                                                      result;
+                                                                },
+                                                              );
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            useCurrentLocation:
+                                                                true,
+                                                          ),
+                                                        ),
                                                       );
                                                       _loginBloc
                                                           .updateUserOfficeLocation(
                                                               {
-                                                            "lat": result.latLng
-                                                                .latitude,
-                                                            "lang": result
-                                                                .latLng
-                                                                .longitude,
+                                                            "lat": _result
+                                                                .geometry
+                                                                .location
+                                                                .lat,
+                                                            "lang": _result
+                                                                .geometry
+                                                                .location
+                                                                .lng,
                                                             "physicalLocation":
-                                                                result.address,
+                                                                _result
+                                                                    .formattedAddress,
                                                           },
                                                               userSnapshot
                                                                   .data.email);
@@ -540,30 +594,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             size: 18,
                                                           ),
                                                           onPressed: () async {
-                                                            LocationResult
-                                                                result =
-                                                                await showLocationPicker(
+                                                            await Navigator
+                                                                .push(
                                                               context,
-                                                              "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                                              automaticallyAnimateToCurrentLocation:
-                                                                  true,
-                                                              myLocationButtonEnabled:
-                                                                  true,
-                                                              layersButtonEnabled:
-                                                                  true,
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        PlacePicker(
+                                                                  apiKey:
+                                                                      "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                                                  onPlacePicked:
+                                                                      (result) {
+                                                                    this.setState(
+                                                                      () {
+                                                                        _result =
+                                                                            result;
+                                                                      },
+                                                                    );
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                  },
+                                                                  useCurrentLocation:
+                                                                      true,
+                                                                ),
+                                                              ),
                                                             );
                                                             _loginBloc
                                                                 .updateUserOfficeLocation(
                                                                     {
-                                                                  "lat": result
-                                                                      .latLng
-                                                                      .latitude,
-                                                                  "lang": result
-                                                                      .latLng
-                                                                      .longitude,
+                                                                  "lat": _result
+                                                                      .geometry
+                                                                      .location
+                                                                      .lat,
+                                                                  "lang": _result
+                                                                      .geometry
+                                                                      .location
+                                                                      .lng,
                                                                   "physicalLocation":
-                                                                      result
-                                                                          .address,
+                                                                      _result
+                                                                          .formattedAddress,
                                                                 },
                                                                     userSnapshot
                                                                         .data

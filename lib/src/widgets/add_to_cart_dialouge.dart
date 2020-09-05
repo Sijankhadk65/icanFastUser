@@ -233,9 +233,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                       SizedBox(
                         width: 50,
                         child: RawMaterialButton(
-                          fillColor: snapshot.data == 1
-                              ? Colors.grey
-                              : Colors.orange[800],
+                          fillColor: Colors.orange[500],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
                               5,
@@ -307,7 +305,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                               5,
                             ),
                           ),
-                          fillColor: Colors.orange[800],
+                          fillColor: Colors.orange[500],
                           onPressed: () {
                             _cartItemBloc.changeCurrentItemCount(
                               snapshot.data + widget.item.increaseBy,
@@ -325,79 +323,111 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                 },
               ),
             ),
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: 10,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: StreamBuilder<double>(
-                        stream: _cartItemBloc.currentTotalPrice,
-                        builder: (context, snapshot) {
-                          return RawMaterialButton(
-                            elevation: snapshot.data == 0 ? 0 : 5,
-                            fillColor:
-                                snapshot.data == 0 ? Colors.grey : Colors.blue,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                5,
-                              ),
-                            ),
-                            onPressed: snapshot.data == 0
-                                ? () {}
-                                : () {
-                                    orderCartBloc.addNewOrder(
-                                      context,
-                                      widget.vendorName,
-                                      parseToCartItem(
-                                        _cartItemBloc.getItem(widget.item.name),
-                                      ),
-                                      widget.user,
-                                      widget.minOrder,
-                                    );
-                                    Navigator.pop(context);
-                                  },
-                            child: Padding(
-                              padding: const EdgeInsets.all(5),
-                              child: RichText(
-                                text: TextSpan(
-                                  text: "Add to cart ! (",
-                                  style: GoogleFonts.nunito(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: " Rs.${snapshot.data} ",
-                                      style: GoogleFonts.nunito(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: ")",
-                                    ),
-                                  ],
+            StreamBuilder<double>(
+                stream: _cartItemBloc.currentTotalPrice,
+                builder: (context, snapshot) {
+                  return AnimatedContainer(
+                    duration: Duration(
+                      milliseconds: 150,
+                    ),
+                    margin: EdgeInsets.only(
+                      left: 10,
+                      right: 10,
+                      bottom: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: snapshot.data == 0
+                            ? [
+                                Colors.grey,
+                                Colors.grey,
+                              ]
+                            : [
+                                Color(0xFF11998e),
+                                Color(0xFF38ef7d),
+                              ],
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        5,
+                      ),
+                      boxShadow: snapshot.data == 0
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: Colors.black38,
+                                offset: Offset(
+                                  0,
+                                  3,
                                 ),
+                                blurRadius: 5,
+                              )
+                            ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: snapshot.data == 0
+                            ? null
+                            : () {
+                                orderCartBloc.addNewOrder(
+                                  context,
+                                  widget.vendorName,
+                                  parseToCartItem(
+                                    _cartItemBloc.getItem(
+                                      widget.item.name,
+                                      widget.item.photoURI,
+                                    ),
+                                  ),
+                                  widget.user,
+                                  widget.minOrder,
+                                );
+                                Navigator.pop(context);
+                              },
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: RichText(
+                              text: TextSpan(
+                                text: "Add to cart !",
+                                style: GoogleFonts.nunito(
+                                  color: snapshot.data == 0
+                                      ? Colors.grey[800]
+                                      : Colors.white,
+                                  fontSize: 18,
+                                  decoration: snapshot.data == 0
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
+                                  decorationThickness: 1,
+                                  decorationColor: Colors.grey[800],
+                                  decorationStyle: TextDecorationStyle.double,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                children: snapshot.data == 0
+                                    ? []
+                                    : [
+                                        TextSpan(
+                                          text: " (",
+                                        ),
+                                        TextSpan(
+                                          text: " Rs.${snapshot.data} ",
+                                          style: GoogleFonts.nunito(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: ")",
+                                        ),
+                                      ],
                               ),
-                              // Text(
-                              //   "Add to cart !",
-                              //   style: GoogleFonts.nunito(
-                              //     color: Colors.white,
-                              //     fontSize: 18,
-                              //     fontWeight: FontWeight.w800,
-                              //   ),
-                              // ),
                             ),
-                          );
-                        }),
-                  ),
-                ],
-              ),
-            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
           ],
         ),
       ),

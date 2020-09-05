@@ -42,10 +42,10 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
         ..add(serializers.serialize(object.quantity,
             specifiedType: const FullType(double)));
     }
-    if (object.note != null) {
+    if (object.photoURI != null) {
       result
-        ..add('note')
-        ..add(serializers.serialize(object.note,
+        ..add('photoURI')
+        ..add(serializers.serialize(object.photoURI,
             specifiedType: const FullType(String)));
     }
     return result;
@@ -78,8 +78,8 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
           result.quantity = serializers.deserialize(value,
               specifiedType: const FullType(double)) as double;
           break;
-        case 'note':
-          result.note = serializers.deserialize(value,
+        case 'photoURI':
+          result.photoURI = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
       }
@@ -99,13 +99,13 @@ class _$CartItem extends CartItem {
   @override
   final double quantity;
   @override
-  final String note;
+  final String photoURI;
 
   factory _$CartItem([void Function(CartItemBuilder) updates]) =>
       (new CartItemBuilder()..update(updates)).build();
 
   _$CartItem._(
-      {this.name, this.price, this.totalPrice, this.quantity, this.note})
+      {this.name, this.price, this.totalPrice, this.quantity, this.photoURI})
       : super._();
 
   @override
@@ -123,7 +123,7 @@ class _$CartItem extends CartItem {
         price == other.price &&
         totalPrice == other.totalPrice &&
         quantity == other.quantity &&
-        note == other.note;
+        photoURI == other.photoURI;
   }
 
   @override
@@ -133,7 +133,7 @@ class _$CartItem extends CartItem {
             $jc($jc($jc(0, name.hashCode), price.hashCode),
                 totalPrice.hashCode),
             quantity.hashCode),
-        note.hashCode));
+        photoURI.hashCode));
   }
 
   @override
@@ -143,7 +143,7 @@ class _$CartItem extends CartItem {
           ..add('price', price)
           ..add('totalPrice', totalPrice)
           ..add('quantity', quantity)
-          ..add('note', note))
+          ..add('photoURI', photoURI))
         .toString();
   }
 }
@@ -167,9 +167,9 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
   double get quantity => _$this._quantity;
   set quantity(double quantity) => _$this._quantity = quantity;
 
-  String _note;
-  String get note => _$this._note;
-  set note(String note) => _$this._note = note;
+  String _photoURI;
+  String get photoURI => _$this._photoURI;
+  set photoURI(String photoURI) => _$this._photoURI = photoURI;
 
   CartItemBuilder();
 
@@ -179,7 +179,7 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
       _price = _$v.price;
       _totalPrice = _$v.totalPrice;
       _quantity = _$v.quantity;
-      _note = _$v.note;
+      _photoURI = _$v.photoURI;
       _$v = null;
     }
     return this;
@@ -206,7 +206,7 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
             price: price,
             totalPrice: totalPrice,
             quantity: quantity,
-            note: note);
+            photoURI: photoURI);
     replace(_$result);
     return _$result;
   }

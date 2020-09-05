@@ -104,6 +104,12 @@ class _$VendorSerializer implements StructuredSerializer<Vendor> {
         ..add(serializers.serialize(object.isFeatured,
             specifiedType: const FullType(bool)));
     }
+    if (object.logo != null) {
+      result
+        ..add('logo')
+        ..add(serializers.serialize(object.logo,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -178,6 +184,10 @@ class _$VendorSerializer implements StructuredSerializer<Vendor> {
           result.isFeatured = serializers.deserialize(value,
               specifiedType: const FullType(bool)) as bool;
           break;
+        case 'logo':
+          result.logo = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
       }
     }
 
@@ -214,6 +224,8 @@ class _$Vendor extends Vendor {
   final bool isAway;
   @override
   final bool isFeatured;
+  @override
+  final String logo;
 
   factory _$Vendor([void Function(VendorBuilder) updates]) =>
       (new VendorBuilder()..update(updates)).build();
@@ -232,7 +244,8 @@ class _$Vendor extends Vendor {
       this.categories,
       this.isBusy,
       this.isAway,
-      this.isFeatured})
+      this.isFeatured,
+      this.logo})
       : super._();
 
   @override
@@ -259,7 +272,8 @@ class _$Vendor extends Vendor {
         categories == other.categories &&
         isBusy == other.isBusy &&
         isAway == other.isAway &&
-        isFeatured == other.isFeatured;
+        isFeatured == other.isFeatured &&
+        logo == other.logo;
   }
 
   @override
@@ -276,20 +290,24 @@ class _$Vendor extends Vendor {
                                         $jc(
                                             $jc(
                                                 $jc(
-                                                    $jc($jc(0, name.hashCode),
-                                                        photoURI.hashCode),
-                                                    closeTime.hashCode),
-                                                openTime.hashCode),
-                                            minOrder.hashCode),
-                                        physicalLocation.hashCode),
-                                    lat.hashCode),
-                                lang.hashCode),
-                            averageRating.hashCode),
-                        tags.hashCode),
-                    categories.hashCode),
-                isBusy.hashCode),
-            isAway.hashCode),
-        isFeatured.hashCode));
+                                                    $jc(
+                                                        $jc(
+                                                            $jc(0,
+                                                                name.hashCode),
+                                                            photoURI.hashCode),
+                                                        closeTime.hashCode),
+                                                    openTime.hashCode),
+                                                minOrder.hashCode),
+                                            physicalLocation.hashCode),
+                                        lat.hashCode),
+                                    lang.hashCode),
+                                averageRating.hashCode),
+                            tags.hashCode),
+                        categories.hashCode),
+                    isBusy.hashCode),
+                isAway.hashCode),
+            isFeatured.hashCode),
+        logo.hashCode));
   }
 
   @override
@@ -308,7 +326,8 @@ class _$Vendor extends Vendor {
           ..add('categories', categories)
           ..add('isBusy', isBusy)
           ..add('isAway', isAway)
-          ..add('isFeatured', isFeatured))
+          ..add('isFeatured', isFeatured)
+          ..add('logo', logo))
         .toString();
   }
 }
@@ -376,6 +395,10 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
   bool get isFeatured => _$this._isFeatured;
   set isFeatured(bool isFeatured) => _$this._isFeatured = isFeatured;
 
+  String _logo;
+  String get logo => _$this._logo;
+  set logo(String logo) => _$this._logo = logo;
+
   VendorBuilder();
 
   VendorBuilder get _$this {
@@ -394,6 +417,7 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
       _isBusy = _$v.isBusy;
       _isAway = _$v.isAway;
       _isFeatured = _$v.isFeatured;
+      _logo = _$v.logo;
       _$v = null;
     }
     return this;
@@ -431,7 +455,8 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
               categories: _categories?.build(),
               isBusy: isBusy,
               isAway: isAway,
-              isFeatured: isFeatured);
+              isFeatured: isFeatured,
+              logo: logo);
     } catch (_) {
       String _$failedField;
       try {

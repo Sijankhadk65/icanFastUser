@@ -186,7 +186,6 @@ class OrderCartBloc {
     _repository.getOrderRefs(user).listen(
       (orderRefs) {
         changeOrderRefrence(orderRefs);
-        print(orderRefs);
       },
     );
   }
@@ -434,7 +433,6 @@ class OrderCartBloc {
       (order) {
         if (order['vendor'] == vendor) {
           changeCurrentOrder(parseJsonToOnlineOrder(order));
-          print(order);
         }
       },
     );
@@ -485,7 +483,7 @@ class OrderCartBloc {
 
   removeCart(String vendorName) {
     _localOrders.removeWhere((cart) => cart['vendor'] == vendorName);
-    print("After Delete $_localOrders");
+
     getLocalOrder();
     getCurrentOrder(null);
   }
@@ -502,12 +500,12 @@ class OrderCartBloc {
             _checkoutCoordinatesSubject.value['lang']),
         LatLng(27.704015260871312, 83.46299696713686),
       );
-      print("Distance $distance");
+
       if (distance >= 5000) {
         _repository.getDistanceRates().listen(
           (rates) {
             addableAmount += (distance - 5000) * (rates.first / 1000);
-            print("Addabe Amount:$addableAmount");
+
             changeDeliveryCharge(addableAmount);
           },
         );
@@ -524,14 +522,14 @@ class OrderCartBloc {
               LatLng(_checkoutCoordinatesSubject.value['lat'],
                   _checkoutCoordinatesSubject.value['lang']),
               LatLng(latlong['lat'], latlong['lang']));
-          print("Distance: $distance");
+
           if (distance > farthestLocation) {
             farthestLocation = distance;
           }
           if (farthestLocation > 5000.0) {
             _repository.getDistanceRates().listen((rates) {
               addableAmount += (farthestLocation - 5000) * (rates.first / 1000);
-              print("Addabe Amount:$addableAmount");
+
               changeDeliveryCharge(addableAmount);
             });
           } else {
@@ -589,15 +587,16 @@ class OrderCartBloc {
     }
   }
 
-  getCheckoutLocation(
-      {Map<String, dynamic> coordinates, String phycialLocation}) {
-    if (coordinates == null && phycialLocation == null) {
+  getCheckoutLocation(Map<String, dynamic> location) {
+    print("Input Location: $location");
+    if (location == null) {
       changeChkeckoutCoordinates(_currentLocationSubject.value);
       changeCheckoutPhysicalLocation(_physicalLocationSubject.value);
     } else {
-      changeChkeckoutCoordinates(coordinates);
-      changeCheckoutPhysicalLocation(phycialLocation);
+      changeChkeckoutCoordinates(location['coordinates']);
+      changeCheckoutPhysicalLocation(location['physicalLocation']);
     }
+    print("Location;${_checkoutPhysicalLocationSubject.value}");
   }
 
   getPhysicalLocation(Map<String, dynamic> location,
@@ -606,16 +605,13 @@ class OrderCartBloc {
       final coordinates = Coordinates(location['lat'], location['lang']);
 
       List<Address> addresses = [];
-      print(coordinates);
+
       try {
         addresses =
             await Geocoder.local.findAddressesFromCoordinates(coordinates);
         var first = addresses.first;
-        // _physicaLocation = first.addressLine;
         changePhysicalLocation(first.addressLine);
-      } catch (e) {
-        print(e);
-      }
+      } catch (e) {}
     } else {
       changePhysicalLocation(addressLine);
     }

@@ -4,7 +4,7 @@ import 'package:fastuserapp/src/widgets/onboarding_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_map_location_picker/google_map_location_picker.dart';
+import 'package:google_maps_place_picker/google_maps_place_picker.dart';
 
 import 'package:provider/provider.dart';
 
@@ -18,7 +18,7 @@ class UserInfoScreen extends StatefulWidget {
 
 class _UserInfoScreenState extends State<UserInfoScreen> {
   LoginBloc _loginBloc;
-
+  PickResult _result;
   TextEditingController _nameController, _phoneNumberController;
   PageController _pageController;
   int _currentIndex = 0;
@@ -196,23 +196,34 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                                             IconButton(
                                               icon: Icon(EvaIcons.edit2Outline),
                                               onPressed: () async {
-                                                LocationResult result =
-                                                    await showLocationPicker(
+                                                await Navigator.push(
                                                   context,
-                                                  "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                                  automaticallyAnimateToCurrentLocation:
-                                                      true,
-                                                  myLocationButtonEnabled: true,
-                                                  layersButtonEnabled: true,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PlacePicker(
+                                                      apiKey:
+                                                          "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                                      onPlacePicked: (result) {
+                                                        this.setState(
+                                                          () {
+                                                            _result = result;
+                                                          },
+                                                        );
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      useCurrentLocation: true,
+                                                    ),
+                                                  ),
                                                 );
                                                 _loginBloc.changeHomeLocation(
                                                   {
-                                                    "lat":
-                                                        result.latLng.latitude,
-                                                    "lang":
-                                                        result.latLng.longitude,
-                                                    "physicalLocation":
-                                                        result.address,
+                                                    "lat": _result
+                                                        .geometry.location.lat,
+                                                    "lang": _result
+                                                        .geometry.location.lng,
+                                                    "physicalLocation": _result
+                                                        .formattedAddress,
                                                   },
                                                 );
                                               },
@@ -222,21 +233,32 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                                       )
                                     : RawMaterialButton(
                                         onPressed: () async {
-                                          LocationResult result =
-                                              await showLocationPicker(
+                                          await Navigator.push(
                                             context,
-                                            "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                            automaticallyAnimateToCurrentLocation:
-                                                true,
-                                            myLocationButtonEnabled: true,
-                                            layersButtonEnabled: true,
+                                            MaterialPageRoute(
+                                              builder: (context) => PlacePicker(
+                                                apiKey:
+                                                    "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                                onPlacePicked: (result) {
+                                                  this.setState(
+                                                    () {
+                                                      _result = result;
+                                                    },
+                                                  );
+                                                  Navigator.of(context).pop();
+                                                },
+                                                useCurrentLocation: true,
+                                              ),
+                                            ),
                                           );
                                           _loginBloc.changeHomeLocation(
                                             {
-                                              "lat": result.latLng.latitude,
-                                              "lang": result.latLng.longitude,
+                                              "lat":
+                                                  _result.geometry.location.lat,
+                                              "lang":
+                                                  _result.geometry.location.lng,
                                               "physicalLocation":
-                                                  result.address,
+                                                  _result.formattedAddress,
                                             },
                                           );
                                         },
@@ -314,22 +336,34 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                                           IconButton(
                                             icon: Icon(EvaIcons.edit2Outline),
                                             onPressed: () async {
-                                              LocationResult result =
-                                                  await showLocationPicker(
+                                              await Navigator.push(
                                                 context,
-                                                "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                                automaticallyAnimateToCurrentLocation:
-                                                    true,
-                                                myLocationButtonEnabled: true,
-                                                layersButtonEnabled: true,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PlacePicker(
+                                                    apiKey:
+                                                        "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                                    onPlacePicked: (result) {
+                                                      this.setState(
+                                                        () {
+                                                          _result = result;
+                                                        },
+                                                      );
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    useCurrentLocation: true,
+                                                  ),
+                                                ),
                                               );
                                               _loginBloc.changeOfficeLocation(
                                                 {
-                                                  "lat": result.latLng.latitude,
-                                                  "lang":
-                                                      result.latLng.longitude,
+                                                  "lat": _result
+                                                      .geometry.location.lat,
+                                                  "lang": _result
+                                                      .geometry.location.lng,
                                                   "physicalLocation":
-                                                      result.address,
+                                                      _result.formattedAddress,
                                                 },
                                               );
                                             },
@@ -339,20 +373,32 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                                     )
                                   : RawMaterialButton(
                                       onPressed: () async {
-                                        LocationResult result =
-                                            await showLocationPicker(
+                                        await Navigator.push(
                                           context,
-                                          "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                          automaticallyAnimateToCurrentLocation:
-                                              true,
-                                          myLocationButtonEnabled: true,
-                                          layersButtonEnabled: true,
+                                          MaterialPageRoute(
+                                            builder: (context) => PlacePicker(
+                                              apiKey:
+                                                  "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                              onPlacePicked: (result) {
+                                                this.setState(
+                                                  () {
+                                                    _result = result;
+                                                  },
+                                                );
+                                                Navigator.of(context).pop();
+                                              },
+                                              useCurrentLocation: true,
+                                            ),
+                                          ),
                                         );
                                         _loginBloc.changeOfficeLocation(
                                           {
-                                            "lat": result.latLng.latitude,
-                                            "lang": result.latLng.longitude,
-                                            "physicalLocation": result.address,
+                                            "lat":
+                                                _result.geometry.location.lat,
+                                            "lang":
+                                                _result.geometry.location.lng,
+                                            "physicalLocation":
+                                                _result.formattedAddress,
                                           },
                                         );
                                       },

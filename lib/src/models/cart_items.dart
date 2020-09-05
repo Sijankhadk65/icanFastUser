@@ -16,7 +16,7 @@ abstract class CartItem implements Built<CartItem, CartItemBuilder> {
   @nullable
   double get quantity;
   @nullable
-  String get note;
+  String get photoURI;
   CartItem._();
   factory CartItem([updates(CartItemBuilder b)]) = _$CartItem;
   static Serializer<CartItem> get serializer => _$cartItemSerializer;
@@ -25,7 +25,7 @@ abstract class CartItem implements Built<CartItem, CartItemBuilder> {
         "price": this.price,
         "quantity": this.quantity,
         "totalPrice": this.totalPrice,
-        "note": this.note,
+        "photoURI": this.photoURI,
       };
 }
 

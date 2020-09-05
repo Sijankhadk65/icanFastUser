@@ -58,7 +58,7 @@ class CartItemBloc {
     }
   }
 
-  Map<String, dynamic> getItem(String itemName) => {
+  Map<String, dynamic> getItem(String itemName, String photoURI) => {
         "name": itemName,
         "totalPrice": _currentTotalPriceSubject.value,
         "quantity": _currentItemCountSubject.value,
@@ -73,6 +73,7 @@ class CartItemBloc {
         "varient": _currentSelectedVarientSubject.value != null
             ? _currentSelectedVarientSubject.value.toNewVarientJson()
             : {},
+        "photoURI": photoURI,
       };
 
   dispose() {
