@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class FirebaseAuthProvider {
   final _firebaseAuthInstance = FirebaseAuth.instance;
@@ -43,6 +44,24 @@ class FirebaseAuthProvider {
 
     return user;
   }
+
+  // loginWithApple() async {
+  //   final authCredential = await SignInWithApple.getAppleIDCredential(
+  //     scopes: [
+  //       AppleIDAuthorizationScopes.email,
+  //       AppleIDAuthorizationScopes.fullName,
+  //     ],
+  //     webAuthenticationOptions: WebAuthenticationOptions(
+  //       clientId: 'ccom.fast977.fastuserapp.icanBMTS.debug.service',
+  //       redirectUri: Uri.parse(
+  //         'https://fast-d2857.firebaseapp.com/__/auth/handler',
+  //       ),
+  //     ),
+  //     // TODO: Remove these if you have no need for them
+  //     // nonce: 'example-nonce',
+  //     // state: 'example-state',
+  //   );
+  // }
 
   Future<void> signOut() {
     return _firebaseAuthInstance.signOut();

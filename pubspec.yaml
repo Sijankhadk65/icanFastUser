@@ -57,6 +57,7 @@ dependencies:
   dotted_line: ^2.0.1
   flutter_local_notifications: ^1.4.4+4
   google_maps_place_picker: ^0.9.5
+  # sign_in_with_apple: ^2.5.2
 
 dev_dependencies:
   # build_runner: ^1.0.0

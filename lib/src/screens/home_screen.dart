@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fastuserapp/src/bloc/dash_bloc.dart';
 import 'package:fastuserapp/src/bloc/search_bloc.dart';
 import 'package:fastuserapp/src/models/online_order.dart';
@@ -40,6 +42,11 @@ class _HomeScreenState extends State<HomeScreen>
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   _configureFCM() {
+    if (Platform.isIOS) {
+      _firebaseMessaging.requestNotificationPermissions(
+        IosNotificationSettings(),
+      );
+    }
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print('onMessage: $message');
@@ -59,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+
     _configureFCM();
     _pageController = PageController();
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../bloc/login_bloc.dart';
 import '../widgets/social_login_button.dart';
 import 'package:provider/provider.dart';
@@ -72,14 +73,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: <Widget>[
                     SocialLoginButton(
-                        onPressed: () {
-                          _loginBloc.signInWithGoogle();
-                        },
-                        asset: "assets/svg/google.svg",
-                        name: "Google"),
+                      onPressed: () {
+                        _loginBloc.signInWithGoogle();
+                      },
+                      asset: "assets/svg/google.svg",
+                      name: "Google",
+                    ),
                   ],
                 ),
               ),
+              // SignInWithAppleButton(onPressed: () async {}),
               Spacer(),
               Text(
                 "*By signing in you agree to all the terms and conditions set for using the app.*",
