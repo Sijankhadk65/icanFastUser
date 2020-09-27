@@ -28,7 +28,7 @@ class _$RatingSerializer implements StructuredSerializer<Rating> {
       result
         ..add('user')
         ..add(serializers.serialize(object.user,
-            specifiedType: const FullType(User)));
+            specifiedType: const FullType(FastUser)));
     }
     if (object.rating != null) {
       result
@@ -62,7 +62,7 @@ class _$RatingSerializer implements StructuredSerializer<Rating> {
           break;
         case 'user':
           result.user.replace(serializers.deserialize(value,
-              specifiedType: const FullType(User)) as User);
+              specifiedType: const FullType(FastUser)) as FastUser);
           break;
         case 'rating':
           result.rating = serializers.deserialize(value,
@@ -83,7 +83,7 @@ class _$Rating extends Rating {
   @override
   final String comment;
   @override
-  final User user;
+  final FastUser user;
   @override
   final double rating;
   @override
@@ -137,9 +137,9 @@ class RatingBuilder implements Builder<Rating, RatingBuilder> {
   String get comment => _$this._comment;
   set comment(String comment) => _$this._comment = comment;
 
-  UserBuilder _user;
-  UserBuilder get user => _$this._user ??= new UserBuilder();
-  set user(UserBuilder user) => _$this._user = user;
+  FastUserBuilder _user;
+  FastUserBuilder get user => _$this._user ??= new FastUserBuilder();
+  set user(FastUserBuilder user) => _$this._user = user;
 
   double _rating;
   double get rating => _$this._rating;

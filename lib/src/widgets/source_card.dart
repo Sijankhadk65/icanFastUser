@@ -75,7 +75,7 @@ class _SourceCardState extends State<SourceCard> {
                     ),
                   );
                 },
-                placeholder: (context, string) => Container(color: Colors.grey),
+                // placeholder: (context, string) => Container(color: Colors.grey),
                 errorWidget: (context, url, error) {
                   this.setState(
                     () {
@@ -183,7 +183,7 @@ class _SourceCardState extends State<SourceCard> {
                             color: Colors.white,
                           ),
                           onPressed: widget.onTap,
-                        )
+                        ),
                       ],
                     ),
                     Text(
@@ -234,7 +234,7 @@ class _SourceCardState extends State<SourceCard> {
                               ),
                               Expanded(
                                 child: Text(
-                                  "The vendor is currently unavailable..",
+                                  "The vendor is currently unavailable...",
                                   style: GoogleFonts.montserrat(
                                     color: Colors.red[700],
                                     fontSize: 10,
@@ -245,7 +245,7 @@ class _SourceCardState extends State<SourceCard> {
                               ),
                             ],
                           )
-                        : Container()
+                        : Container(),
                   ],
                 ),
               ),

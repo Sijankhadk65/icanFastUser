@@ -16,7 +16,11 @@ abstract class CarouselItem
   @nullable
   String get photoURI;
   @nullable
-  String get vendor;
+  String get vendorName;
+  @nullable
+  int get minOrder;
+  @nullable
+  String get itemCode;
   CarouselItem._();
   factory CarouselItem([updates(CarouselItemBuilder b)]) = _$CarouselItem;
   static Serializer<CarouselItem> get serializer => _$carouselItemSerializer;

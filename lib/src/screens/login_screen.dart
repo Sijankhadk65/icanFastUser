@@ -1,9 +1,12 @@
+import 'dart:io';
+
+import 'package:apple_sign_in/apple_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../bloc/login_bloc.dart';
 import '../widgets/social_login_button.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -82,7 +85,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-              // SignInWithAppleButton(onPressed: () async {}),
+              FutureBuilder(
+                future: _loginBloc.isAppleSignInAvailable(),
+                builder: (context, snapshot) {
+                  if (snapshot.data == true) {
+                    return AppleSignInButton(
+                      onPressed: () {
+                        _loginBloc.signInWithApple();
+                      },
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
+              ),
               Spacer(),
               Text(
                 "*By signing in you agree to all the terms and conditions set for using the app.*",

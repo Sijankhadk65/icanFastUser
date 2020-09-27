@@ -43,10 +43,22 @@ class _$CarouselItemSerializer implements StructuredSerializer<CarouselItem> {
         ..add(serializers.serialize(object.photoURI,
             specifiedType: const FullType(String)));
     }
-    if (object.vendor != null) {
+    if (object.vendorName != null) {
       result
-        ..add('vendor')
-        ..add(serializers.serialize(object.vendor,
+        ..add('vendorName')
+        ..add(serializers.serialize(object.vendorName,
+            specifiedType: const FullType(String)));
+    }
+    if (object.minOrder != null) {
+      result
+        ..add('minOrder')
+        ..add(serializers.serialize(object.minOrder,
+            specifiedType: const FullType(int)));
+    }
+    if (object.itemCode != null) {
+      result
+        ..add('itemCode')
+        ..add(serializers.serialize(object.itemCode,
             specifiedType: const FullType(String)));
     }
     return result;
@@ -79,8 +91,16 @@ class _$CarouselItemSerializer implements StructuredSerializer<CarouselItem> {
           result.photoURI = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'vendor':
-          result.vendor = serializers.deserialize(value,
+        case 'vendorName':
+          result.vendorName = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'minOrder':
+          result.minOrder = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int;
+          break;
+        case 'itemCode':
+          result.itemCode = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
       }
@@ -100,7 +120,11 @@ class _$CarouselItem extends CarouselItem {
   @override
   final String photoURI;
   @override
-  final String vendor;
+  final String vendorName;
+  @override
+  final int minOrder;
+  @override
+  final String itemCode;
 
   factory _$CarouselItem([void Function(CarouselItemBuilder) updates]) =>
       (new CarouselItemBuilder()..update(updates)).build();
@@ -110,7 +134,9 @@ class _$CarouselItem extends CarouselItem {
       this.isActive,
       this.isInteractive,
       this.photoURI,
-      this.vendor})
+      this.vendorName,
+      this.minOrder,
+      this.itemCode})
       : super._();
 
   @override
@@ -128,17 +154,23 @@ class _$CarouselItem extends CarouselItem {
         isActive == other.isActive &&
         isInteractive == other.isInteractive &&
         photoURI == other.photoURI &&
-        vendor == other.vendor;
+        vendorName == other.vendorName &&
+        minOrder == other.minOrder &&
+        itemCode == other.itemCode;
   }
 
   @override
   int get hashCode {
     return $jf($jc(
         $jc(
-            $jc($jc($jc(0, carouselID.hashCode), isActive.hashCode),
-                isInteractive.hashCode),
-            photoURI.hashCode),
-        vendor.hashCode));
+            $jc(
+                $jc(
+                    $jc($jc($jc(0, carouselID.hashCode), isActive.hashCode),
+                        isInteractive.hashCode),
+                    photoURI.hashCode),
+                vendorName.hashCode),
+            minOrder.hashCode),
+        itemCode.hashCode));
   }
 
   @override
@@ -148,7 +180,9 @@ class _$CarouselItem extends CarouselItem {
           ..add('isActive', isActive)
           ..add('isInteractive', isInteractive)
           ..add('photoURI', photoURI)
-          ..add('vendor', vendor))
+          ..add('vendorName', vendorName)
+          ..add('minOrder', minOrder)
+          ..add('itemCode', itemCode))
         .toString();
   }
 }
@@ -174,9 +208,17 @@ class CarouselItemBuilder
   String get photoURI => _$this._photoURI;
   set photoURI(String photoURI) => _$this._photoURI = photoURI;
 
-  String _vendor;
-  String get vendor => _$this._vendor;
-  set vendor(String vendor) => _$this._vendor = vendor;
+  String _vendorName;
+  String get vendorName => _$this._vendorName;
+  set vendorName(String vendorName) => _$this._vendorName = vendorName;
+
+  int _minOrder;
+  int get minOrder => _$this._minOrder;
+  set minOrder(int minOrder) => _$this._minOrder = minOrder;
+
+  String _itemCode;
+  String get itemCode => _$this._itemCode;
+  set itemCode(String itemCode) => _$this._itemCode = itemCode;
 
   CarouselItemBuilder();
 
@@ -186,7 +228,9 @@ class CarouselItemBuilder
       _isActive = _$v.isActive;
       _isInteractive = _$v.isInteractive;
       _photoURI = _$v.photoURI;
-      _vendor = _$v.vendor;
+      _vendorName = _$v.vendorName;
+      _minOrder = _$v.minOrder;
+      _itemCode = _$v.itemCode;
       _$v = null;
     }
     return this;
@@ -213,7 +257,9 @@ class CarouselItemBuilder
             isActive: isActive,
             isInteractive: isInteractive,
             photoURI: photoURI,
-            vendor: vendor);
+            vendorName: vendorName,
+            minOrder: minOrder,
+            itemCode: itemCode);
     replace(_$result);
     return _$result;
   }

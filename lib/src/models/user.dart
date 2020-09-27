@@ -6,7 +6,7 @@ import '../models/serializer.dart';
 
 part 'user.g.dart';
 
-abstract class User implements Built<User, UserBuilder> {
+abstract class FastUser implements Built<FastUser, FastUserBuilder> {
   @nullable
   String get email;
   @nullable
@@ -24,14 +24,14 @@ abstract class User implements Built<User, UserBuilder> {
   @nullable
   BuiltList<String> get promoCodes;
 
-  factory User([void Function(UserBuilder) updates]) = _$User;
-  User._();
-  static Serializer<User> get serializer => _$userSerializer;
+  factory FastUser([void Function(FastUserBuilder) updates]) = _$FastUser;
+  FastUser._();
+  static Serializer<FastUser> get serializer => _$fastUserSerializer;
 }
 
-User parseJsonToUser(Map<String, dynamic> json) {
-  return jsonSerializer.deserializeWith(User.serializer, json);
+FastUser parseJsonToUser(Map<String, dynamic> json) {
+  return jsonSerializer.deserializeWith(FastUser.serializer, json);
 }
 
-Map<String, dynamic> convertUserToJson(User user) =>
+Map<String, dynamic> convertUserToJson(FastUser user) =>
     {"name": user.name, "email": user.email, "photoURI": user.photoURI};

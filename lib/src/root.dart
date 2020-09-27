@@ -28,7 +28,7 @@ class _RootState extends State<Root> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder<FirebaseUser>(
+      body: StreamBuilder<User>(
         stream: _bloc.currentUserStateStream,
         builder: (context, userSnapshot) {
           if (userSnapshot.hasError)
@@ -67,7 +67,7 @@ class _RootState extends State<Root> {
                               break;
                             case ConnectionState.active:
                               return snapshot.data == true
-                                  ? StreamBuilder<User>(
+                                  ? StreamBuilder<FastUser>(
                                       stream: _bloc
                                           .getUser(userSnapshot.data.email),
                                       builder: (context, snapshot) {

@@ -37,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       body: Container(
         margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-        child: StreamBuilder<User>(
+        child: StreamBuilder<FastUser>(
           builder: (context, userSnapshot) {
             if (userSnapshot.hasError)
               return Text("Error:${userSnapshot.error}");

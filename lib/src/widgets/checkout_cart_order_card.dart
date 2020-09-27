@@ -16,10 +16,10 @@ class CheckoutCartOrderCard extends StatelessWidget {
         vertical: 10,
       ),
       child: Material(
-        borderRadius: BorderRadius.circular(
-          5,
-        ),
-        elevation: 5,
+        // borderRadius: BorderRadius.circular(
+        //   5,
+        // ),
+        // elevation: 5,
         child: InkWell(
           onTap: () {},
           borderRadius: BorderRadius.circular(
@@ -47,94 +47,93 @@ class CheckoutCartOrderCard extends StatelessWidget {
                               fontWeight: FontWeight.w800,
                             ),
                           ),
-                          ListView(
-                            shrinkWrap: true,
-                            physics: ClampingScrollPhysics(),
-                            children: order.items
-                                .map(
-                                  (item) => RichText(
-                                    text: TextSpan(
-                                      text: item.name,
-                                      children: [
-                                        TextSpan(
-                                          text: ",",
-                                        ),
-                                      ],
-                                      style: GoogleFonts.nunito(
-                                        fontSize: 10,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          )
+                          // ListView(
+                          //   shrinkWrap: true,
+                          //   physics: ClampingScrollPhysics(),
+                          //   children: order.items
+                          //       .map(
+                          //         (item) => RichText(
+                          //           text: TextSpan(
+                          //             text: item.name,
+                          //             children: [
+                          //               TextSpan(
+                          //                 text: ",",
+                          //               ),
+                          //             ],
+                          //             style: GoogleFonts.nunito(
+                          //               fontSize: 10,
+                          //               color: Colors.black,
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       )
+                          //       .toList(),
+                          // )
                         ],
                       ),
                     ),
-                    Expanded(
-                      child: Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: 10,
-                          ),
-                          child: RichText(
-                            text: TextSpan(
-                              text: "x",
-                              style: GoogleFonts.nunito(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                                color: Colors.black,
-                              ),
-                              children:
-                                  order.cartLength - order.cartLength.toInt() ==
-                                          0
-                                      ? [
-                                          TextSpan(
-                                            text: "${order.cartLength.toInt()}",
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                            ),
-                                          )
-                                        ]
-                                      : [],
-                            ),
-                          )
-                          // (order.cartLength - order.cartLength.toInt() == 0)
-                          //     ? Text(
-                          //         "x ${order.cartLength.toInt()}",
-                          //         style: GoogleFonts.nunito(
-                          //           fontWeight: FontWeight.w600,
-                          //         ),
-                          //       )
-                          //     : Row(
-                          //         mainAxisAlignment: MainAxisAlignment.center,
-                          //         children: [
-                          //           Text(
-                          //             "${order.cartLength.toInt()} ",
-                          //             style: GoogleFonts.oswald(
-                          //               fontSize: 18,
-                          //             ),
-                          //           ),
-                          //           Column(
-                          //             children: [
-                          //               Text(
-                          //                 "1",
-                          //                 style: GoogleFonts.oswald(),
-                          //               ),
-                          //               Container(
-                          //                   width: 10,
-                          //                   height: 2,
-                          //                   color: Colors.black),
-                          //               Text(
-                          //                 "2",
-                          //                 style: GoogleFonts.oswald(),
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         ],
-                          //       ),
-                          ),
-                    ),
+                    // Expanded(
+                    //   child: Container(
+                    //     margin: EdgeInsets.symmetric(
+                    //       horizontal: 10,
+                    //     ),
+                    //     child: RichText(
+                    //       text: TextSpan(
+                    //         text: "x",
+                    //         style: GoogleFonts.nunito(
+                    //           fontWeight: FontWeight.w600,
+                    //           fontSize: 12,
+                    //           color: Colors.black,
+                    //         ),
+                    //         children:
+                    //             order.cartLength - order.cartLength.toInt() == 0
+                    //                 ? [
+                    //                     TextSpan(
+                    //                       text: "${order.cartLength.toInt()}",
+                    //                       style: TextStyle(
+                    //                         fontSize: 16,
+                    //                       ),
+                    //                     )
+                    //                   ]
+                    //                 : [],
+                    //       ),
+                    //     ),
+                    //     // (order.cartLength - order.cartLength.toInt() == 0)
+                    //     //     ? Text(
+                    //     //         "x ${order.cartLength.toInt()}",
+                    //     //         style: GoogleFonts.nunito(
+                    //     //           fontWeight: FontWeight.w600,
+                    //     //         ),
+                    //     //       )
+                    //     //     : Row(
+                    //     //         mainAxisAlignment: MainAxisAlignment.center,
+                    //     //         children: [
+                    //     //           Text(
+                    //     //             "${order.cartLength.toInt()} ",
+                    //     //             style: GoogleFonts.oswald(
+                    //     //               fontSize: 18,
+                    //     //             ),
+                    //     //           ),
+                    //     //           Column(
+                    //     //             children: [
+                    //     //               Text(
+                    //     //                 "1",
+                    //     //                 style: GoogleFonts.oswald(),
+                    //     //               ),
+                    //     //               Container(
+                    //     //                   width: 10,
+                    //     //                   height: 2,
+                    //     //                   color: Colors.black),
+                    //     //               Text(
+                    //     //                 "2",
+                    //     //                 style: GoogleFonts.oswald(),
+                    //     //               ),
+                    //     //             ],
+                    //     //           ),
+                    //     //         ],
+                    //     //       ),
+                    //   ),
+                    // ),
                     Text(
                       "Rs. ${order.totalPrice}",
                       style: GoogleFonts.nunito(
@@ -143,6 +142,7 @@ class CheckoutCartOrderCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                Divider(),
               ],
             ),
           ),

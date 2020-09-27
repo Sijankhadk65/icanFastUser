@@ -8,6 +8,7 @@ import 'package:fastuserapp/src/widgets/menu_item_displayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 import '../bloc/ratings_bloc.dart';
 import '../models/online_order.dart';
 import '../screens/cart_screen.dart';
@@ -59,41 +60,43 @@ class _VendorScreenState extends State<VendorScreen>
                 widget.vendorName,
               ),
             ),
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => Provider(
-                      create: (_) => RatingsBloc(),
-                      child: RatingScreen(
-                        user: widget.user,
-                        vendorName: widget.vendorName,
-                      ),
-                    ),
-                  ),
-                );
-              },
-              child: Column(
-                children: <Widget>[
-                  Icon(
-                    EvaIcons.star,
-                    color: Colors.yellow[800],
-                  ),
-                  Text(
-                    "(${widget.vendorRating})",
-                    style: GoogleFonts.nunito(
-                      color: Colors.black,
-                      fontSize: 10,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  )
-                ],
-              ),
-            )
           ],
         ),
+        actions: [
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Provider(
+                    create: (_) => RatingsBloc(),
+                    child: RatingScreen(
+                      user: widget.user,
+                      vendorName: widget.vendorName,
+                    ),
+                  ),
+                ),
+              );
+            },
+            child: Column(
+              children: <Widget>[
+                Icon(
+                  EvaIcons.star,
+                  color: Colors.yellow[800],
+                ),
+                Text(
+                  "(${widget.vendorRating})",
+                  style: GoogleFonts.nunito(
+                    color: Colors.black,
+                    fontSize: 10,
+                    letterSpacing: 0,
+                    fontWeight: FontWeight.w800,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -113,7 +116,9 @@ class _VendorScreenState extends State<VendorScreen>
                       break;
                     case ConnectionState.waiting:
                       return Center(
-                        child: CircularProgressIndicator(),
+                        child: JumpingDotsProgressIndicator(
+                          fontSize: 100,
+                        ),
                       );
                       break;
                     case ConnectionState.active:
@@ -130,7 +135,9 @@ class _VendorScreenState extends State<VendorScreen>
                                     break;
                                   case ConnectionState.waiting:
                                     return Center(
-                                      child: CircularProgressIndicator(),
+                                      child: JumpingDotsProgressIndicator(
+                                        fontSize: 20.0,
+                                      ),
                                     );
                                     break;
                                   case ConnectionState.active:

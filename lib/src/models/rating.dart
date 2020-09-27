@@ -10,7 +10,7 @@ abstract class Rating implements Built<Rating, RatingBuilder> {
   @nullable
   String get comment;
   @nullable
-  User get user;
+  FastUser get user;
   @nullable
   double get rating;
   @nullable

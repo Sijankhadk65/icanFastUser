@@ -8,12 +8,17 @@ import 'package:fastuserapp/src/widgets/delivery_location_selector.dart';
 import 'package:fastuserapp/src/widgets/order_bottom_sheet.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_place_picker/google_maps_place_picker.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final Map<String, dynamic> user;
 
-  const CheckoutScreen({Key key, @required this.user}) : super(key: key);
+  const CheckoutScreen({
+    Key key,
+    @required this.user,
+  }) : super(key: key);
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
 }
@@ -21,6 +26,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   TextEditingController _phoneNumberController;
   String _newNumber = "";
+  PickResult _result;
 
   _changeNewNumber(number) {
     this.setState(() {
@@ -33,6 +39,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _phoneNumberController = TextEditingController();
     orderCartBloc.changeUserPhoneNumber(widget.user['phoneNumber'].toString());
     _phoneNumberController.text = widget.user['phoneNumber'].toString();
+    orderCartBloc.getCheckoutLocation(null);
     super.initState();
   }
 
@@ -41,7 +48,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     orderCartBloc.getLocalOrder();
     orderCartBloc.getCartsTotal();
     orderCartBloc.getDeliveryCharge();
-    orderCartBloc.getCheckoutLocation(null);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -111,12 +117,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           right: 10,
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
-                            Text("Delivery To:"),
                             Text(
-                              "${widget.user['name']},",
-                              style: GoogleFonts.nunito(
+                              "${widget.user['name']}",
+                              style: GoogleFonts.montserrat(
                                 fontSize: 23,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -146,86 +151,89 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 );
                               },
                             ),
-                            // StreamBuilder<bool>(
-                            //   initialData: false,
-                            //   stream: orderCartBloc.isScheduled,
-                            //   builder: (context, snapshot) {
-                            //     return snapshot.data
-                            //         ? StreamBuilder<String>(
-                            //             initialData: "",
-                            //             stream: orderCartBloc.scheduledTime,
-                            //             builder: (context, snapshot) {
-                            //               DateTime date =
-                            //                   DateTime.parse(snapshot.data);
-                            //               return ChangableDisplayer(
-                            //                 primaryText:
-                            //                     "${date.year}/${date.month}/${date.day} at ${date.hour}:${date.minute}",
-                            //                 secondaryText:
-                            //                     "( change date or time )",
-                            //                 displayChanger: () {
-                            //                   DatePicker.showDateTimePicker(
-                            //                       context,
-                            //                       showTitleActions: true,
-                            //                       minTime: DateTime(2018, 3, 5),
-                            //                       maxTime: DateTime(2019, 6, 7),
-                            //                       onChanged: (date) {
-                            //                     orderCartBloc
-                            //                         .changeScheduledTime(
-                            //                       date.toIso8601String(),
-                            //                     );
-                            //                   }, onConfirm: (date) {
-                            //                     orderCartBloc
-                            //                         .changeSchedulingStatus(
-                            //                             true);
-                            //                   },
-                            //                       currentTime: DateTime.now(),
-                            //                       locale: LocaleType.en);
-                            //                 },
-                            //               );
-                            //             },
-                            //           )
-                            //         : RawMaterialButton(
-                            //             onPressed: () {
-                            //               DatePicker.showDateTimePicker(context,
-                            //                   showTitleActions: true,
-                            //                   minTime: DateTime(2018, 3, 5),
-                            //                   maxTime: DateTime(2019, 6, 7),
-                            //                   onChanged: (date) {
-                            //                 orderCartBloc.changeScheduledTime(
-                            //                   date.toIso8601String(),
-                            //                 );
-                            //               }, onConfirm: (date) {
-                            //                 orderCartBloc
-                            //                     .changeSchedulingStatus(true);
-                            //               },
-                            //                   currentTime: DateTime.now(),
-                            //                   locale: LocaleType.en);
-                            //             },
-                            //             shape: RoundedRectangleBorder(
-                            //               borderRadius: BorderRadius.circular(
-                            //                 5,
-                            //               ),
-                            //             ),
-                            //             padding: EdgeInsets.only(
-                            //               left: 5,
-                            //               right: 5,
-                            //             ),
-                            //             child: Text(
-                            //               "Schedule for later",
-                            //               style: GoogleFonts.nunito(
-                            //                 color: Colors.white,
-                            //                 fontWeight: FontWeight.w800,
-                            //               ),
-                            //             ),
-                            //             fillColor: Colors.orange[800],
-                            //           );
-                            //   },
-                            // )
+                            StreamBuilder<bool>(
+                              initialData: false,
+                              stream: orderCartBloc.isScheduled,
+                              builder: (context, snapshot) {
+                                return snapshot.data
+                                    ? StreamBuilder<String>(
+                                        initialData: "",
+                                        stream: orderCartBloc.scheduledTime,
+                                        builder: (context, snapshot) {
+                                          DateTime date =
+                                              DateTime.parse(snapshot.data);
+                                          return ChangableDisplayer(
+                                            primaryText:
+                                                "${date.year}/${date.month}/${date.day} at ${date.hour}:${date.minute}",
+                                            secondaryText:
+                                                "( change date or time )",
+                                            displayChanger: () {
+                                              DatePicker.showDateTimePicker(
+                                                  context,
+                                                  showTitleActions: true,
+                                                  minTime: DateTime(2018, 3, 5),
+                                                  maxTime: DateTime(2019, 6, 7),
+                                                  onChanged: (date) {
+                                                orderCartBloc
+                                                    .changeScheduledTime(
+                                                  date.toIso8601String(),
+                                                );
+                                              }, onConfirm: (date) {
+                                                orderCartBloc
+                                                    .changeSchedulingStatus(
+                                                        true);
+                                              },
+                                                  currentTime: DateTime.now(),
+                                                  locale: LocaleType.en);
+                                            },
+                                          );
+                                        },
+                                      )
+                                    : RawMaterialButton(
+                                        onPressed: () {
+                                          DatePicker.showDateTimePicker(
+                                            context,
+                                            showTitleActions: true,
+                                            minTime: DateTime(2018, 3, 5),
+                                            maxTime: DateTime(2019, 6, 7),
+                                            onChanged: (date) {
+                                              orderCartBloc.changeScheduledTime(
+                                                date.toIso8601String(),
+                                              );
+                                            },
+                                            onConfirm: (date) {
+                                              orderCartBloc
+                                                  .changeSchedulingStatus(true);
+                                            },
+                                            currentTime: DateTime.now(),
+                                            locale: LocaleType.en,
+                                          );
+                                        },
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        padding: EdgeInsets.only(
+                                          left: 5,
+                                          right: 5,
+                                        ),
+                                        child: Text(
+                                          "Schedule for later",
+                                          style: GoogleFonts.nunito(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        fillColor: Colors.orange[800],
+                                      );
+                              },
+                            ),
                             DeliveryLocationSelector(
                               user: widget.user,
                               setCheckoutLocation:
                                   orderCartBloc.getCheckoutLocation,
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -385,222 +393,253 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           vertical: 10,
                           horizontal: 20,
                         ),
-                        padding: EdgeInsets.symmetric(
-                          vertical: 5,
-                          horizontal: 10,
-                        ),
-                        child: Column(
-                          children: [
-                            StreamBuilder<String>(
-                              stream: orderCartBloc.checkoutPhysicalLocation,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError)
-                                  return Text("Error: ${snapshot.error}");
-                                switch (snapshot.connectionState) {
-                                  case ConnectionState.none:
-                                    return Text("Awaiting Bids...");
-                                    break;
-                                  case ConnectionState.waiting:
-                                    return Center(
-                                      child: LinearProgressIndicator(),
-                                    );
-                                    break;
-                                  case ConnectionState.active:
-                                    return Container(
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PlacePicker(
+                                    apiKey:
+                                        "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                    onPlacePicked: (result) {
+                                      this.setState(
+                                        () {
+                                          _result = result;
+                                        },
+                                      );
+                                      Navigator.of(context).pop();
+                                    },
+                                    useCurrentLocation: true,
+                                  ),
+                                ),
+                              );
+                              orderCartBloc.getCheckoutLocation(
+                                {
+                                  "coordinates": {
+                                    "lat": _result.geometry.location.lat,
+                                    "lang": _result.geometry.location.lng,
+                                  },
+                                  "physicalLocation": _result.formattedAddress,
+                                },
+                              );
+                              orderCartBloc.getDeliveryCharge();
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 5,
+                                horizontal: 10,
+                              ),
+                              child: Column(
+                                children: [
+                                  StreamBuilder<String>(
+                                    stream:
+                                        orderCartBloc.checkoutPhysicalLocation,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasError)
+                                        return Text("Error: ${snapshot.error}");
+                                      switch (snapshot.connectionState) {
+                                        case ConnectionState.none:
+                                          return Text("Awaiting Bids...");
+                                          break;
+                                        case ConnectionState.waiting:
+                                          return Center(
+                                            child: LinearProgressIndicator(),
+                                          );
+                                          break;
+                                        case ConnectionState.active:
+                                          return Container(
+                                            child: Row(
                                               children: [
-                                                Text(
-                                                  "Delivery Address",
-                                                  style: GoogleFonts.nunito(
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  snapshot.data,
-                                                  style: GoogleFonts.nunito(
-                                                    fontWeight: FontWeight.w800,
-                                                    color: Colors.white,
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Delivery Address",
+                                                        style:
+                                                            GoogleFonts.nunito(
+                                                          fontSize: 25,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        snapshot.data,
+                                                        style:
+                                                            GoogleFonts.nunito(
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                    // ChangableDisplayer(
-                                    //   primaryText: snapshot.data,
-                                    //   secondaryText: " ( change location )",
-                                    //   displayChanger: () async {
-                                    //     LocationResult result =
-                                    //         await showLocationPicker(
-                                    //       context,
-                                    //       "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                    //       automaticallyAnimateToCurrentLocation: true,
-                                    //       myLocationButtonEnabled: true,
-                                    //       layersButtonEnabled: true,
-                                    //     );
-                                    //     orderCartBloc.getCheckoutLocation(
-                                    //       {
-                                    //         "coordinates": {
-                                    //           "lat": result.latLng.latitude,
-                                    //           "lang": result.latLng.longitude,
-                                    //         },
-                                    //         "phycialLocation": result.address,
-                                    //       },
-                                    //     );
-                                    //     orderCartBloc.getDeliveryCharge();
-                                    //   },
-                                    // );
-
-                                    break;
-                                  case ConnectionState.done:
-                                    return Text("The task has completed");
-                                    break;
-                                }
-                                return null;
-                              },
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                bottom: 10,
-                              ),
-                              child: DottedLine(
-                                dashColor: Colors.white24,
-                                lineThickness: 2,
-                                dashRadius: 5,
-                              ),
-                            ),
-                            StreamBuilder<double>(
-                              stream: orderCartBloc.cartsTotal,
-                              builder: (context, totalAmount) {
-                                if (totalAmount.hasError)
-                                  return Text("Error: ${totalAmount.error}");
-                                switch (totalAmount.connectionState) {
-                                  case ConnectionState.none:
-                                    return Text("Awaiting bids....");
-                                    break;
-                                  case ConnectionState.waiting:
-                                    return LinearProgressIndicator();
-                                    break;
-                                  case ConnectionState.active:
-                                    return StreamBuilder<double>(
-                                      stream: orderCartBloc.deliveryCharge,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasError)
-                                          return (Text(
-                                              "Error: ${snapshot.error}"));
-                                        switch (snapshot.connectionState) {
-                                          case ConnectionState.none:
-                                            return Text("Awaiting bids....");
-                                            break;
-                                          case ConnectionState.waiting:
-                                            return Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                            break;
-                                          case ConnectionState.active:
-                                            return Container(
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                    child: Container(
-                                                      child: Row(
-                                                        children: [
-                                                          Expanded(
-                                                            child: Text(
-                                                              "Delivery Charge",
-                                                              style: GoogleFonts
-                                                                  .nunito(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w800,
-                                                                fontSize: 16,
-                                                                color: Color(
-                                                                  0xFFAB304C,
+                                          );
+                                          break;
+                                        case ConnectionState.done:
+                                          return Text("The task has completed");
+                                          break;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(
+                                      bottom: 10,
+                                    ),
+                                    child: DottedLine(
+                                      dashColor: Colors.white24,
+                                      lineThickness: 2,
+                                      dashRadius: 5,
+                                    ),
+                                  ),
+                                  StreamBuilder<double>(
+                                    stream: orderCartBloc.cartsTotal,
+                                    builder: (context, totalAmount) {
+                                      if (totalAmount.hasError)
+                                        return Text(
+                                            "Error: ${totalAmount.error}");
+                                      switch (totalAmount.connectionState) {
+                                        case ConnectionState.none:
+                                          return Text("Awaiting bids....");
+                                          break;
+                                        case ConnectionState.waiting:
+                                          return LinearProgressIndicator();
+                                          break;
+                                        case ConnectionState.active:
+                                          return StreamBuilder<double>(
+                                            stream:
+                                                orderCartBloc.deliveryCharge,
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasError)
+                                                return (Text(
+                                                    "Error: ${snapshot.error}"));
+                                              switch (
+                                                  snapshot.connectionState) {
+                                                case ConnectionState.none:
+                                                  return Text(
+                                                      "Awaiting bids....");
+                                                  break;
+                                                case ConnectionState.waiting:
+                                                  return Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  );
+                                                  break;
+                                                case ConnectionState.active:
+                                                  return Container(
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          child: Container(
+                                                            child: Row(
+                                                              children: [
+                                                                Expanded(
+                                                                  child: Text(
+                                                                    "Delivery Charge",
+                                                                    style: GoogleFonts
+                                                                        .nunito(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w800,
+                                                                      fontSize:
+                                                                          16,
+                                                                      color:
+                                                                          Color(
+                                                                        0xFFAB304C,
+                                                                      ),
+                                                                    ),
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            "Rs.${snapshot.data.toStringAsFixed(2)}",
-                                                            style: GoogleFonts
-                                                                .nunito(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                              // fontSize: 18,
-                                                              color: Color(
-                                                                0xFFAB304C,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    child: Row(
-                                                      children: <Widget>[
-                                                        Expanded(
-                                                          child: Text(
-                                                            "Total",
-                                                            style: GoogleFonts
-                                                                .nunito(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                              fontSize: 16,
-                                                              color: Color(
-                                                                0xFFAB304C,
-                                                              ),
+                                                                Text(
+                                                                  "Rs.${snapshot.data.toStringAsFixed(2)}",
+                                                                  style:
+                                                                      GoogleFonts
+                                                                          .nunito(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w800,
+                                                                    // fontSize: 18,
+                                                                    color:
+                                                                        Color(
+                                                                      0xFFAB304C,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
                                                           ),
                                                         ),
-                                                        Text(
-                                                          "Rs.${double.parse((snapshot.data + totalAmount.data).toStringAsFixed(2))}",
-                                                          style: GoogleFonts
-                                                              .nunito(
-                                                            fontWeight:
-                                                                FontWeight.w800,
-                                                            // fontSize: 18,
-                                                            color: Color(
-                                                              0xFFAB304C,
-                                                            ),
+                                                        Container(
+                                                          child: Row(
+                                                            children: <Widget>[
+                                                              Expanded(
+                                                                child: Text(
+                                                                  "Total",
+                                                                  style:
+                                                                      GoogleFonts
+                                                                          .nunito(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w800,
+                                                                    fontSize:
+                                                                        16,
+                                                                    color:
+                                                                        Color(
+                                                                      0xFFAB304C,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                "Rs.${double.parse((snapshot.data + totalAmount.data).toStringAsFixed(2))}",
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .nunito(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                  // fontSize: 18,
+                                                                  color: Color(
+                                                                    0xFFAB304C,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            ],
                                                           ),
-                                                        )
+                                                        ),
                                                       ],
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                            break;
-                                          case ConnectionState.done:
-                                            return Text(
-                                                "The task has completed.");
-                                            break;
-                                        }
-                                        return null;
-                                      },
-                                    );
-                                    break;
-                                  case ConnectionState.done:
-                                    return Text("The task has completed");
-                                    break;
-                                }
-                                return null;
-                              },
+                                                  );
+                                                  break;
+                                                case ConnectionState.done:
+                                                  return Text(
+                                                      "The task has completed.");
+                                                  break;
+                                              }
+                                              return null;
+                                            },
+                                          );
+                                          break;
+                                        case ConnectionState.done:
+                                          return Text("The task has completed");
+                                          break;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
 

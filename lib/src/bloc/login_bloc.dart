@@ -52,7 +52,7 @@ class LoginBloc {
 
   saveUserNumber(int phoneNumber) {}
 
-  Stream<FirebaseUser> get currentUserStateStream => _repo.onAuthStateChanged;
+  Stream<User> get currentUserStateStream => _repo.onAuthStateChanged;
 
   signInWithGoogle() {
     try {
@@ -74,9 +74,27 @@ class LoginBloc {
     }
   }
 
+  signInWithApple() {
+    _repo.appleSignIn().then(
+      (value) async {
+        var token = await FirebaseMessaging().getToken();
+        await _repo.saveUserToken(
+          value.email,
+          {
+            "createdAt": DateTime.now().toIso8601String(),
+            "token": token,
+            "platform": Platform.operatingSystem,
+          },
+        );
+      },
+    );
+  }
+
+  isAppleSignInAvailable() => _repo.isAppleSiginInAvailable();
+
   Stream<bool> getUserStatus(String email) => _repo.getUserStatus(email);
 
-  Stream<User> getUser(String email) => _repo.getUser(email);
+  Stream<FastUser> getUser(String email) => _repo.getUser(email);
 
   Stream<bool> get canSubmitData => Rx.combineLatest2<String, String, bool>(
         name,

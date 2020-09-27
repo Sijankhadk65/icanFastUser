@@ -67,23 +67,35 @@ class _CartItemCardState extends State<CartItemCard> {
                 ),
               ),
               Expanded(
-                child: Text(
-                  widget.cartItem.name,
-                  style: GoogleFonts.oswald(
-                    fontSize: 25,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.cartItem.name,
+                      style: GoogleFonts.oswald(
+                        fontSize: 25,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      "Rs.${widget.cartItem.totalPrice}",
+                      style: GoogleFonts.nunito(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               widget.job == "history"
                   ? Expanded(
                       child: Container(
                         child: Text(
-                          "x${widget.cartItem.quantity.toString()}",
+                          "x${widget.cartItem.quantity.toInt().toString()}",
                           style: GoogleFonts.nunito(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
+                            color: Colors.orange.shade700,
                           ),
                         ),
                       ),
@@ -114,7 +126,7 @@ class _CartItemCardState extends State<CartItemCard> {
                                   ),
                                 ),
                                 Text(
-                                  widget.cartItem.quantity.toString(),
+                                  widget.cartItem.quantity.toInt().toString(),
                                   style: GoogleFonts.nunito(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -145,12 +157,6 @@ class _CartItemCardState extends State<CartItemCard> {
                         },
                       ),
                     ),
-              Text(
-                "Rs.${widget.cartItem.totalPrice}",
-                style: GoogleFonts.nunito(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
             ],
           ),
         ),

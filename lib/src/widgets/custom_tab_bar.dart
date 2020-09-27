@@ -96,7 +96,7 @@ class _CustomTabsState extends State<CustomTabView>
     if (widget.itemCount < 1) return widget.stub ?? Container();
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      // crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Container(
           margin: EdgeInsets.only(
@@ -105,12 +105,18 @@ class _CustomTabsState extends State<CustomTabView>
             bottom: 5,
           ),
           alignment: Alignment.center,
-          child: TabBar(
-            isScrollable: widget.itemCount > 3 ? true : false,
-            controller: controller,
-            tabs: List.generate(
-              widget.itemCount,
-              (index) => widget.tabBuilder(context, index),
+          child: Material(
+            borderRadius: BorderRadius.circular(
+              5,
+            ),
+            color: Colors.orange.withAlpha(100),
+            child: TabBar(
+              isScrollable: widget.itemCount > 3 ? true : false,
+              controller: controller,
+              tabs: List.generate(
+                widget.itemCount,
+                (index) => widget.tabBuilder(context, index),
+              ),
             ),
           ),
         ),

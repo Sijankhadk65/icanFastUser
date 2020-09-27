@@ -19,16 +19,17 @@ class Repository {
   final _authProvider = FirebaseAuthProvider();
   final _firestoreProvider = FirestoreProvider();
 
-  Stream<FirebaseUser> get onAuthStateChanged =>
-      _authProvider.onAuthStateChanged
-          .map((user) => user != null ? user : null);
+  Stream<User> get onAuthStateChanged => _authProvider.onAuthStateChanged
+      .map((user) => user != null ? user : null);
 
   Stream<MenuItem> getMenuItem(String createdAt) =>
       _firestoreProvider.getMenuItem(createdAt).transform(
         StreamTransformer.fromHandlers(
           handleData: (DocumentSnapshot snapshot, sink) {
             sink.add(
-              parseToMenuItemModel(snapshot.data),
+              parseToMenuItemModel(
+                snapshot.data(),
+              ),
             );
           },
         ),
@@ -39,7 +40,9 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (DocumentSnapshot snapshot, sink) {
             sink.add(
-              parseJsonToVendor(snapshot.data),
+              parseJsonToVendor(
+                snapshot.data(),
+              ),
             );
           },
         ),
@@ -50,7 +53,7 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (DocumentSnapshot snapshot, sink) {
             sink.add(
-              snapshot.data['minOrder'],
+              snapshot.data()['minOrder'],
             );
           },
         ),
@@ -63,8 +66,8 @@ class Repository {
         if (snapshot.exists) {
           sink.add(
             {
-              "lat": snapshot.data['lat'],
-              "lang": snapshot.data['lang'],
+              "lat": snapshot.data()['lat'],
+              "lang": snapshot.data()['lang'],
             },
           );
         } else {
@@ -72,25 +75,33 @@ class Repository {
         }
       }));
 
-  Stream<List<int>> getDistanceRates() => _firestoreProvider
-          .getDistanceRates()
-          .transform(StreamTransformer.fromHandlers(
-              handleData: (QuerySnapshot snapshot, sink) {
-        List<int> rates = [];
-        snapshot.documents.forEach((element) {
-          rates.add(element.data['rate']);
-        });
-        sink.add(rates);
-      }));
+  Stream<List<int>> getDistanceRates() =>
+      _firestoreProvider.getDistanceRates().transform(
+        StreamTransformer.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<int> rates = [];
+            snapshot.docs.forEach(
+              (element) {
+                rates.add(
+                  element.data()['rate'],
+                );
+              },
+            );
+            sink.add(rates);
+          },
+        ),
+      );
 
   Stream<List<String>> getVendorCategories(String vendor) =>
       _firestoreProvider.getVendorCategory(vendor).transform(
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<String> _categories = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
-                _categories.add(document.data['name']);
+                _categories.add(
+                  document.data()['name'],
+                );
               },
             );
             sink.add(_categories);
@@ -103,9 +114,13 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<OrderRef> orders = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
-                orders.add(parseJsonToOrderRef(document.data));
+                orders.add(
+                  parseJsonToOrderRef(
+                    document.data(),
+                  ),
+                );
               },
             );
             sink.add(orders);
@@ -118,9 +133,13 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<OrderRef> orders = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
-                orders.add(parseJsonToOrderRef(document.data));
+                orders.add(
+                  parseJsonToOrderRef(
+                    document.data(),
+                  ),
+                );
               },
             );
             sink.add(orders);
@@ -135,10 +154,14 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<OnlineOrder> orders = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 if (document.exists) {
-                  orders.add(parseJsonToOnlineOrder(document.data));
+                  orders.add(
+                    parseJsonToOnlineOrder(
+                      document.data(),
+                    ),
+                  );
                 } else {
                   sink.addError("No Doc found");
                 }
@@ -154,7 +177,7 @@ class Repository {
   //       StreamTransformer<QuerySnapshot, OnlineOrder>.fromHandlers(
   //         handleData: (QuerySnapshot snapshot, sink) {
   //           snapshot.documentChanges.forEach(
-  //             (doc) {
+  //             (doc) {s
   //               sink.add(parseJsonToOnlineOrder(doc.document.data));
   //             },
   //           );
@@ -162,7 +185,9 @@ class Repository {
   //       ),
   //     );
 
-  Future<FirebaseUser> googleSignIn() => _authProvider.signInWithGoogle();
+  Future<User> googleSignIn() => _authProvider.signInWithGoogle();
+  Future<User> appleSignIn() => _authProvider.appleSignIn();
+  Future<bool> isAppleSiginInAvailable() => _authProvider.appleSignInAvailable;
   Future<void> addUser(Map<String, dynamic> user) =>
       _firestoreProvider.addNewUser(user);
   Future<void> signOut() => _authProvider.signOut();
@@ -172,10 +197,16 @@ class Repository {
         StreamTransformer<QuerySnapshot, List<MenuItem>>.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<MenuItem> items = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (doc) {
-                if (parseToMenuItemModel(doc.data).isAvailable) {
-                  items.add(parseToMenuItemModel(doc.data));
+                if (parseToMenuItemModel(
+                  doc.data(),
+                ).isAvailable) {
+                  items.add(
+                    parseToMenuItemModel(
+                      doc.data(),
+                    ),
+                  );
                 }
               },
             );
@@ -199,9 +230,13 @@ class Repository {
         StreamTransformer<QuerySnapshot, List<Vendor>>.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<Vendor> _vendors = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
-                _vendors.add(parseJsonToVendor(document.data));
+                _vendors.add(
+                  parseJsonToVendor(
+                    document.data(),
+                  ),
+                );
               },
             );
             sink.add(_vendors);
@@ -214,10 +249,12 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<Vendor> featuredVendors = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 featuredVendors.add(
-                  parseJsonToVendor(document.data),
+                  parseJsonToVendor(
+                    document.data(),
+                  ),
                 );
               },
             );
@@ -231,10 +268,12 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<MenuItem> featuredItems = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 featuredItems.add(
-                  parseToMenuItemModel(document.data),
+                  parseToMenuItemModel(
+                    document.data(),
+                  ),
                 );
               },
             );
@@ -249,24 +288,32 @@ class Repository {
       _firestoreProvider.saveOrder(order);
 
   Stream<List<String>> getTags() => _firestoreProvider.getTags().transform(
-          StreamTransformer<QuerySnapshot, List<String>>.fromHandlers(
-              handleData: (QuerySnapshot snapshot, sink) {
-        List<String> tags = [];
-        snapshot.documents.forEach((document) {
-          tags.add(document.data['name']);
-        });
-        sink.add(tags);
-      }));
+        StreamTransformer<QuerySnapshot, List<String>>.fromHandlers(
+          handleData: (QuerySnapshot snapshot, sink) {
+            List<String> tags = [];
+            snapshot.docs.forEach(
+              (document) {
+                tags.add(
+                  document.data()['name'],
+                );
+              },
+            );
+            sink.add(tags);
+          },
+        ),
+      );
   // Ratings
   Stream<List<Rating>> getRatings(String vendorName) =>
       _firestoreProvider.getRatings(vendorName).transform(
         StreamTransformer<QuerySnapshot, List<Rating>>.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<Rating> ratings = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 ratings.add(
-                  parseJsonToRating(document.data),
+                  parseJsonToRating(
+                    document.data(),
+                  ),
                 );
               },
             );
@@ -283,11 +330,11 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<CarouselItem> carouselItems = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 carouselItems.add(
                   parseToCarouselItem(
-                    document.data,
+                    document.data(),
                   ),
                 );
               },
@@ -298,24 +345,35 @@ class Repository {
       );
 
   Stream<List<OffersItem>> getSpecialOffers() =>
-      _firestoreProvider.getOffers().transform(StreamTransformer.fromHandlers(
+      _firestoreProvider.getOffers().transform(
+        StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
-        List<OffersItem> offers = [];
-        snapshot.documents.forEach((document) {
-          offers.add(parseToOffersItem(document.data));
-        });
-        sink.add(offers);
-      }));
+            List<OffersItem> offers = [];
+            snapshot.docs.forEach(
+              (document) {
+                offers.add(
+                  parseToOffersItem(
+                    document.data(),
+                  ),
+                );
+              },
+            );
+            sink.add(offers);
+          },
+        ),
+      );
 
   Stream<List<Vendor>> getVegVendors() =>
       _firestoreProvider.getVegVendors().transform(
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<Vendor> vendors = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 vendors.add(
-                  parseJsonToVendor(document.data),
+                  parseJsonToVendor(
+                    document.data(),
+                  ),
                 );
               },
             );
@@ -328,10 +386,12 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<Vendor> vendors = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 vendors.add(
-                  parseJsonToVendor(document.data),
+                  parseJsonToVendor(
+                    document.data(),
+                  ),
                 );
               },
             );
@@ -345,10 +405,12 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<MenuItem> vendors = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 vendors.add(
-                  parseToMenuItemModel(document.data),
+                  parseToMenuItemModel(
+                    document.data(),
+                  ),
                 );
               },
             );
@@ -362,10 +424,12 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<MenuItem> vendors = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 vendors.add(
-                  parseToMenuItemModel(document.data),
+                  parseToMenuItemModel(
+                    document.data(),
+                  ),
                 );
               },
             );
@@ -386,11 +450,15 @@ class Repository {
           },
         ),
       );
-  Stream<User> getUser(String email) =>
+  Stream<FastUser> getUser(String email) =>
       _firestoreProvider.getUser(email).transform(
         StreamTransformer.fromHandlers(
           handleData: (DocumentSnapshot snapshot, sink) {
-            sink.add(parseJsonToUser(snapshot.data));
+            sink.add(
+              parseJsonToUser(
+                snapshot.data(),
+              ),
+            );
           },
         ),
       );
@@ -399,7 +467,9 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (DocumentSnapshot snapshot, sink) {
             if (snapshot.exists) {
-              sink.add(snapshot.data['discountRate']);
+              sink.add(
+                snapshot.data()['discountRate'],
+              );
             }
           },
         ),
@@ -409,10 +479,10 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<String> favourites = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 favourites.add(
-                  document.data['name'],
+                  document.data()['name'],
                 );
               },
             );
@@ -426,10 +496,10 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<String> favourites = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 favourites.add(
-                  document.data['createdAt'],
+                  document.data()['createdAt'],
                 );
               },
             );
@@ -443,10 +513,12 @@ class Repository {
         StreamTransformer.fromHandlers(
           handleData: (QuerySnapshot snapshot, sink) {
             List<Liquor> liquors = [];
-            snapshot.documents.forEach(
+            snapshot.docs.forEach(
               (document) {
                 liquors.add(
-                  parseToLiquorModel(document.data),
+                  parseToLiquorModel(
+                    document.data(),
+                  ),
                 );
               },
             );

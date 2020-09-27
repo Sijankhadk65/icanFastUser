@@ -28,7 +28,7 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
       result
         ..add('user')
         ..add(serializers.serialize(object.user,
-            specifiedType: const FullType(User)));
+            specifiedType: const FullType(FastUser)));
     }
     if (object.refID != null) {
       result
@@ -72,7 +72,7 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
       result
         ..add('isAssignedTo')
         ..add(serializers.serialize(object.isAssignedTo,
-            specifiedType: const FullType(User)));
+            specifiedType: const FullType(FastUser)));
     }
     if (object.lat != null) {
       result
@@ -106,7 +106,7 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
           break;
         case 'user':
           result.user.replace(serializers.deserialize(value,
-              specifiedType: const FullType(User)) as User);
+              specifiedType: const FullType(FastUser)) as FastUser);
           break;
         case 'refID':
           result.refID = serializers.deserialize(value,
@@ -138,7 +138,7 @@ class _$OrderRefSerializer implements StructuredSerializer<OrderRef> {
           break;
         case 'isAssignedTo':
           result.isAssignedTo.replace(serializers.deserialize(value,
-              specifiedType: const FullType(User)) as User);
+              specifiedType: const FullType(FastUser)) as FastUser);
           break;
         case 'lat':
           result.lat = serializers.deserialize(value,
@@ -159,7 +159,7 @@ class _$OrderRef extends OrderRef {
   @override
   final double totalCost;
   @override
-  final User user;
+  final FastUser user;
   @override
   final String refID;
   @override
@@ -173,7 +173,7 @@ class _$OrderRef extends OrderRef {
   @override
   final String physicalLocation;
   @override
-  final User isAssignedTo;
+  final FastUser isAssignedTo;
   @override
   final double lat;
   @override
@@ -269,9 +269,9 @@ class OrderRefBuilder implements Builder<OrderRef, OrderRefBuilder> {
   double get totalCost => _$this._totalCost;
   set totalCost(double totalCost) => _$this._totalCost = totalCost;
 
-  UserBuilder _user;
-  UserBuilder get user => _$this._user ??= new UserBuilder();
-  set user(UserBuilder user) => _$this._user = user;
+  FastUserBuilder _user;
+  FastUserBuilder get user => _$this._user ??= new FastUserBuilder();
+  set user(FastUserBuilder user) => _$this._user = user;
 
   String _refID;
   String get refID => _$this._refID;
@@ -301,9 +301,10 @@ class OrderRefBuilder implements Builder<OrderRef, OrderRefBuilder> {
   set physicalLocation(String physicalLocation) =>
       _$this._physicalLocation = physicalLocation;
 
-  UserBuilder _isAssignedTo;
-  UserBuilder get isAssignedTo => _$this._isAssignedTo ??= new UserBuilder();
-  set isAssignedTo(UserBuilder isAssignedTo) =>
+  FastUserBuilder _isAssignedTo;
+  FastUserBuilder get isAssignedTo =>
+      _$this._isAssignedTo ??= new FastUserBuilder();
+  set isAssignedTo(FastUserBuilder isAssignedTo) =>
       _$this._isAssignedTo = isAssignedTo;
 
   double _lat;

@@ -1,6 +1,7 @@
 import 'package:fastuserapp/src/models/varient.dart';
 import 'package:fastuserapp/src/widgets/varient_button_item.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class VarientButtonBar extends StatefulWidget {
   final List<Varient> varients;
@@ -23,29 +24,35 @@ class _VarientButtonBarState extends State<VarientButtonBar> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(
-        left: 20,
-        right: 20,
         top: 10,
       ),
       child: Material(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 5,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: widget.varients
-                .map(
-                  (varient) => VarientButtonItem(
-                    varient: varient,
-                    isSelected: widget.selectedVarient == varient,
-                    onPressed: () {
-                      widget.onChange(varient);
-                    },
-                  ),
-                )
-                .toList(),
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Varients",
+              style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.w800,
+                fontSize: 16,
+                color: Colors.orange[300],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: widget.varients
+                  .map(
+                    (varient) => VarientButtonItem(
+                      varient: varient,
+                      isSelected: widget.selectedVarient == varient,
+                      onPressed: () {
+                        widget.onChange(varient);
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
         ),
       ),
     );

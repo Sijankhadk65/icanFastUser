@@ -64,47 +64,72 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
         ),
         elevation: 10,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             LayoutBuilder(
               builder: (context, constraint) {
-                return CachedNetworkImage(
-                  imageUrl: widget.item.photoURI,
-                  imageBuilder: (context, imageProvider) => Container(
-                    margin: EdgeInsets.all(
-                      10,
-                    ),
-                    height: 300,
-                    width: 300,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(
-                        5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          offset: Offset(
-                            0,
-                            5,
+                return Stack(
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: widget.item.photoURI,
+                      imageBuilder: (context, imageProvider) => Container(
+                        height: 300,
+                        // width: 300
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(
+                              5,
+                            ),
+                            bottomRight: Radius.circular(
+                              5,
+                            ),
+                            topLeft: Radius.circular(
+                              5,
+                            ),
+                            topRight: Radius.circular(
+                              5,
+                            ),
                           ),
-                          blurRadius: 10,
+                          image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ],
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover,
                       ),
                     ),
-                  ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            EvaIcons.closeOutline,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        Expanded(
+                          child: Container(),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                            right: 15,
+                          ),
+                          child: Icon(
+                            EvaIcons.heartOutline,
+                            size: 20,
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
                 );
               },
             ),
             Container(
-              margin: EdgeInsets.only(
-                top: 10,
+              margin: EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 20,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     widget.item.name,
@@ -112,47 +137,81 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                       fontSize: 30,
                     ),
                   ),
-                  Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: 10,
-                    ),
-                    height: 30,
-                    width: 2,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.orange[500],
-                          Colors.orange[500],
-                          Colors.white,
-                        ],
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    EvaIcons.heartOutline,
-                    size: 20,
-                  )
+                  widget.item.price == 0
+                      ? StreamBuilder<Varient>(
+                          stream: _cartItemBloc.currentSelectedVarient,
+                          builder: (context, snapshot) {
+                            return VarientButtonBar(
+                              selectedVarient: snapshot.data,
+                              varients: widget.item.varients.toList(),
+                              onChange: (varient) {
+                                _cartItemBloc
+                                    .changeCurrentSelectedVarient(varient);
+                                _cartItemBloc.changeCurrentUnitPrice(
+                                    varient.price.toDouble());
+                                _cartItemBloc.changeTotalPrice();
+                                _cartItemBloc.changeCurrentSelectedAddons([]);
+                              },
+                            );
+                          },
+                        )
+                      : Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 5,
+                            horizontal: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                              5,
+                            ),
+                            border: Border.all(
+                              color: Colors.orange[500],
+                              width: 2,
+                            ),
+                          ),
+                          child: Text(
+                            "Rs.${widget.item.price}",
+                            style: GoogleFonts.nunito(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              color: Colors.orange[500],
+                            ),
+                          ),
+                        ),
+                  widget.item.description != null
+                      ? Container(
+                          margin: EdgeInsets.only(
+                            top: 20,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Description",
+                                style: GoogleFonts.montserrat(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                  color: Colors.orange[300],
+                                ),
+                              ),
+                              Text(
+                                widget.item.description,
+                                textAlign: TextAlign.left,
+                                style: GoogleFonts.nunito(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black45,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Text(
+                          widget.item.description,
+                        ),
                 ],
               ),
             ),
-            widget.item.description != null
-                ? Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: 15,
-                    ),
-                    child: Text(
-                      widget.item.description,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.nunito(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black45,
-                        fontSize: 11,
-                      ),
-                    ),
-                  )
-                : Container(),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.only(
@@ -160,47 +219,6 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                 ),
                 child: Column(
                   children: [
-                    widget.item.price == 0
-                        ? StreamBuilder<Varient>(
-                            stream: _cartItemBloc.currentSelectedVarient,
-                            builder: (context, snapshot) {
-                              return VarientButtonBar(
-                                selectedVarient: snapshot.data,
-                                varients: widget.item.varients.toList(),
-                                onChange: (varient) {
-                                  _cartItemBloc
-                                      .changeCurrentSelectedVarient(varient);
-                                  _cartItemBloc.changeCurrentUnitPrice(
-                                      varient.price.toDouble());
-                                  _cartItemBloc.changeTotalPrice();
-                                  _cartItemBloc.changeCurrentSelectedAddons([]);
-                                },
-                              );
-                            },
-                          )
-                        : Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 5,
-                              horizontal: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                5,
-                              ),
-                              border: Border.all(
-                                color: Colors.orange[500],
-                                width: 2,
-                              ),
-                            ),
-                            child: Text(
-                              "Rs.${widget.item.price}",
-                              style: GoogleFonts.nunito(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 15,
-                                color: Colors.orange[500],
-                              ),
-                            ),
-                          ),
                     widget.item.addOns != null
                         ? widget.item.addOns.isNotEmpty
                             ? StreamBuilder<List<AddOn>>(
@@ -220,214 +238,223 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                 ),
               ),
             ),
+            // Container(
+            //   margin: EdgeInsets.symmetric(
+            //     horizontal: 10,
+            //   ),
+            //   child: StreamBuilder<double>(
+            //     initialData: widget.item.increaseBy,
+            //     stream: _cartItemBloc.currentItemCount,
+            //     builder: (context, snapshot) {
+            //       return Row(
+            //         children: <Widget>[
+            //           SizedBox(
+            //             width: 50,
+            //             child: RawMaterialButton(
+            //               fillColor: Colors.orange[500],
+            //               shape: RoundedRectangleBorder(
+            //                 borderRadius: BorderRadius.circular(
+            //                   5,
+            //                 ),
+            //               ),
+            //               onPressed: snapshot.data == 1
+            //                   ? null
+            //                   : () {
+            //                       _cartItemBloc.changeCurrentItemCount(
+            //                         snapshot.data - 1,
+            //                       );
+            //                       _cartItemBloc.changeTotalPrice();
+            //                     },
+            //               child: Icon(
+            //                 EvaIcons.minus,
+            //                 color: Colors.white,
+            //               ),
+            //             ),
+            //           ),
+            //           Expanded(
+            //             child: Center(
+            //               child: Text(
+            //                 "${snapshot.data.toInt()} ${widget.item.unit != null ? widget.item.unit : "Pcs"}",
+            //                 style: GoogleFonts.oswald(
+            //                   fontSize: 18,
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //           SizedBox(
+            //             width: 50,
+            //             child: RawMaterialButton(
+            //               shape: RoundedRectangleBorder(
+            //                 borderRadius: BorderRadius.circular(
+            //                   5,
+            //                 ),
+            //               ),
+            //               fillColor: Colors.orange[500],
+            //               onPressed: () {
+            //                 _cartItemBloc.changeCurrentItemCount(
+            //                   snapshot.data + 1,
+            //                 );
+            //                 _cartItemBloc.changeTotalPrice();
+            //               },
+            //               child: Icon(
+            //                 EvaIcons.plus,
+            //                 color: Colors.white,
+            //               ),
+            //             ),
+            //           ),
+            //         ],
+            //       );
+            //     },
+            //   ),
+            // ),
             Container(
               margin: EdgeInsets.symmetric(
-                horizontal: 10,
+                horizontal: 20,
               ),
-              child: StreamBuilder<double>(
-                initialData: widget.item.increaseBy,
-                stream: _cartItemBloc.currentItemCount,
-                builder: (context, snapshot) {
-                  return Row(
-                    children: <Widget>[
-                      SizedBox(
-                        width: 50,
-                        child: RawMaterialButton(
-                          fillColor: Colors.orange[500],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              5,
-                            ),
-                          ),
-                          onPressed: snapshot.data == 1
-                              ? null
-                              : () {
-                                  _cartItemBloc.changeCurrentItemCount(
-                                    snapshot.data - widget.item.increaseBy,
-                                  );
-                                  _cartItemBloc.changeTotalPrice();
-                                },
-                          child: Icon(
-                            EvaIcons.minus,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: snapshot.data - snapshot.data.toInt() == 0
-                              ? Text(
-                                  "${snapshot.data.toInt()} ${widget.item.unit}",
-                                  style: GoogleFonts.oswald(
-                                    fontSize: 18,
-                                  ),
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "${snapshot.data.toInt()} ",
-                                      style: GoogleFonts.oswald(
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          "1",
-                                          style: GoogleFonts.oswald(),
-                                        ),
-                                        Container(
-                                            width: 10,
-                                            height: 2,
-                                            color: Colors.black),
-                                        Text(
-                                          "2",
-                                          style: GoogleFonts.oswald(),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      " ${widget.item.unit}",
-                                      style: GoogleFonts.oswald(
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 50,
-                        child: RawMaterialButton(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              5,
-                            ),
-                          ),
-                          fillColor: Colors.orange[500],
-                          onPressed: () {
-                            _cartItemBloc.changeCurrentItemCount(
-                              snapshot.data + widget.item.increaseBy,
-                            );
-                            _cartItemBloc.changeTotalPrice();
-                          },
-                          child: Icon(
-                            EvaIcons.plus,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
+              padding: EdgeInsets.only(
+                top: 10,
               ),
-            ),
-            StreamBuilder<double>(
-                stream: _cartItemBloc.currentTotalPrice,
-                builder: (context, snapshot) {
-                  return AnimatedContainer(
-                    duration: Duration(
-                      milliseconds: 150,
-                    ),
-                    margin: EdgeInsets.only(
-                      left: 10,
-                      right: 10,
-                      bottom: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: snapshot.data == 0
-                            ? [
-                                Colors.grey,
-                                Colors.grey,
-                              ]
-                            : [
-                                Color(0xFF11998e),
-                                Color(0xFF38ef7d),
-                              ],
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        5,
-                      ),
-                      boxShadow: snapshot.data == 0
-                          ? []
-                          : [
-                              BoxShadow(
+              decoration: BoxDecoration(
+                color: Colors.orange.withAlpha(
+                  120,
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(
+                    5,
+                  ),
+                  topRight: Radius.circular(
+                    5,
+                  ),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: StreamBuilder<double>(
+                      stream: _cartItemBloc.currentTotalPrice,
+                      builder: (context, snapshot) {
+                        return Column(
+                          children: [
+                            Text(
+                              "Rs.${snapshot.data.toInt()}",
+                              style: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 20,
+                              ),
+                            ),
+                            Text(
+                              "Total Payable",
+                              style: GoogleFonts.nunito(
+                                fontWeight: FontWeight.w800,
                                 color: Colors.black38,
-                                offset: Offset(
-                                  0,
-                                  3,
-                                ),
-                                blurRadius: 5,
-                              )
-                            ],
+                                // fontSize: 20
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: snapshot.data == 0
-                            ? null
-                            : () {
-                                orderCartBloc.addNewOrder(
-                                  context,
-                                  widget.vendorName,
-                                  parseToCartItem(
-                                    _cartItemBloc.getItem(
-                                      widget.item.name,
-                                      widget.item.photoURI,
-                                    ),
-                                  ),
-                                  widget.user,
-                                  widget.minOrder,
-                                );
-                                Navigator.pop(context);
-                              },
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Center(
-                            child: RichText(
-                              text: TextSpan(
-                                text: "Add to cart !",
-                                style: GoogleFonts.nunito(
-                                  color: snapshot.data == 0
-                                      ? Colors.grey[800]
-                                      : Colors.white,
-                                  fontSize: 18,
-                                  decoration: snapshot.data == 0
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none,
-                                  decorationThickness: 1,
-                                  decorationColor: Colors.grey[800],
-                                  decorationStyle: TextDecorationStyle.double,
-                                  fontWeight: FontWeight.w800,
+                  ),
+                  StreamBuilder<double>(
+                    stream: _cartItemBloc.currentTotalPrice,
+                    builder: (context, snapshot) {
+                      return AnimatedContainer(
+                        duration: Duration(
+                          milliseconds: 150,
+                        ),
+                        margin: EdgeInsets.only(
+                          left: 10,
+                          right: 10,
+                          bottom: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: snapshot.data == 0
+                              ? Colors.black.withAlpha(
+                                  60,
+                                )
+                              : Color(
+                                  0xFF11998e,
                                 ),
-                                children: snapshot.data == 0
-                                    ? []
-                                    : [
-                                        TextSpan(
-                                          text: " (",
+                          // gradient: LinearGradient(
+                          //   colors: snapshot.data == 0
+                          //       ? [
+                          //           Colors.black.withAlpha(
+                          //             60,
+                          //           ),
+                          //           Colors.black.withAlpha(
+                          //             60,
+                          //           ),
+                          //         ]
+                          //       : [
+                          //           Color(0xFF11998e),
+                          //           Color(0xFF11998e),
+                          //         ],
+                          // ),
+                          borderRadius: BorderRadius.circular(
+                            5,
+                          ),
+                          boxShadow: snapshot.data == 0
+                              ? []
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black38,
+                                    offset: Offset(
+                                      0,
+                                      3,
+                                    ),
+                                    blurRadius: 5,
+                                  )
+                                ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: snapshot.data == 0
+                                ? null
+                                : () {
+                                    orderCartBloc.addNewOrder(
+                                      context,
+                                      widget.vendorName,
+                                      parseToCartItem(
+                                        _cartItemBloc.getItem(
+                                          widget.item.name,
+                                          widget.item.photoURI,
                                         ),
-                                        TextSpan(
-                                          text: " Rs.${snapshot.data} ",
-                                          style: GoogleFonts.nunito(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: ")",
-                                        ),
-                                      ],
+                                      ),
+                                      widget.user,
+                                      widget.minOrder,
+                                    );
+                                    Navigator.pop(context);
+                                  },
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Center(
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: "Add to cart !",
+                                    style: GoogleFonts.montserrat(
+                                      color: snapshot.data == 0
+                                          ? Colors.black.withAlpha(
+                                              60,
+                                            )
+                                          : Colors.white,
+                                      // fontSize: 18,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                    children: [],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                }),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

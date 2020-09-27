@@ -6,16 +6,16 @@ part of 'user.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
-Serializer<User> _$userSerializer = new _$UserSerializer();
+Serializer<FastUser> _$fastUserSerializer = new _$FastUserSerializer();
 
-class _$UserSerializer implements StructuredSerializer<User> {
+class _$FastUserSerializer implements StructuredSerializer<FastUser> {
   @override
-  final Iterable<Type> types = const [User, _$User];
+  final Iterable<Type> types = const [FastUser, _$FastUser];
   @override
-  final String wireName = 'User';
+  final String wireName = 'FastUser';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, User object,
+  Iterable<Object> serialize(Serializers serializers, FastUser object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object>[];
     if (object.email != null) {
@@ -71,9 +71,9 @@ class _$UserSerializer implements StructuredSerializer<User> {
   }
 
   @override
-  User deserialize(Serializers serializers, Iterable<Object> serialized,
+  FastUser deserialize(Serializers serializers, Iterable<Object> serialized,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = new UserBuilder();
+    final result = new FastUserBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
@@ -122,7 +122,7 @@ class _$UserSerializer implements StructuredSerializer<User> {
   }
 }
 
-class _$User extends User {
+class _$FastUser extends FastUser {
   @override
   final String email;
   @override
@@ -140,10 +140,10 @@ class _$User extends User {
   @override
   final BuiltList<String> promoCodes;
 
-  factory _$User([void Function(UserBuilder) updates]) =>
-      (new UserBuilder()..update(updates)).build();
+  factory _$FastUser([void Function(FastUserBuilder) updates]) =>
+      (new FastUserBuilder()..update(updates)).build();
 
-  _$User._(
+  _$FastUser._(
       {this.email,
       this.name,
       this.photoURI,
@@ -155,16 +155,16 @@ class _$User extends User {
       : super._();
 
   @override
-  User rebuild(void Function(UserBuilder) updates) =>
+  FastUser rebuild(void Function(FastUserBuilder) updates) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  UserBuilder toBuilder() => new UserBuilder()..replace(this);
+  FastUserBuilder toBuilder() => new FastUserBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is User &&
+    return other is FastUser &&
         email == other.email &&
         name == other.name &&
         photoURI == other.photoURI &&
@@ -193,7 +193,7 @@ class _$User extends User {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('User')
+    return (newBuiltValueToStringHelper('FastUser')
           ..add('email', email)
           ..add('name', name)
           ..add('photoURI', photoURI)
@@ -206,8 +206,8 @@ class _$User extends User {
   }
 }
 
-class UserBuilder implements Builder<User, UserBuilder> {
-  _$User _$v;
+class FastUserBuilder implements Builder<FastUser, FastUserBuilder> {
+  _$FastUser _$v;
 
   String _email;
   String get email => _$this._email;
@@ -244,9 +244,9 @@ class UserBuilder implements Builder<User, UserBuilder> {
   set promoCodes(ListBuilder<String> promoCodes) =>
       _$this._promoCodes = promoCodes;
 
-  UserBuilder();
+  FastUserBuilder();
 
-  UserBuilder get _$this {
+  FastUserBuilder get _$this {
     if (_$v != null) {
       _email = _$v.email;
       _name = _$v.name;
@@ -262,24 +262,24 @@ class UserBuilder implements Builder<User, UserBuilder> {
   }
 
   @override
-  void replace(User other) {
+  void replace(FastUser other) {
     if (other == null) {
       throw new ArgumentError.notNull('other');
     }
-    _$v = other as _$User;
+    _$v = other as _$FastUser;
   }
 
   @override
-  void update(void Function(UserBuilder) updates) {
+  void update(void Function(FastUserBuilder) updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$User build() {
-    _$User _$result;
+  _$FastUser build() {
+    _$FastUser _$result;
     try {
       _$result = _$v ??
-          new _$User._(
+          new _$FastUser._(
               email: email,
               name: name,
               photoURI: photoURI,
@@ -300,7 +300,7 @@ class UserBuilder implements Builder<User, UserBuilder> {
         _promoCodes?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'User', _$failedField, e.toString());
+            'FastUser', _$failedField, e.toString());
       }
       rethrow;
     }

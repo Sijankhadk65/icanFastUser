@@ -6,9 +6,7 @@ import 'package:fastuserapp/src/bloc/cart_menu_bloc.dart';
 import 'package:fastuserapp/src/bloc/dash_bloc.dart';
 import 'package:fastuserapp/src/bloc/liquor_bloc.dart';
 import 'package:fastuserapp/src/bloc/offers_bloc.dart';
-import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
 import 'package:fastuserapp/src/models/carousel_item.dart';
-import 'package:fastuserapp/src/models/cart_items.dart';
 import 'package:fastuserapp/src/models/item.dart';
 import 'package:fastuserapp/src/models/vendor.dart';
 import 'package:fastuserapp/src/screens/bakeries_screen.dart';
@@ -185,6 +183,59 @@ class _DashScreenState extends State<DashScreen> {
                                 fit: BoxFit.cover,
                               ),
                             ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(
+                                  5,
+                                ),
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => Provider(
+                                      create: (_) => CartItemBloc(),
+                                      child: StreamBuilder<MenuItem>(
+                                        stream: _cartMenuBloc.getMenuItem(
+                                            snapshot.data[index].itemCode),
+                                        builder: (context, itemSnapshot) {
+                                          if (itemSnapshot.hasError)
+                                            return Text(
+                                                "Error:${itemSnapshot.error}");
+                                          switch (
+                                              itemSnapshot.connectionState) {
+                                            case ConnectionState.none:
+                                              return Text("awaiting bids....");
+                                              break;
+                                            case ConnectionState.waiting:
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                              break;
+                                            case ConnectionState.active:
+                                              return AddToCartDialouge(
+                                                item: itemSnapshot.data,
+                                                minOrder: snapshot
+                                                    .data[index].minOrder,
+                                                vendorName: snapshot
+                                                    .data[index].vendorName,
+                                                user: widget.user,
+                                              );
+                                              break;
+                                            case ConnectionState.done:
+                                              return Text(
+                                                "The task has completed",
+                                              );
+                                              break;
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                           errorWidget: (context, msg, error) => Container(
                             margin: EdgeInsets.only(
@@ -233,20 +284,6 @@ class _DashScreenState extends State<DashScreen> {
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
                 children: <Widget>[
-                  QuickAccessCard(
-                    title: "Most Searched",
-                    description:
-                        "A list of most searched Resturants and food items.",
-                    assetPath: "assets/svg/food-delivery.svg",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ComingSoon(),
-                        ),
-                      );
-                    },
-                  ),
                   QuickAccessCard(
                     title: "Favourites",
                     description:

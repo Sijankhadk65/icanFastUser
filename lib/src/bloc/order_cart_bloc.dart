@@ -590,11 +590,19 @@ class OrderCartBloc {
   getCheckoutLocation(Map<String, dynamic> location) {
     print("Input Location: $location");
     if (location == null) {
-      changeChkeckoutCoordinates(_currentLocationSubject.value);
-      changeCheckoutPhysicalLocation(_physicalLocationSubject.value);
+      changeChkeckoutCoordinates(
+        _currentLocationSubject.value,
+      );
+      changeCheckoutPhysicalLocation(
+        _physicalLocationSubject.value,
+      );
     } else {
-      changeChkeckoutCoordinates(location['coordinates']);
-      changeCheckoutPhysicalLocation(location['physicalLocation']);
+      changeChkeckoutCoordinates(
+        location['coordinates'],
+      );
+      changeCheckoutPhysicalLocation(
+        location['physicalLocation'],
+      );
     }
     print("Location;${_checkoutPhysicalLocationSubject.value}");
   }

@@ -10,7 +10,7 @@ abstract class OrderRef implements Built<OrderRef, OrderRefBuilder> {
   @nullable
   double get totalCost;
   @nullable
-  User get user;
+  FastUser get user;
   @nullable
   String get refID;
   @nullable
@@ -24,7 +24,7 @@ abstract class OrderRef implements Built<OrderRef, OrderRefBuilder> {
   @nullable
   String get physicalLocation;
   @nullable
-  User get isAssignedTo;
+  FastUser get isAssignedTo;
   @nullable
   double get lat;
   @nullable

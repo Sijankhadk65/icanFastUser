@@ -24,7 +24,7 @@ part 'serializer.g.dart';
   const [
     CartItem,
     OnlineOrder,
-    User,
+    FastUser,
     MenuItem,
     Vendor,
     OrderRef,

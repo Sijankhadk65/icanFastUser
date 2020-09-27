@@ -8,6 +8,7 @@ import 'package:fastuserapp/src/screens/dash_screen.dart';
 import 'package:fastuserapp/src/widgets/food_search_delegate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_menu_bloc.dart';
@@ -40,6 +41,23 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+
+  _configureLocalNotification() {
+    var _androidSettings = AndroidInitializationSettings(
+      "logo",
+    );
+    var _iosSettings = IOSInitializationSettings();
+    var _initializationSettings = InitializationSettings(
+      _androidSettings,
+      _iosSettings,
+    );
+    _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    _flutterLocalNotificationsPlugin.initialize(
+      _initializationSettings,
+      onSelectNotification: (value) {},
+    );
+  }
 
   _configureFCM() {
     if (Platform.isIOS) {
@@ -49,15 +67,29 @@ class _HomeScreenState extends State<HomeScreen>
     }
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print('onMessage: $message');
+        _sendNotification();
       },
+      // onBackgroundMessage: (data) => _sendNotification(),
       onLaunch: (Map<String, dynamic> message) async {
-        print('onLaunch: $message');
+        _sendNotification();
       },
       onResume: (Map<String, dynamic> message) async {
-        print('onResume: $message');
+        _sendNotification();
       },
     );
+  }
+
+  Future _sendNotification() async {
+    var androidDetails = new AndroidNotificationDetails(
+        "Channel ID", "iCAN BMTS", "This is our channel",
+        importance: Importance.Max);
+    var iSODetails = new IOSNotificationDetails();
+    var generalNotificationDetails =
+        new NotificationDetails(androidDetails, iSODetails);
+
+    await _flutterLocalNotificationsPlugin.show(
+        0, "Task", "You created a Task", generalNotificationDetails,
+        payload: "Task");
   }
 
   PageController _pageController;
@@ -66,8 +98,9 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-
+    _configureLocalNotification();
     _configureFCM();
+
     _pageController = PageController();
   }
 

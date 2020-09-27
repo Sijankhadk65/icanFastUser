@@ -66,7 +66,7 @@ class _MenuItemDisplayerState extends State<MenuItemDisplayer> {
                     ),
                   );
                 },
-                placeholder: (context, string) => Container(color: Colors.grey),
+                // placeholder: (context, string) => Container(color: Colors.grey),
                 errorWidget: (context, url, error) {
                   return Container(
                     decoration: BoxDecoration(
@@ -119,14 +119,14 @@ class _MenuItemDisplayerState extends State<MenuItemDisplayer> {
                       color: Colors.transparent,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 5, right: 5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
                           children: [
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: Text(
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
                                     widget.item.name,
                                     style: GoogleFonts.oswald(
                                       fontSize: 20,
@@ -135,35 +135,39 @@ class _MenuItemDisplayerState extends State<MenuItemDisplayer> {
                                       fontStyle: FontStyle.italic,
                                     ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    widget.isFeatured
-                                        ? EvaIcons.bookmark
-                                        : EvaIcons.bookmarkOutline,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: widget.onTap,
-                                )
-                              ],
+                                  widget.item.price != 0
+                                      ? Text(
+                                          "Price: Rs.${widget.item.price}",
+                                          style: GoogleFonts.montserrat(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        )
+                                      : Text(
+                                          "Choose From a varient",
+                                          style: GoogleFonts.montserrat(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
+                                ],
+                              ),
                             ),
-                            widget.item.price != 0
-                                ? Text(
-                                    "Price: Rs.${widget.item.price}",
-                                    style: GoogleFonts.montserrat(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  )
-                                : Text(
-                                    "Choose From a varient",
-                                    style: GoogleFonts.montserrat(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  )
+                            IconButton(
+                              icon: Icon(
+                                widget.isFeatured
+                                    ? EvaIcons.heart
+                                    : EvaIcons.heartOutline,
+                                color: widget.isFeatured
+                                    ? Color(
+                                        0xffFF6BA3,
+                                      )
+                                    : Colors.white,
+                              ),
+                              onPressed: widget.onTap,
+                            )
                           ],
                         ),
                       ),

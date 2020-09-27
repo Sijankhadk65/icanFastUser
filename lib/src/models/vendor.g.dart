@@ -104,10 +104,10 @@ class _$VendorSerializer implements StructuredSerializer<Vendor> {
         ..add(serializers.serialize(object.isFeatured,
             specifiedType: const FullType(bool)));
     }
-    if (object.logo != null) {
+    if (object.logoURL != null) {
       result
-        ..add('logo')
-        ..add(serializers.serialize(object.logo,
+        ..add('logoURL')
+        ..add(serializers.serialize(object.logoURL,
             specifiedType: const FullType(String)));
     }
     return result;
@@ -184,8 +184,8 @@ class _$VendorSerializer implements StructuredSerializer<Vendor> {
           result.isFeatured = serializers.deserialize(value,
               specifiedType: const FullType(bool)) as bool;
           break;
-        case 'logo':
-          result.logo = serializers.deserialize(value,
+        case 'logoURL':
+          result.logoURL = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
       }
@@ -225,7 +225,7 @@ class _$Vendor extends Vendor {
   @override
   final bool isFeatured;
   @override
-  final String logo;
+  final String logoURL;
 
   factory _$Vendor([void Function(VendorBuilder) updates]) =>
       (new VendorBuilder()..update(updates)).build();
@@ -245,7 +245,7 @@ class _$Vendor extends Vendor {
       this.isBusy,
       this.isAway,
       this.isFeatured,
-      this.logo})
+      this.logoURL})
       : super._();
 
   @override
@@ -273,7 +273,7 @@ class _$Vendor extends Vendor {
         isBusy == other.isBusy &&
         isAway == other.isAway &&
         isFeatured == other.isFeatured &&
-        logo == other.logo;
+        logoURL == other.logoURL;
   }
 
   @override
@@ -307,7 +307,7 @@ class _$Vendor extends Vendor {
                     isBusy.hashCode),
                 isAway.hashCode),
             isFeatured.hashCode),
-        logo.hashCode));
+        logoURL.hashCode));
   }
 
   @override
@@ -327,7 +327,7 @@ class _$Vendor extends Vendor {
           ..add('isBusy', isBusy)
           ..add('isAway', isAway)
           ..add('isFeatured', isFeatured)
-          ..add('logo', logo))
+          ..add('logoURL', logoURL))
         .toString();
   }
 }
@@ -395,9 +395,9 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
   bool get isFeatured => _$this._isFeatured;
   set isFeatured(bool isFeatured) => _$this._isFeatured = isFeatured;
 
-  String _logo;
-  String get logo => _$this._logo;
-  set logo(String logo) => _$this._logo = logo;
+  String _logoURL;
+  String get logoURL => _$this._logoURL;
+  set logoURL(String logoURL) => _$this._logoURL = logoURL;
 
   VendorBuilder();
 
@@ -417,7 +417,7 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
       _isBusy = _$v.isBusy;
       _isAway = _$v.isAway;
       _isFeatured = _$v.isFeatured;
-      _logo = _$v.logo;
+      _logoURL = _$v.logoURL;
       _$v = null;
     }
     return this;
@@ -456,7 +456,7 @@ class VendorBuilder implements Builder<Vendor, VendorBuilder> {
               isBusy: isBusy,
               isAway: isAway,
               isFeatured: isFeatured,
-              logo: logo);
+              logoURL: logoURL);
     } catch (_) {
       String _$failedField;
       try {

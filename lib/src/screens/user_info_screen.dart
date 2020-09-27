@@ -1,10 +1,14 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:fastuserapp/src/bloc/login_bloc.dart';
+import 'package:fastuserapp/src/widgets/input_field.dart';
+import 'package:fastuserapp/src/widgets/location_picker.dart';
 import 'package:fastuserapp/src/widgets/onboarding_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_place_picker/google_maps_place_picker.dart';
+import 'package:progress_indicator_button/progress_button.dart';
 
 import 'package:provider/provider.dart';
 
@@ -19,16 +23,18 @@ class UserInfoScreen extends StatefulWidget {
 class _UserInfoScreenState extends State<UserInfoScreen> {
   LoginBloc _loginBloc;
   PickResult _result;
-  TextEditingController _nameController, _phoneNumberController;
-  PageController _pageController;
-  int _currentIndex = 0;
+  FocusNode _textFocusNode;
+  // TextEditingController _nameController, _phoneNumberController;
+  // PageController _pageController;
+  // int _currentIndex = 0;
 
   @override
   void initState() {
-    _pageController = PageController();
-    _nameController = TextEditingController();
-    _phoneNumberController = TextEditingController();
+    // _pageController = PageController();
+    // _nameController = TextEditingController();
+    // _phoneNumberController = TextEditingController();
     super.initState();
+    _textFocusNode = FocusNode();
   }
 
   @override
@@ -38,500 +44,284 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   }
 
   @override
+  void dispose() {
+    _textFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              pageSnapping: true,
-              onPageChanged: (value) {
-                this.setState(() {
-                  _currentIndex = value;
-                });
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // SvgPicture.asset(
+            //   "assets/svg/info_form.svg",
+            //   height: 200,
+            // ),
+            Container(
+              margin: EdgeInsets.only(
+                top: 15,
+              ),
+              child: Text(
+                "User's Information",
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            StreamBuilder<String>(
+              stream: _loginBloc.name,
+              builder: (context, snapshot) {
+                return InputField(
+                  onChanged: _loginBloc.changeName,
+                  label: "Name",
+                  hint: "John Doe",
+                  // autoFoucs: true,
+                  onSubmitted: (value) => _textFocusNode.requestFocus(),
+                );
               },
-              children: [
-                OnboardingPage(
-                  assetPath: "assets/svg/profile info.svg",
-                  title: "Let's get you started !",
-                  subtitle: "What do you want us to call you ?",
-                  child: StreamBuilder<String>(
-                    stream: _loginBloc.name,
-                    builder: (context, snapshot) {
-                      return Column(
+            ),
+            StreamBuilder<String>(
+              stream: _loginBloc.phoneNumber,
+              builder: (context, snapshot) {
+                return InputField(
+                  onChanged: _loginBloc.changePhoneNumber,
+                  label: "Phone Number",
+                  hint: "98-XXX-XXX-XX",
+                  keyboardType: TextInputType.number,
+                  focusNode: _textFocusNode,
+                );
+              },
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Material(
+                elevation: 5,
+                borderRadius: BorderRadius.circular(
+                  5,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 150,
+                      child: Stack(
                         children: [
                           Container(
-                            margin: EdgeInsets.only(
-                              left: 10,
-                              right: 10,
-                              top: 10,
-                            ),
-                            child: Material(
-                              borderRadius: BorderRadius.circular(
-                                5,
-                              ),
-                              elevation: 5,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 5,
-                                  right: 5,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(
+                                  5,
                                 ),
-                                child: TextField(
-                                  controller: _nameController,
-                                  onChanged: (value) {
-                                    _loginBloc.changeName(value);
-                                  },
-                                  decoration: InputDecoration(
-                                    labelText: " Full Name",
-                                    hintText: "John Doe",
-                                  ),
+                                topRight: Radius.circular(
+                                  5,
                                 ),
                               ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                OnboardingPage(
-                  assetPath: "assets/svg/phone_number.svg",
-                  title: "Add a phone number!",
-                  subtitle: "This so that we can contact you.",
-                  child: StreamBuilder<String>(
-                    stream: _loginBloc.phoneNumber,
-                    builder: (context, snapshot) {
-                      return Container(
-                        margin: EdgeInsets.only(
-                          left: 10,
-                          right: 10,
-                          top: 10,
-                        ),
-                        child: Material(
-                          borderRadius: BorderRadius.circular(
-                            5,
-                          ),
-                          elevation: 5,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 5,
-                              right: 5,
-                            ),
-                            child: TextField(
-                              controller: _phoneNumberController,
-                              onChanged: (value) {
-                                _loginBloc.changePhoneNumber(value);
-                              },
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText: "Phone Number",
-                                hintText: "98-XXX-XXX-XX",
+                              image: DecorationImage(
+                                image: AssetImage(
+                                  "assets/background/location.jpg",
+                                ),
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                OnboardingPage(
-                  assetPath: "assets/svg/location_info.svg",
-                  title: "Where do you want  your food ?",
-                  subtitle: "Save these two locations for ease access.",
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
                           Container(
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey[300],
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                5,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                left: 10,
-                                right: 10,
-                                top: 5,
-                                bottom: 5,
-                              ),
-                              child: Text(
-                                "HOME",
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 20,
-                                  color: Colors.grey[300],
+                                // gradient: LinearGradient(
+                                //   begin: Alignment.topCenter,
+                                //   end: Alignment.bottomCenter,
+                                //   colors: [
+                                //     Colors.transparent,
+                                //     Colors.orange[300],
+                                //   ],
+                                // ),
                                 ),
-                              ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 10,
                             ),
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          StreamBuilder<Map<String, dynamic>>(
-                              stream: _loginBloc.homeLocation,
-                              builder: (context, snapshot) {
-                                return snapshot.hasData
-                                    ? Expanded(
-                                        child: Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Text(
-                                                snapshot
-                                                    .data['physicalLocation']
-                                                    .toString()
-                                                    .toUpperCase(),
-                                                style: GoogleFonts.nunito(
-                                                  color: Colors.orange,
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: Icon(EvaIcons.edit2Outline),
-                                              onPressed: () async {
-                                                await Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        PlacePicker(
-                                                      apiKey:
-                                                          "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                                      onPlacePicked: (result) {
-                                                        this.setState(
-                                                          () {
-                                                            _result = result;
-                                                          },
-                                                        );
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                      useCurrentLocation: true,
-                                                    ),
-                                                  ),
-                                                );
-                                                _loginBloc.changeHomeLocation(
-                                                  {
-                                                    "lat": _result
-                                                        .geometry.location.lat,
-                                                    "lang": _result
-                                                        .geometry.location.lng,
-                                                    "physicalLocation": _result
-                                                        .formattedAddress,
-                                                  },
-                                                );
-                                              },
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                    : RawMaterialButton(
-                                        onPressed: () async {
-                                          await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => PlacePicker(
-                                                apiKey:
-                                                    "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                                onPlacePicked: (result) {
-                                                  this.setState(
-                                                    () {
-                                                      _result = result;
-                                                    },
-                                                  );
-                                                  Navigator.of(context).pop();
-                                                },
-                                                useCurrentLocation: true,
-                                              ),
-                                            ),
-                                          );
-                                          _loginBloc.changeHomeLocation(
-                                            {
-                                              "lat":
-                                                  _result.geometry.location.lat,
-                                              "lang":
-                                                  _result.geometry.location.lng,
-                                              "physicalLocation":
-                                                  _result.formattedAddress,
-                                            },
-                                          );
-                                        },
-                                        padding: EdgeInsets.only(
-                                          left: 10,
-                                          right: 10,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            5,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          "SELECT A LOCATION",
-                                          style: GoogleFonts.nunito(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        fillColor: Colors.orange,
-                                      );
-                              })
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey[300],
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                5,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                left: 10,
-                                right: 10,
-                                top: 5,
-                                bottom: 5,
-                              ),
-                              child: Text(
-                                "OFFICE",
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 20,
-                                  color: Colors.grey[300],
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          StreamBuilder<Map<String, dynamic>>(
-                            stream: _loginBloc.officeLocation,
-                            builder: (context, snapshot) {
-                              return snapshot.hasData
-                                  ? Expanded(
-                                      child: Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Text(
-                                              snapshot.data['physicalLocation']
-                                                  .toString()
-                                                  .toUpperCase(),
-                                              style: GoogleFonts.nunito(
-                                                color: Colors.orange,
-                                                fontWeight: FontWeight.w800,
-                                              ),
-                                            ),
-                                          ),
-                                          IconButton(
-                                            icon: Icon(EvaIcons.edit2Outline),
-                                            onPressed: () async {
-                                              await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      PlacePicker(
-                                                    apiKey:
-                                                        "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                                    onPlacePicked: (result) {
-                                                      this.setState(
-                                                        () {
-                                                          _result = result;
-                                                        },
-                                                      );
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    useCurrentLocation: true,
-                                                  ),
-                                                ),
-                                              );
-                                              _loginBloc.changeOfficeLocation(
-                                                {
-                                                  "lat": _result
-                                                      .geometry.location.lat,
-                                                  "lang": _result
-                                                      .geometry.location.lng,
-                                                  "physicalLocation":
-                                                      _result.formattedAddress,
-                                                },
-                                              );
-                                            },
-                                          )
-                                        ],
+                            child: Row(
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Pick a location !",
+                                      style: GoogleFonts.montserrat(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 20,
                                       ),
-                                    )
-                                  : RawMaterialButton(
-                                      onPressed: () async {
-                                        await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => PlacePicker(
-                                              apiKey:
-                                                  "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
-                                              onPlacePicked: (result) {
-                                                this.setState(
-                                                  () {
-                                                    _result = result;
-                                                  },
-                                                );
-                                                Navigator.of(context).pop();
-                                              },
-                                              useCurrentLocation: true,
-                                            ),
-                                          ),
-                                        );
-                                        _loginBloc.changeOfficeLocation(
-                                          {
-                                            "lat":
-                                                _result.geometry.location.lat,
-                                            "lang":
-                                                _result.geometry.location.lng,
-                                            "physicalLocation":
-                                                _result.formattedAddress,
-                                          },
-                                        );
-                                      },
-                                      padding: EdgeInsets.only(
-                                        left: 10,
-                                        right: 10,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          5,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        "SELECT A LOCATION",
-                                        style: GoogleFonts.nunito(
-                                          color: Colors.white,
+                                    ),
+                                    Text(
+                                      "These saved locations can be later used for delivery.",
+                                      style: GoogleFonts.nunito(
+                                          color: Colors.white60,
                                           fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                      fillColor: Colors.orange,
-                                    );
-                            },
-                          )
+                                          fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                      StreamBuilder<bool>(
-                        stream: _loginBloc.canSubmitData,
-                        builder: (context, snapshot) {
-                          return RawMaterialButton(
-                            onPressed: snapshot.hasData
-                                ? () => _loginBloc.saveUser(widget.user)
-                                : null,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                5,
-                              ),
-                            ),
-                            fillColor: Colors.orange[800],
-                            child: Text(
-                              "Save Info",
-                              style: GoogleFonts.montserrat(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              FlatButton(
-                onPressed: _currentIndex > 0
-                    ? () {
-                        this.setState(
-                          () {
-                            _currentIndex = _currentIndex - 1;
-                          },
-                        );
-                        _pageController.animateToPage(
-                          _currentIndex,
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      }
-                    : () {},
-                child: Text("Back"),
-              ),
-              Container(
-                width: 100,
-                child: Stack(
-                  children: [
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Container(
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: Colors.black12,
-                            borderRadius: BorderRadius.circular(
-                              2,
-                            ),
-                          ),
-                        );
-                      },
                     ),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        return AnimatedContainer(
-                          height: 10,
-                          duration: Duration(
-                            milliseconds: 300,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 10,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            children: [
+                              StreamBuilder<Map<String, dynamic>>(
+                                stream: _loginBloc.homeLocation,
+                                initialData: {},
+                                builder: (context, snapshot) {
+                                  return LocationPicker(
+                                    title: "Home",
+                                    location: snapshot.data['physicalLocation'],
+                                    icon: EvaIcons.homeOutline,
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PlacePicker(
+                                            apiKey:
+                                                "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                            onPlacePicked: (result) {
+                                              this.setState(
+                                                () {
+                                                  _result = result;
+                                                },
+                                              );
+                                              Navigator.of(context).pop();
+                                            },
+                                            useCurrentLocation: true,
+                                          ),
+                                        ),
+                                      );
+                                      _loginBloc.changeHomeLocation(
+                                        {
+                                          "lat": _result.geometry.location.lat,
+                                          "lang": _result.geometry.location.lng,
+                                          "physicalLocation":
+                                              _result.formattedAddress,
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              _result == null ? Divider() : Container(),
+                              StreamBuilder<Map<String, dynamic>>(
+                                stream: _loginBloc.officeLocation,
+                                initialData: {},
+                                builder: (context, snapshot) {
+                                  return LocationPicker(
+                                    location: snapshot.data['physicalLocation'],
+                                    title: "Office",
+                                    icon: EvaIcons.linkedinOutline,
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PlacePicker(
+                                            apiKey:
+                                                "AIzaSyATdr7r2cCqiNWcgv9VQSYKf7k50Qzx7IY",
+                                            onPlacePicked: (result) {
+                                              this.setState(
+                                                () {
+                                                  _result = result;
+                                                },
+                                              );
+                                              Navigator.of(context).pop();
+                                            },
+                                            useCurrentLocation: true,
+                                          ),
+                                        ),
+                                      );
+                                      _loginBloc.changeOfficeLocation(
+                                        {
+                                          "lat": _result.geometry.location.lat,
+                                          "lang": _result.geometry.location.lng,
+                                          "physicalLocation":
+                                              _result.formattedAddress,
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              Text(
+                                "* These can be saved later too *",
+                                style: GoogleFonts.nunito(
+                                  color: Colors.black12,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
                           ),
-                          width:
-                              ((_currentIndex + 1) / 3) * constraints.maxWidth,
-                          decoration: BoxDecoration(
-                            color: Colors.orangeAccent,
-                            borderRadius: BorderRadius.circular(
-                              2,
-                            ),
-                          ),
-                        );
-                      },
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              FlatButton(
-                onPressed: _currentIndex < 2
-                    ? () {
-                        this.setState(
-                          () {
-                            _currentIndex = _currentIndex + 1;
-                          },
-                        );
-                        _pageController.animateToPage(
-                          _currentIndex,
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      }
-                    : () {},
-                child: Text("Next"),
+            ),
+            // Expanded(
+            //   child: Container(),
+            // ),
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
               ),
-            ],
-          )),
-        ],
+              child: Row(
+                children: [
+                  Expanded(
+                    child: StreamBuilder<bool>(
+                      stream: _loginBloc.canSubmitData,
+                      builder: (context, snapshot) {
+                        return RawMaterialButton(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 15,
+                          ),
+                          onPressed: snapshot.hasData
+                              ? () => _loginBloc.saveUser(widget.user)
+                              : null,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              5,
+                            ),
+                          ),
+                          fillColor: Colors.orange[800],
+                          child: Text(
+                            "Save Info",
+                            style: GoogleFonts.montserrat(
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

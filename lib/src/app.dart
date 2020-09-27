@@ -14,8 +14,8 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         tabBarTheme: TabBarTheme(
-          labelColor: Colors.orange[600],
-          unselectedLabelColor: Colors.black,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
           labelPadding: EdgeInsets.only(
             top: 10,
             bottom: 10,
@@ -24,24 +24,21 @@ class App extends StatelessWidget {
           ),
           indicator: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
-            color: Colors.white,
-            border: Border.all(
-              width: 2,
-              color: Colors.orange[800],
-            ),
+            color: Colors.orange[500],
           ),
           labelStyle: GoogleFonts.montserrat(
             fontWeight: FontWeight.w600,
             fontSize: 17,
           ),
           unselectedLabelStyle: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
             fontSize: 15,
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
-          labelStyle: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w600,
-          ),
+          // labelStyle: GoogleFonts.montserrat(
+          //   fontWeight: FontWeight.w600,
+          // ),
           hintStyle: GoogleFonts.nunito(
             fontWeight: FontWeight.w400,
           ),
@@ -52,11 +49,11 @@ class App extends StatelessWidget {
           color: Colors.transparent,
           elevation: 0.0,
           textTheme: TextTheme(
-            headline6: GoogleFonts.oswald(
-                color: Colors.black,
-                fontSize: 30,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 2),
+            headline6: GoogleFonts.nunito(
+              color: Colors.black,
+              // fontSize: 30,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),
