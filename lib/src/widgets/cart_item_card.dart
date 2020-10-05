@@ -37,35 +37,37 @@ class _CartItemCardState extends State<CartItemCard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              CachedNetworkImage(
-                imageUrl: widget.cartItem.photoURI,
-                imageBuilder: (context, imageProvider) => Container(
-                  margin: EdgeInsets.only(
-                    right: 15,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                      5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black38,
-                        offset: Offset(
-                          0,
-                          3,
+              widget.cartItem.photoURI != null
+                  ? CachedNetworkImage(
+                      imageUrl: widget.cartItem.photoURI,
+                      imageBuilder: (context, imageProvider) => Container(
+                        margin: EdgeInsets.only(
+                          right: 15,
                         ),
-                        blurRadius: 5,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black38,
+                              offset: Offset(
+                                0,
+                                3,
+                              ),
+                              blurRadius: 5,
+                            ),
+                          ],
+                          image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        height: 80,
+                        width: 80,
                       ),
-                    ],
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  height: 80,
-                  width: 80,
-                ),
-              ),
+                    )
+                  : Container(),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

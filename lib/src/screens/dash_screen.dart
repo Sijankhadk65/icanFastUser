@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:fastuserapp/src/bloc/bakeries_bloc.dart';
 import 'package:fastuserapp/src/bloc/cart_item_bloc.dart';
 import 'package:fastuserapp/src/bloc/cart_menu_bloc.dart';
@@ -60,12 +61,12 @@ class _DashScreenState extends State<DashScreen> {
               child: GridView.count(
                 shrinkWrap: true,
                 crossAxisCount: 2,
-                childAspectRatio: 22 / 9,
+                childAspectRatio: 16 / 9,
                 children: <Widget>[
                   CategoriesCard(
-                    assetPath: "assets/svg/cafe.svg",
+                    assetPath: "assets/background/resturant.jpg",
                     category: "Restaurants",
-                    message: "A list of curated resturants near you.",
+                    message: "A curated list of resturants near you.",
                     onTap: () {
                       Navigator.push(
                         context,
@@ -81,8 +82,8 @@ class _DashScreenState extends State<DashScreen> {
                     },
                   ),
                   CategoriesCard(
-                    assetPath: "assets/svg/bakery-shop.svg",
-                    category: "Bakeries",
+                    assetPath: "assets/background/cakesandbakeries.jpg",
+                    category: "Cakes and Bakeries",
                     message: "A selection of the best bakeries for you.",
                     onTap: () {
                       Navigator.push(
@@ -106,7 +107,7 @@ class _DashScreenState extends State<DashScreen> {
                     },
                   ),
                   CategoriesCard(
-                    assetPath: "assets/svg/liquor.svg",
+                    assetPath: "assets/background/liquors.jpg",
                     category: "Liquors",
                     message: "Satisfy your thirst the FAST way.",
                     onTap: () {
@@ -131,7 +132,7 @@ class _DashScreenState extends State<DashScreen> {
                     },
                   ),
                   CategoriesCard(
-                    assetPath: "assets/svg/supermarket.svg",
+                    assetPath: "assets/background/groceries.jpg",
                     category: "Groceries",
                     message: "Your one stop for all your groceries.",
                     onTap: () {
@@ -362,6 +363,9 @@ class _DashScreenState extends State<DashScreen> {
               ),
             ),
             Container(
+              margin: EdgeInsets.only(
+                top: 10,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -391,18 +395,92 @@ class _DashScreenState extends State<DashScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            margin: EdgeInsets.only(
-                              left: 5,
-                              top: 5,
-                            ),
-                            child: Text(
-                              featuredVendorSnapshot.data.name.toUpperCase(),
-                              style: GoogleFonts.oswald(
-                                fontSize: 25,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.white.withAlpha(
+                                    100,
+                                  ),
+                                  Colors.white.withAlpha(
+                                    50,
+                                  ),
+                                  Colors.white.withAlpha(
+                                    20,
+                                  ),
+                                ],
                               ),
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(
+                                  55,
+                                ),
+                              ),
+                            ),
+                            padding: EdgeInsets.all(
+                              20,
+                            ),
+                            child: Row(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                        left: 25,
+                                      ),
+                                      child: Text(
+                                        "Pick of the week!",
+                                        style: GoogleFonts.oswald(
+                                          fontSize: 15,
+                                          color: Colors.orange,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                        left: 15,
+                                      ),
+                                      child: Text(
+                                        featuredVendorSnapshot.data.name
+                                            .toUpperCase(),
+                                        style: GoogleFonts.oswald(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                        left: 15,
+                                      ),
+                                      child: Material(
+                                        // elevation: 10,
+                                        color: Colors.orange[300],
+                                        borderRadius: BorderRadius.circular(
+                                          5,
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
+                                          ),
+                                          child: Text(
+                                            "Rating: ${featuredVendorSnapshot.data.averageRating}",
+                                            style: GoogleFonts.nunito(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                           StreamBuilder<List<MenuItem>>(
@@ -422,7 +500,7 @@ class _DashScreenState extends State<DashScreen> {
                                   break;
                                 case ConnectionState.active:
                                   return SizedBox(
-                                    height: 250,
+                                    height: 230,
                                     child: ListView(
                                       padding: EdgeInsets.only(
                                         left: 10,
@@ -435,6 +513,11 @@ class _DashScreenState extends State<DashScreen> {
                                           .map(
                                             (item) => FeaturedItemCard(
                                               item: item,
+                                              minOrder: featuredVendorSnapshot
+                                                  .data.minOrder,
+                                              vendorName: featuredVendorSnapshot
+                                                  .data.name,
+                                              user: widget.user,
                                               addToCart: () => showDialog(
                                                 context: context,
                                                 builder: (context) => Provider(

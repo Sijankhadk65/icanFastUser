@@ -57,16 +57,34 @@ class QuickAccessCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Expanded(
-                      flex: 4,
-                      child: SvgPicture.asset(
-                        assetPath,
-                        height:
-                            MediaQuery.of(context).size.height < 1080 ? 60 : 80,
-                        width:
-                            MediaQuery.of(context).size.height < 1080 ? 60 : 80,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+                        flex: 4,
+                        child: Container(
+                          margin: EdgeInsets.only(
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                              5,
+                            ),
+                            image: DecorationImage(
+                              image: AssetImage(
+                                "assets/background/veg.jpg",
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        )
+                        // SvgPicture.asset(
+                        //   assetPath,
+                        //   height:
+                        //       MediaQuery.of(context).size.height < 1080 ? 60 : 80,
+                        //   width:
+                        //       MediaQuery.of(context).size.height < 1080 ? 60 : 80,
+                        //   fit: BoxFit.contain,
+                        // ),
+                        ),
                     Expanded(
                       flex: 1,
                       child: Text(

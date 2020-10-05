@@ -20,6 +20,7 @@ class _OrderScreenState extends State<OrderScreen> {
     orderCartBloc.getOrderRefs(widget.user);
     return Scaffold(
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
             margin: EdgeInsets.only(

@@ -31,8 +31,8 @@ class AddToCartDialouge extends StatefulWidget {
 }
 
 class _AddToCartDialougeState extends State<AddToCartDialouge> {
-  int _itemQuantity = 1;
-  String _note = "";
+  // int _itemQuantity = 1;
+  // String _note = "";
 
   CartItemBloc _cartItemBloc;
 
@@ -74,7 +74,6 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                       imageUrl: widget.item.photoURI,
                       imageBuilder: (context, imageProvider) => Container(
                         height: 300,
-                        // width: 300
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(
@@ -131,11 +130,144 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.item.name,
-                    style: GoogleFonts.oswald(
-                      fontSize: 30,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          widget.item.name,
+                          style: GoogleFonts.oswald(
+                            fontSize: 30,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: 10,
+                          ),
+                          child: StreamBuilder<double>(
+                            initialData: 0,
+                            stream: _cartItemBloc.currentItemCount,
+                            builder: (context, snapshot) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                    5,
+                                  ),
+                                  border: Border.all(
+                                    color: Colors.black,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: RawMaterialButton(
+                                        onPressed: snapshot.data == 1
+                                            ? null
+                                            : () {
+                                                _cartItemBloc
+                                                    .changeCurrentItemCount(
+                                                  snapshot.data - 1,
+                                                );
+                                                _cartItemBloc
+                                                    .changeTotalPrice();
+                                              },
+                                        child: Icon(
+                                          EvaIcons.minus,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          "${snapshot.data.toInt()} ${widget.item.unit != null ? widget.item.unit : "Pcs"}",
+                                          style: GoogleFonts.oswald(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: RawMaterialButton(
+                                        onPressed: () {
+                                          _cartItemBloc.changeCurrentItemCount(
+                                            snapshot.data + 1,
+                                          );
+                                          _cartItemBloc.changeTotalPrice();
+                                        },
+                                        child: Icon(
+                                          EvaIcons.plus,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              // Row(
+                              //   children: <Widget>[
+                              //     SizedBox(
+                              //       width: 50,
+                              //       child: RawMaterialButton(
+                              //         fillColor: Colors.orange[500],
+                              //         shape: RoundedRectangleBorder(
+                              //           borderRadius: BorderRadius.circular(
+                              //             5,
+                              //           ),
+                              //         ),
+                              //         onPressed: snapshot.data == 1
+                              //             ? null
+                              //             : () {
+                              //                 _cartItemBloc
+                              //                     .changeCurrentItemCount(
+                              //                   snapshot.data - 1,
+                              //                 );
+                              //                 _cartItemBloc.changeTotalPrice();
+                              //               },
+                              //         child: Icon(
+                              //           EvaIcons.minus,
+                              //           color: Colors.white,
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     Expanded(
+                              //       child: Center(
+                              //         child: Text(
+                              //           "${snapshot.data.toInt()} ${widget.item.unit != null ? widget.item.unit : "Pcs"}",
+                              //           style: GoogleFonts.oswald(
+                              //             fontSize: 18,
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     SizedBox(
+                              //       width: 50,
+                              //       child: RawMaterialButton(
+                              //         shape: RoundedRectangleBorder(
+                              //           borderRadius: BorderRadius.circular(
+                              //             5,
+                              //           ),
+                              //         ),
+                              //         fillColor: Colors.orange[500],
+                              //         onPressed: () {
+                              //           _cartItemBloc.changeCurrentItemCount(
+                              //             snapshot.data + 1,
+                              //           );
+                              //           _cartItemBloc.changeTotalPrice();
+                              //         },
+                              //         child: Icon(
+                              //           EvaIcons.plus,
+                              //           color: Colors.white,
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ],
+                              // );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   widget.item.price == 0
                       ? StreamBuilder<Varient>(
@@ -207,7 +339,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                           ),
                         )
                       : Text(
-                          widget.item.description,
+                          "",
                         ),
                 ],
               ),
@@ -238,75 +370,6 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                 ),
               ),
             ),
-            // Container(
-            //   margin: EdgeInsets.symmetric(
-            //     horizontal: 10,
-            //   ),
-            //   child: StreamBuilder<double>(
-            //     initialData: widget.item.increaseBy,
-            //     stream: _cartItemBloc.currentItemCount,
-            //     builder: (context, snapshot) {
-            //       return Row(
-            //         children: <Widget>[
-            //           SizedBox(
-            //             width: 50,
-            //             child: RawMaterialButton(
-            //               fillColor: Colors.orange[500],
-            //               shape: RoundedRectangleBorder(
-            //                 borderRadius: BorderRadius.circular(
-            //                   5,
-            //                 ),
-            //               ),
-            //               onPressed: snapshot.data == 1
-            //                   ? null
-            //                   : () {
-            //                       _cartItemBloc.changeCurrentItemCount(
-            //                         snapshot.data - 1,
-            //                       );
-            //                       _cartItemBloc.changeTotalPrice();
-            //                     },
-            //               child: Icon(
-            //                 EvaIcons.minus,
-            //                 color: Colors.white,
-            //               ),
-            //             ),
-            //           ),
-            //           Expanded(
-            //             child: Center(
-            //               child: Text(
-            //                 "${snapshot.data.toInt()} ${widget.item.unit != null ? widget.item.unit : "Pcs"}",
-            //                 style: GoogleFonts.oswald(
-            //                   fontSize: 18,
-            //                 ),
-            //               ),
-            //             ),
-            //           ),
-            //           SizedBox(
-            //             width: 50,
-            //             child: RawMaterialButton(
-            //               shape: RoundedRectangleBorder(
-            //                 borderRadius: BorderRadius.circular(
-            //                   5,
-            //                 ),
-            //               ),
-            //               fillColor: Colors.orange[500],
-            //               onPressed: () {
-            //                 _cartItemBloc.changeCurrentItemCount(
-            //                   snapshot.data + 1,
-            //                 );
-            //                 _cartItemBloc.changeTotalPrice();
-            //               },
-            //               child: Icon(
-            //                 EvaIcons.plus,
-            //                 color: Colors.white,
-            //               ),
-            //             ),
-            //           ),
-            //         ],
-            //       );
-            //     },
-            //   ),
-            // ),
             Container(
               margin: EdgeInsets.symmetric(
                 horizontal: 20,
@@ -332,6 +395,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                 children: [
                   Expanded(
                     child: StreamBuilder<double>(
+                      initialData: 0,
                       stream: _cartItemBloc.currentTotalPrice,
                       builder: (context, snapshot) {
                         return Column(

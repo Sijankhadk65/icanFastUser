@@ -24,18 +24,6 @@ class _VarientButtonItemState extends State<VarientButtonItem> {
       margin: EdgeInsets.only(
         right: 10,
       ),
-      // padding: EdgeInsets.only(
-      //   top: 2,
-      //   bottom: 5,
-      //   left: 2,
-      //   right: 2,
-      // ),
-      // decoration: BoxDecoration(
-      //   color: Colors.white,
-      //   borderRadius: BorderRadius.circular(
-      //     5,
-      //   ),
-      // ),
       child: Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(
@@ -44,33 +32,31 @@ class _VarientButtonItemState extends State<VarientButtonItem> {
         child: InkWell(
           onTap: widget.onPressed,
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 15,
-              horizontal: 5,
+            padding: const EdgeInsets.only(
+              top: 20,
+              bottom: 10,
+              left: 15,
+              right: 15,
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   widget.varient.name,
                   style: GoogleFonts.nunito(
                     fontWeight: FontWeight.w900,
-                    fontSize: 13,
+                    fontSize: 10,
                     color:
                         widget.isSelected ? Colors.orange[500] : Colors.black87,
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                  ),
-                  child: Text(
-                    "Rs.${widget.varient.price}",
-                    style: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),
+                Text(
+                  "Rs.${widget.varient.price}",
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    color: Colors.black,
                   ),
                 ),
               ],

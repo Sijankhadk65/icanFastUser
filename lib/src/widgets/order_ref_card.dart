@@ -1,3 +1,4 @@
+import 'package:built_value/built_value.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/order_ref.dart';
@@ -13,6 +14,20 @@ class OrderRefCard extends StatefulWidget {
 }
 
 class _OrderRefCardState extends State<OrderRefCard> {
+  List<String> _months = [
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC",
+  ];
   DateTime _date;
   @override
   void initState() {
@@ -38,14 +53,7 @@ class _OrderRefCardState extends State<OrderRefCard> {
             blurRadius: 12,
           )
         ],
-        gradient: LinearGradient(
-          begin: Alignment.bottomRight,
-          end: Alignment.topLeft,
-          colors: [
-            Colors.orange[400],
-            Colors.orange[800],
-          ],
-        ),
+        color: Colors.white,
       ),
       child: Material(
         color: Colors.transparent,
@@ -74,45 +82,38 @@ class _OrderRefCardState extends State<OrderRefCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "order placed at ${_date.hour}:${_date.minute} ${_date.hour >= 12 ? "PM" : "AM"},today",
+                  "${widget.orderRef.refID}",
                   style: GoogleFonts.montserrat(
                     fontStyle: FontStyle.italic,
-                    color: Colors.black26,
+                    color: Colors.orange[800],
                   ),
                 ),
-
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        widget.orderRef.user.name.toUpperCase(),
-                        style: GoogleFonts.oswald(
-                          fontSize: 30,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      "Rs.${widget.orderRef.totalCost}",
-                      style: GoogleFonts.nunito(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 17,
-                      ),
-                    )
-                  ],
+                Text(
+                  widget.orderRef.user.name.toUpperCase(),
+                  style: GoogleFonts.oswald(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-                // Text(
-                //   "Orderd at: ${_date.hour}:${_date.minute} ${_date.hour >= 12 ? "PM" : "AM"}, ${_date.day == DateTime.now().day ? "today" : _date.day} ",
-                //   style: GoogleFonts.montserrat(
-                //     fontWeight: FontWeight.bold,
-                //     fontStyle: FontStyle.italic,
-                //     color: Colors.white,
-                //   ),
-                // )
+                Text(
+                  widget.orderRef.physicalLocation,
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.orange.withAlpha(
+                      190,
+                    ),
+                  ),
+                ),
+                Text(
+                  "${_date.hour}:${_date.minute} ${_date.hour >= 12 ? "PM" : "AM"}, ${_date.day == DateTime.now().day ? "today" : _date.day} ${_months[_date.month - 1]}",
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                    color: Colors.orange.withAlpha(
+                      150,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

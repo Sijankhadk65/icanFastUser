@@ -7,6 +7,7 @@ import 'package:fastuserapp/src/widgets/custom_tab_bar.dart';
 import 'package:fastuserapp/src/widgets/menu_item_displayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 import '../bloc/ratings_bloc.dart';
@@ -196,11 +197,24 @@ class _VendorScreenState extends State<VendorScreen>
                               },
                             )
                           : Center(
-                              child: Text(
-                                "no items here!",
-                                style: GoogleFonts.pacifico(
-                                  fontSize: 30,
-                                ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                    "assets/svg/empty.svg",
+                                    height: 200,
+                                    width: 200,
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(
+                                      top: 10,
+                                    ),
+                                    child: Text(
+                                      "",
+                                      style: GoogleFonts.montserrat(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             );
                       break;
