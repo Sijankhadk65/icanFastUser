@@ -1,4 +1,5 @@
 import 'package:fastuserapp/src/screens/checkout_screen.dart';
+import 'package:fastuserapp/src/widgets/app_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../bloc/order_cart_bloc.dart';
@@ -58,7 +59,7 @@ class _CartScreenState extends State<CartScreen> {
                             tabBuilder: (context, index) => Column(
                               children: <Widget>[
                                 Text(
-                                  snapshot.data[index].vendor,
+                                  snapshot.data[index].vendorName,
                                 ),
                                 Text(
                                   "Subtotal: Rs.${snapshot.data[index].totalPrice}",
@@ -77,98 +78,113 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                           ),
                         ),
-                        AnimatedContainer(
-                          duration: Duration(
-                            milliseconds: 300,
-                          ),
-                          margin: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 15,
-                          ),
-                          decoration: BoxDecoration(
-                              color: Color(0xFF11998e),
-                              // gradient: LinearGradient(
-                              //   begin: Alignment.topLeft,
-                              //   end: Alignment.bottomRight,
-                              //   colors: [
-                              //     Color(0xFF11998e),
-                              //     Color(0xFF38ef7d),
-                              //   ],
-                              // ),
-                              borderRadius: BorderRadius.circular(
-                                5,
+                        Column(
+                          children: [
+                            AnimatedContainer(
+                              duration: Duration(
+                                milliseconds: 300,
                               ),
-                              boxShadow: snapshot.data
-                                      .map(
-                                        (order) {
-                                          return order.totalPrice >=
-                                              order.minOrder;
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 15,
+                              ),
+                              decoration: BoxDecoration(
+                                  color: Color(0xFF11998e),
+                                  borderRadius: BorderRadius.circular(
+                                    5,
+                                  ),
+                                  boxShadow: snapshot.data
+                                          .map(
+                                            (order) {
+                                              return order.totalPrice >=
+                                                  order.minOrder;
+                                            },
+                                          )
+                                          .toList()
+                                          .contains(
+                                            false,
+                                          )
+                                      ? []
+                                      : [
+                                          BoxShadow(
+                                            color: Colors.black38,
+                                            offset: Offset(
+                                              0,
+                                              3,
+                                            ),
+                                            blurRadius: 5,
+                                          )
+                                        ]),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: snapshot.data
+                                          .map(
+                                            (order) {
+                                              return order.totalPrice >=
+                                                  order.minOrder;
+                                            },
+                                          )
+                                          .toList()
+                                          .contains(
+                                            false,
+                                          )
+                                      ? null
+                                      : () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => CheckoutScreen(
+                                                user: widget.user,
+                                              ),
+                                            ),
+                                          );
                                         },
-                                      )
-                                      .toList()
-                                      .contains(
-                                        false,
-                                      )
-                                  ? []
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.black38,
-                                        offset: Offset(
-                                          0,
-                                          3,
-                                        ),
-                                        blurRadius: 5,
-                                      )
-                                    ]),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: snapshot.data
-                                      .map(
-                                        (order) {
-                                          return order.totalPrice >=
-                                              order.minOrder;
-                                        },
-                                      )
-                                      .toList()
-                                      .contains(
-                                        false,
-                                      )
-                                  ? null
-                                  : () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => CheckoutScreen(
-                                            user: widget.user,
+                                  borderRadius: BorderRadius.circular(
+                                    5,
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 25,
+                                      vertical: 15,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Next",
+                                          style: GoogleFonts.nunito(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 17,
                                           ),
                                         ),
-                                      );
-                                    },
-                              borderRadius: BorderRadius.circular(
-                                5,
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 25,
-                                  vertical: 15,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Next",
-                                      style: GoogleFonts.nunito(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 17,
-                                      ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                            snapshot.data
+                                    .map(
+                                      (order) {
+                                        return order.totalPrice >=
+                                            order.minOrder;
+                                      },
+                                    )
+                                    .toList()
+                                    .contains(
+                                      false,
+                                    )
+                                ? AppAlert(
+                                    isCollapsible: false,
+                                    priority: "error",
+                                    message:
+                                        "You have not met the minimum amount to order for ${snapshot.data.where((order) => order.totalPrice < order.minOrder).map((order) => order.vendorName)}.",
+                                  )
+                                : Container(),
+                          ],
                         ),
                         // AnimatedContainer(
                         //   duration: Duration(

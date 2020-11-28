@@ -1,9 +1,16 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fastuserapp/src/models/carousel_item.dart';
 import 'package:fastuserapp/src/models/liquor.dart';
 import 'package:fastuserapp/src/models/offers_item.dart';
+import 'package:fastuserapp/src/models/promo_code.dart';
 import 'package:fastuserapp/src/models/user.dart';
+import 'package:fastuserapp/src/resources/cloud_storage_provider.dart';
+import 'package:fastuserapp/src/resources/hive_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:hive/hive.dart';
 import '../models/order_ref.dart';
 import '../models/rating.dart';
 import '../models/vendor.dart';
@@ -18,6 +25,16 @@ import 'dart:async';
 class Repository {
   final _authProvider = FirebaseAuthProvider();
   final _firestoreProvider = FirestoreProvider();
+  final _cloudStorageProvider = CloudStorageProvider();
+  final _hiveProvider = HiveProvider();
+
+  // For DB Usage
+
+  Future<Box> openDB() => _hiveProvider.openBox();
+
+  closeDB() => _hiveProvider.closeBox();
+
+  // For DB Usage
 
   Stream<User> get onAuthStateChanged => _authProvider.onAuthStateChanged
       .map((user) => user != null ? user : null);
@@ -61,19 +78,21 @@ class Repository {
 
   Stream<Map<String, dynamic>> getVendorLocation(String vendorName) =>
       _firestoreProvider.getVendor(vendorName).transform(
-          StreamTransformer.fromHandlers(
-              handleData: (DocumentSnapshot snapshot, sink) {
-        if (snapshot.exists) {
-          sink.add(
-            {
-              "lat": snapshot.data()['lat'],
-              "lang": snapshot.data()['lang'],
-            },
-          );
-        } else {
-          sink.addError("No Vendor found");
-        }
-      }));
+        StreamTransformer.fromHandlers(
+          handleData: (DocumentSnapshot snapshot, sink) {
+            if (snapshot.exists) {
+              sink.add(
+                {
+                  "lat": snapshot.data()['lat'],
+                  "lang": snapshot.data()['lang'],
+                },
+              );
+            } else {
+              sink.addError("No Vendor found");
+            }
+          },
+        ),
+      );
 
   Stream<List<int>> getDistanceRates() =>
       _firestoreProvider.getDistanceRates().transform(
@@ -462,13 +481,15 @@ class Repository {
           },
         ),
       );
-  Stream<int> getPromoCode(String code) =>
+  Stream<PromoCode> getPromoCode(String code) =>
       _firestoreProvider.getPromoCode(code).transform(
         StreamTransformer.fromHandlers(
           handleData: (DocumentSnapshot snapshot, sink) {
             if (snapshot.exists) {
               sink.add(
-                snapshot.data()['discountRate'],
+                parseJsonToPromoCode(
+                  snapshot.data(),
+                ),
               );
             }
           },
@@ -537,10 +558,15 @@ class Repository {
   Future<void> updateUserOfficeLocation(
           {Map<String, dynamic> office, String email}) =>
       _firestoreProvider.updateUserOfficeLocation(office: office, email: email);
+  updateProfilePicture(String email, String file) =>
+      _firestoreProvider.updateProfilePicture(email, file);
   Future<void> addToFavourites(
           String type, String email, Map<String, dynamic> itemData) =>
       _firestoreProvider.addToFavourite(type, email, itemData);
   Future<void> removeFavourites(
           String type, String email, Map<String, dynamic> itemName) =>
       _firestoreProvider.removeFavourites(type, email, itemName);
+  // Profile Photo Upload
+  Future<StorageTaskSnapshot> savePhoto(File imageFile, String filename) =>
+      _cloudStorageProvider.uploadProfileImageToServer(imageFile, filename);
 }

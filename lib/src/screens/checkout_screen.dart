@@ -2,6 +2,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
 import 'package:fastuserapp/src/models/online_order.dart';
 import 'package:fastuserapp/src/screens/change_phone_number_dialog.dart';
+import 'package:fastuserapp/src/widgets/app_alert.dart';
 import 'package:fastuserapp/src/widgets/changable_displayer.dart';
 import 'package:fastuserapp/src/widgets/checkout_cart_list.dart';
 import 'package:fastuserapp/src/widgets/delivery_location_selector.dart';
@@ -41,6 +42,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _phoneNumberController.text = widget.user['phoneNumber'].toString();
     orderCartBloc.getCheckoutLocation(null);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    orderCartBloc.changePromoCodesMessage(null);
+    super.dispose();
   }
 
   @override
@@ -257,96 +264,144 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ),
                       // This is for applying promo code.
-                      // Container(
-                      //   margin: EdgeInsets.only(
-                      //     left: 10,
-                      //     right: 10,
-                      //   ),
-                      //   child: Row(
-                      //     children: <Widget>[
-                      //       // Expanded(
-                      //       //   child: Container(
-                      //       //     margin: EdgeInsets.only(
-                      //       //       right: 10,
-                      //       //     ),
-                      //       //     child: Material(
-                      //       //       elevation: 5,
-                      //       //       borderRadius: BorderRadius.circular(
-                      //       //         5,
-                      //       //       ),
-                      //       //       child: Padding(
-                      //       //         padding: const EdgeInsets.only(
-                      //       //           left: 10,
-                      //       //           right: 10,
-                      //       //         ),
-                      //       //         child: StreamBuilder<String>(
-                      //       //             stream: orderCartBloc.promoCode,
-                      //       //             builder: (context, snapshot) {
-                      //       //               return TextField(
-                      //       //                 onChanged:
-                      //       //                     orderCartBloc.changePromoCode,
-                      //       //                 decoration: InputDecoration(
-                      //       //                   hintText:
-                      //       //                       "Enter the promo code here...",
-                      //       //                   hintStyle: GoogleFonts.nunito(
-                      //       //                     fontStyle: FontStyle.italic,
-                      //       //                   ),
-                      //       //                 ),
-                      //       //               );
-                      //       //             }),
-                      //       //       ),
-                      //       //     ),
-                      //       //   ),
-                      //       // ),
-                      //       // StreamBuilder<bool>(
-                      //       //   stream: orderCartBloc.promoCodeIsUsed,
-                      //       //   builder: (context, snapshot) {
-                      //       //     if (snapshot.hasError)
-                      //       //       return Text("Error: ${snapshot.error}");
-                      //       //     switch (snapshot.connectionState) {
-                      //       //       case ConnectionState.none:
-                      //       //         return Text("Awaiting bids....");
-                      //       //         break;
-                      //       //       case ConnectionState.waiting:
-                      //       //         return Center(
-                      //       //             child: CircularProgressIndicator());
-                      //       //         break;
-                      //       //       case ConnectionState.active:
-                      //       //         return RawMaterialButton(
-                      //       //           fillColor: snapshot.data
-                      //       //               ? Colors.grey
-                      //       //               : Colors.blue[800],
-                      //       //           shape: RoundedRectangleBorder(
-                      //       //             borderRadius: BorderRadius.circular(
-                      //       //               5,
-                      //       //             ),
-                      //       //           ),
-                      //       //           onPressed: snapshot.data
-                      //       //               ? null
-                      //       //               : () {
-                      //       //                   orderCartBloc.applyPromoCode(
-                      //       //                       widget.user['email']);
-                      //       //                 },
-                      //       //           child: Text(
-                      //       //             "Apply Code",
-                      //       //             style: GoogleFonts.nunito(
-                      //       //               color: snapshot.data
-                      //       //                   ? Colors.black26
-                      //       //                   : Colors.white,
-                      //       //             ),
-                      //       //           ),
-                      //       //         );
-                      //       //         break;
-                      //       //       case ConnectionState.done:
-                      //       //         return Text("The task has completed");
-                      //       //         break;
-                      //       //     }
-                      //       //   },
-                      //       // ),
-                      //     ],
-                      //   ),
-                      // ),
-
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                  right: 10,
+                                ),
+                                child: Material(
+                                  elevation: 5,
+                                  borderRadius: BorderRadius.circular(
+                                    5,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 10,
+                                      right: 10,
+                                    ),
+                                    child: StreamBuilder<String>(
+                                        stream: orderCartBloc.promoCode,
+                                        builder: (context, snapshot) {
+                                          return TextField(
+                                            onChanged:
+                                                orderCartBloc.changePromoCode,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  "Enter the promo code here...",
+                                              hintStyle: GoogleFonts.nunito(
+                                                fontStyle: FontStyle.italic,
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            RawMaterialButton(
+                              fillColor: Colors.blue[800],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  5,
+                                ),
+                              ),
+                              onPressed: () {
+                                orderCartBloc
+                                    .applyPromoCode(widget.user['email']);
+                              },
+                              child: Text(
+                                "Apply Code",
+                                style: GoogleFonts.nunito(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            // StreamBuilder<bool>(
+                            //   stream: orderCartBloc.promoCodeIsUsed,
+                            //   builder: (context, snapshot) {
+                            //     if (snapshot.hasError)
+                            //       return Text("Error: ${snapshot.error}");
+                            //     switch (snapshot.connectionState) {
+                            //       case ConnectionState.none:
+                            //         return Text("Awaiting bids....");
+                            //         break;
+                            //       case ConnectionState.waiting:
+                            //         return Center(
+                            //             child: CircularProgressIndicator());
+                            //         break;
+                            //       case ConnectionState.active:
+                            //         return RawMaterialButton(
+                            //           fillColor: snapshot.data
+                            //               ? Colors.grey
+                            //               : Colors.blue[800],
+                            //           shape: RoundedRectangleBorder(
+                            //             borderRadius: BorderRadius.circular(
+                            //               5,
+                            //             ),
+                            //           ),
+                            //           onPressed: () {
+                            //             orderCartBloc.applyPromoCode(
+                            //                 widget.user['email']);
+                            //           },
+                            //           child: Text(
+                            //             "Apply Code",
+                            //             style: GoogleFonts.nunito(
+                            //               color: Colors.black26,
+                            //             ),
+                            //           ),
+                            //         );
+                            //         break;
+                            //       case ConnectionState.done:
+                            //         return Text("The task has completed");
+                            //         break;
+                            //     }
+                            //   },
+                            // ),
+                          ],
+                        ),
+                      ),
+                      StreamBuilder(
+                        initialData: {},
+                        stream: orderCartBloc.promoCodeMessage,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError)
+                            return Text(
+                              "Error:${snapshot.error}",
+                            );
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.none:
+                              return Text("Awaiting Bids....");
+                              break;
+                            case ConnectionState.waiting:
+                              return Center(
+                                child: LinearProgressIndicator(),
+                              );
+                              break;
+                            case ConnectionState.active:
+                              return snapshot.hasData
+                                  ? AppAlert(
+                                      message: snapshot.data['message'],
+                                      priority: snapshot.data['priority'],
+                                      onCollapse: () {
+                                        orderCartBloc
+                                            .changePromoCodesMessage(null);
+                                      },
+                                    )
+                                  : Container();
+                              break;
+                            case ConnectionState.done:
+                              return Text("The task has completed.");
+                              break;
+                          }
+                          return null;
+                        },
+                      ),
                       // This is for displaying if the code is applied or not.
                       // StreamBuilder<bool>(
                       //   stream: orderCartBloc.promoCodeIsUsed,

@@ -21,6 +21,15 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 
 import './order_screen.dart';
 
+Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) {
+  if (message.containsKey('data')) {
+    final dynamic data = message['data'];
+  }
+  if (message.containsKey('notification')) {
+    final dynamic notification = message['notification'];
+  }
+}
+
 class HomeScreen extends StatefulWidget {
   final Map<String, dynamic> user;
 
@@ -67,14 +76,14 @@ class _HomeScreenState extends State<HomeScreen>
     }
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        _sendNotification();
+        // _sendNotification();
       },
-      // onBackgroundMessage: (data) => _sendNotification(),
+      // onBackgroundMessage: myBackgroundMessageHandler,
       onLaunch: (Map<String, dynamic> message) async {
-        _sendNotification();
+        // _sendNotification();
       },
       onResume: (Map<String, dynamic> message) async {
-        _sendNotification();
+        // _sendNotification();
       },
     );
   }

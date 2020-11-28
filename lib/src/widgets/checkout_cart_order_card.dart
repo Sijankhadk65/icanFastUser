@@ -40,7 +40,7 @@ class CheckoutCartOrderCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            order.vendor.toUpperCase(),
+                            order.vendorName.toUpperCase(),
                             style: GoogleFonts.montserrat(
                               fontSize: 20,
                               letterSpacing: 1.5,

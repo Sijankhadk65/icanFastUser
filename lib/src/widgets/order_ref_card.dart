@@ -15,18 +15,18 @@ class OrderRefCard extends StatefulWidget {
 
 class _OrderRefCardState extends State<OrderRefCard> {
   List<String> _months = [
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
+    "JANUARY",
+    "FEBRUARY",
+    "MARCH",
+    "APRIL",
     "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DEC",
+    "JUNE",
+    "JULY",
+    "AUGUST",
+    "SEPTEMBER",
+    "OCTOBER",
+    "NOVEMBER",
+    "DECEMBER",
   ];
   DateTime _date;
   @override
@@ -39,26 +39,14 @@ class _OrderRefCardState extends State<OrderRefCard> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(
-        left: 10,
-        right: 10,
-        top: 20,
-        bottom: 20,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black26,
-            offset: Offset(5, 5),
-            blurRadius: 12,
-          )
-        ],
-        color: Colors.white,
-      ),
+          // left: 10,
+          // right: 10,
+          // top: 20,
+          // bottom: 20,
+          ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(5),
           splashColor: Colors.deepOrangeAccent[700],
           highlightColor: Colors.greenAccent[700],
           onTap: () {
@@ -89,31 +77,29 @@ class _OrderRefCardState extends State<OrderRefCard> {
                   ),
                 ),
                 Text(
-                  widget.orderRef.user.name.toUpperCase(),
-                  style: GoogleFonts.oswald(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
+                  widget.orderRef.physicalLocation.toUpperCase(),
+                  style: GoogleFonts.montserrat(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  widget.orderRef.physicalLocation,
+                  "${_months[_date.month - 1]} ${_date.day == DateTime.now().day ? "today" : _date.day} ${_date.year}, ${_date.hour}:${_date.minute} ${_date.hour >= 12 ? "PM" : "AM"}",
                   style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.orange.withAlpha(
-                      190,
-                    ),
-                  ),
-                ),
-                Text(
-                  "${_date.hour}:${_date.minute} ${_date.hour >= 12 ? "PM" : "AM"}, ${_date.day == DateTime.now().day ? "today" : _date.day} ${_months[_date.month - 1]}",
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                    color: Colors.orange.withAlpha(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 10,
+                    color: Colors.black.withAlpha(
                       150,
                     ),
                   ),
                 ),
+                // Text(
+                //   widget.orderRef.user.name ?? "No Location was found",
+                //   style: GoogleFonts.notoSerif(
+                //     fontStyle: FontStyle.italic,
+                //   ),
+                // ),
+                Divider(),
               ],
             ),
           ),

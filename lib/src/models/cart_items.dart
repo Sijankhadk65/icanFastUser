@@ -10,11 +10,11 @@ abstract class CartItem implements Built<CartItem, CartItemBuilder> {
   @nullable
   String get name;
   @nullable
-  double get price;
+  int get price;
   @nullable
-  double get totalPrice;
+  int get totalPrice;
   @nullable
-  double get quantity;
+  int get quantity;
   @nullable
   String get photoURI;
   CartItem._();

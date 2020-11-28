@@ -15,15 +15,21 @@ import 'package:provider/provider.dart';
 class AddToCartDialouge extends StatefulWidget {
   final MenuItem item;
   final Map<String, dynamic> user;
-  final String vendorName;
+  final String vendorName, vendorID;
   final int minOrder;
-
+  final bool shouldSchedule, isNight;
+  final DateTime openingTime, closingTime;
   const AddToCartDialouge({
     Key key,
     this.item,
     this.vendorName,
     this.user,
     this.minOrder,
+    this.vendorID,
+    this.shouldSchedule = false,
+    this.openingTime,
+    this.closingTime,
+    this.isNight,
   }) : super(key: key);
 
   @override
@@ -44,8 +50,8 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
       _cartItemBloc.changeCurrentUnitPrice(0);
       _cartItemBloc.changeCurrentTotalPrice(0);
     } else {
-      _cartItemBloc.changeCurrentUnitPrice(widget.item.price.toDouble());
-      _cartItemBloc.changeCurrentTotalPrice(widget.item.price.toDouble());
+      _cartItemBloc.changeCurrentUnitPrice(widget.item.price);
+      _cartItemBloc.changeCurrentTotalPrice(widget.item.price);
     }
   }
 
@@ -145,7 +151,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                           margin: EdgeInsets.symmetric(
                             horizontal: 10,
                           ),
-                          child: StreamBuilder<double>(
+                          child: StreamBuilder<int>(
                             initialData: 0,
                             stream: _cartItemBloc.currentItemCount,
                             builder: (context, snapshot) {
@@ -279,8 +285,8 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                               onChange: (varient) {
                                 _cartItemBloc
                                     .changeCurrentSelectedVarient(varient);
-                                _cartItemBloc.changeCurrentUnitPrice(
-                                    varient.price.toDouble());
+                                _cartItemBloc
+                                    .changeCurrentUnitPrice(varient.price);
                                 _cartItemBloc.changeTotalPrice();
                                 _cartItemBloc.changeCurrentSelectedAddons([]);
                               },
@@ -394,7 +400,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: StreamBuilder<double>(
+                    child: StreamBuilder<int>(
                       initialData: 0,
                       stream: _cartItemBloc.currentTotalPrice,
                       builder: (context, snapshot) {
@@ -420,7 +426,7 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                       },
                     ),
                   ),
-                  StreamBuilder<double>(
+                  StreamBuilder<int>(
                     stream: _cartItemBloc.currentTotalPrice,
                     builder: (context, snapshot) {
                       return AnimatedContainer(
@@ -479,15 +485,20 @@ class _AddToCartDialougeState extends State<AddToCartDialouge> {
                                 : () {
                                     orderCartBloc.addNewOrder(
                                       context,
-                                      widget.vendorName,
-                                      parseToCartItem(
+                                      minOrder: widget.minOrder,
+                                      newItem: parseToCartItem(
                                         _cartItemBloc.getItem(
                                           widget.item.name,
                                           widget.item.photoURI,
                                         ),
                                       ),
-                                      widget.user,
-                                      widget.minOrder,
+                                      shouldSchedule: widget.shouldSchedule,
+                                      openingTime: widget.openingTime,
+                                      closingTime: widget.closingTime,
+                                      isNight: widget.isNight,
+                                      user: widget.user,
+                                      vendor: widget.vendorName,
+                                      vendorID: widget.vendorID,
                                     );
                                     Navigator.pop(context);
                                   },

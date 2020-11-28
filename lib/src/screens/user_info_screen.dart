@@ -5,15 +5,13 @@ import 'package:fastuserapp/src/widgets/location_picker.dart';
 import 'package:fastuserapp/src/widgets/onboarding_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_place_picker/google_maps_place_picker.dart';
-import 'package:progress_indicator_button/progress_button.dart';
 
 import 'package:provider/provider.dart';
 
 class UserInfoScreen extends StatefulWidget {
-  final FirebaseUser user;
+  final User user;
 
   const UserInfoScreen({Key key, this.user}) : super(key: key);
   @override

@@ -1,10 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:fastuserapp/src/bloc/order_cart_bloc.dart';
-import 'package:fastuserapp/src/models/order_ref.dart';
 import 'package:fastuserapp/src/models/user.dart';
 import 'package:fastuserapp/src/models/user_location.dart';
-import 'package:fastuserapp/src/widgets/order_ref_card.dart';
+import 'package:fastuserapp/src/widgets/profile_image_source.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -61,169 +60,212 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     userSnapshot.data.office,
                   ),
                 );
-
-                orderCartBloc.getClosedOrderRefs(
-                  {
-                    "name": userSnapshot.data.name,
-                    "email": userSnapshot.data.email,
-                  },
-                );
                 return Column(
                   children: <Widget>[
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        CachedNetworkImage(
-                          imageUrl: userSnapshot.data.photoURI,
-                          placeholder: (context, msg) => Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          imageBuilder: (context, imageProvider) {
-                            return Container(
-                              height: 100,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.black26,
-                                      offset: Offset(0, 5),
-                                      blurRadius: 5)
-                                ],
-                                borderRadius: BorderRadius.circular(
-                                  5,
-                                ),
-                                image: DecorationImage(
-                                  image: imageProvider,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.only(left: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  userSnapshot.data.name.toUpperCase(),
-                                  style: GoogleFonts.oswald(
-                                    fontSize: 35,
-                                    fontWeight: FontWeight.w700,
+                    Container(
+                      padding: EdgeInsets.all(
+                        5,
+                      ),
+                      height: 150,
+                      width: 150,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(
+                              0,
+                              6,
+                            ),
+                            blurRadius: 10,
+                          )
+                        ],
+                        color: Colors.white,
+                      ),
+                      child: Stack(
+                        children: [
+                          userSnapshot.data.photoURI != null
+                              ? CachedNetworkImage(
+                                  imageUrl: userSnapshot.data.photoURI,
+                                  placeholder: (context, msg) => Center(
+                                    child: CircularProgressIndicator(),
                                   ),
-                                ),
-                                Text(
-                                  userSnapshot.data.email,
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 10,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  userSnapshot.data.phoneNumber.toString(),
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 10,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    Expanded(
-                                      flex: 4,
-                                      child: StreamBuilder<String>(
-                                        builder: (context, snapshot) {
-                                          if (snapshot.hasError)
-                                            return Text(
-                                                "Error: ${snapshot.error}");
-                                          switch (snapshot.connectionState) {
-                                            case ConnectionState.none:
-                                              return Text("Awaiting bids....");
-                                              break;
-                                            case ConnectionState.waiting:
-                                              return Center(
-                                                child:
-                                                    LinearProgressIndicator(),
-                                              );
-                                              break;
-                                            case ConnectionState.active:
-                                              return Text(
-                                                snapshot.data,
-                                                style: GoogleFonts.nunito(
-                                                  fontSize: 13,
-                                                  color: Colors.orange,
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              );
-                                              break;
-                                            case ConnectionState.done:
-                                              return Text(
-                                                  "The task has completed....");
-                                              break;
-                                          }
-                                          return null;
-                                        },
-                                        stream: orderCartBloc.physicalLocation,
+                                  errorWidget: (context, msg, _) => Container(),
+                                  imageBuilder: (context, imageProvider) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: Icon(
-                                        EvaIcons.pin,
-                                        size: 18,
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(
-                                    top: 5,
-                                  ),
+                                    );
+                                  },
+                                )
+                              : Container(
                                   decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.orange[800],
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(
-                                      5,
-                                    ),
-                                  ),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        FirebaseAuth.instance.signOut();
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 10,
-                                          right: 10,
-                                        ),
-                                        child: Text(
-                                          "Logout",
-                                          style: GoogleFonts.nunito(
-                                            color: Colors.orange[800],
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                        "assets/background/profile-alt.png",
                                       ),
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
-                              ],
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(
+                                150,
+                              ),
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => Provider(
+                                    create: (_) => LoginBloc(),
+                                    child: ProfileImageSourceDialoge(
+                                      email: userSnapshot.data.email,
+                                    ),
+                                    dispose: (context, LoginBloc bloc) =>
+                                        bloc.dispose(),
+                                  ),
+                                );
+                              },
                             ),
                           ),
-                        )
-                      ],
+                        ],
+                      ),
                     ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      userSnapshot.data.name.toUpperCase(),
+                      style: GoogleFonts.oswald(
+                        fontSize: 35,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    StreamBuilder<String>(
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError)
+                          return Text("Error: ${snapshot.error}");
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                            return Text("Awaiting bids....");
+                            break;
+                          case ConnectionState.waiting:
+                            return Center(
+                              child: LinearProgressIndicator(),
+                            );
+                            break;
+                          case ConnectionState.active:
+                            return Container(
+                              padding: EdgeInsets.only(
+                                right: 15,
+                                left: 12,
+                                top: 8,
+                                bottom: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange[300].withAlpha(
+                                  100,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  20,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    color: Colors.orange,
+                                  ),
+                                  Text(
+                                    snapshot.data,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                            break;
+                          case ConnectionState.done:
+                            return Text("The task has completed....");
+                            break;
+                        }
+                        return null;
+                      },
+                      stream: orderCartBloc.physicalLocation,
+                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     Container(
+                    //       child: Text(
+                    //         userSnapshot.data.email,
+                    //         style: GoogleFonts.montserrat(
+                    //           fontSize: 13,
+                    //           fontWeight: FontWeight.w500,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Container(
+                    //       width: 5,
+                    //     ),
+                    //     Container(
+                    //       child: Text(
+                    //         userSnapshot.data.phoneNumber.toString(),
+                    //         style: GoogleFonts.montserrat(
+                    //           fontSize: 13,
+                    //           fontWeight: FontWeight.w500,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+
+                    // Container(
+                    //   margin: EdgeInsets.only(
+                    //     top: 5,
+                    //   ),
+                    //   decoration: BoxDecoration(
+                    //     border: Border.all(
+                    //       color: Colors.orange[800],
+                    //       width: 2,
+                    //     ),
+                    //     borderRadius: BorderRadius.circular(
+                    //       5,
+                    //     ),
+                    //   ),
+                    //   child: Material(
+                    //     color: Colors.transparent,
+                    //     child: InkWell(
+                    //       onTap: () {
+                    //         FirebaseAuth.instance.signOut();
+                    //       },
+                    //       child: Padding(
+                    //         padding: const EdgeInsets.only(
+                    //           left: 10,
+                    //           right: 10,
+                    //         ),
+                    //         child: Text(
+                    //           "Logout",
+                    //           style: GoogleFonts.nunito(
+                    //             color: Colors.orange[800],
+                    //             fontWeight: FontWeight.w800,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     Container(
                       margin: EdgeInsets.only(
                         top: 10,
@@ -660,81 +702,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: Container(
-                        margin: EdgeInsets.only(
-                          top: 10,
-                          bottom: 10,
-                        ),
-                        child: Material(
-                          elevation: 5.0,
-                          borderRadius: BorderRadius.circular(
-                            5,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  "CLOSED ORDERS",
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.orange[800].withAlpha(100),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: StreamBuilder<List<OrderRef>>(
-                                    stream: orderCartBloc.closedRefrence,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasError)
-                                        return Text("Error: ${snapshot.error}");
-                                      switch (snapshot.connectionState) {
-                                        case ConnectionState.none:
-                                          return Text('Awaiting bids...');
-                                          break;
-                                        case ConnectionState.waiting:
-                                          return Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                          break;
-                                        case ConnectionState.active:
-                                          return snapshot.data.isEmpty
-                                              ? Center(
-                                                  child: Text(
-                                                    "No Order have been paid yet!",
-                                                    style: GoogleFonts.pacifico(
-                                                      fontSize: 25,
-                                                      color: Colors.orange[600],
-                                                    ),
-                                                  ),
-                                                )
-                                              : ListView(
-                                                  shrinkWrap: true,
-                                                  children: snapshot.data
-                                                      .map(
-                                                        (order) => OrderRefCard(
-                                                          orderRef: order,
-                                                        ),
-                                                      )
-                                                      .toList(),
-                                                );
-                                          break;
-                                        case ConnectionState.done:
-                                          return Text(
-                                              "The task has completed.");
-                                          break;
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
                   ],
                 );
                 break;
@@ -748,5 +715,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+}
+
+class ProfileClipper extends CustomClipper<Rect> {
+  @override
+  Rect getClip(Size size) {
+    return Rect.fromCircle(
+      center: Offset(size.height / 2, size.width / 2),
+      radius: 150,
+    );
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Rect> oldClipper) {
+    throw false;
   }
 }

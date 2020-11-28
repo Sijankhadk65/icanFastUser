@@ -55,6 +55,12 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
         ..add(serializers.serialize(object.vendor,
             specifiedType: const FullType(String)));
     }
+    if (object.vendorName != null) {
+      result
+        ..add('vendorName')
+        ..add(serializers.serialize(object.vendorName,
+            specifiedType: const FullType(String)));
+    }
     if (object.minOrder != null) {
       result
         ..add('minOrder')
@@ -67,6 +73,13 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
         ..add(serializers.serialize(object.items,
             specifiedType:
                 const FullType(BuiltList, const [const FullType(CartItem)])));
+    }
+    if (object.promoCodes != null) {
+      result
+        ..add('promoCodes')
+        ..add(serializers.serialize(object.promoCodes,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
     }
     return result;
   }
@@ -108,6 +121,10 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
           result.vendor = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
+        case 'vendorName':
+          result.vendorName = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
         case 'minOrder':
           result.minOrder = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
@@ -116,6 +133,12 @@ class _$OnlineOrderSerializer implements StructuredSerializer<OnlineOrder> {
           result.items.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
                       BuiltList, const [const FullType(CartItem)]))
+              as BuiltList<dynamic>);
+          break;
+        case 'promoCodes':
+          result.promoCodes.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(String)]))
               as BuiltList<dynamic>);
           break;
       }
@@ -139,9 +162,13 @@ class _$OnlineOrder extends OnlineOrder {
   @override
   final String vendor;
   @override
+  final String vendorName;
+  @override
   final int minOrder;
   @override
   final BuiltList<CartItem> items;
+  @override
+  final BuiltList<String> promoCodes;
 
   factory _$OnlineOrder([void Function(OnlineOrderBuilder) updates]) =>
       (new OnlineOrderBuilder()..update(updates)).build();
@@ -153,8 +180,10 @@ class _$OnlineOrder extends OnlineOrder {
       this.status,
       this.createdAt,
       this.vendor,
+      this.vendorName,
       this.minOrder,
-      this.items})
+      this.items,
+      this.promoCodes})
       : super._();
 
   @override
@@ -174,8 +203,10 @@ class _$OnlineOrder extends OnlineOrder {
         status == other.status &&
         createdAt == other.createdAt &&
         vendor == other.vendor &&
+        vendorName == other.vendorName &&
         minOrder == other.minOrder &&
-        items == other.items;
+        items == other.items &&
+        promoCodes == other.promoCodes;
   }
 
   @override
@@ -185,13 +216,19 @@ class _$OnlineOrder extends OnlineOrder {
             $jc(
                 $jc(
                     $jc(
-                        $jc($jc($jc(0, totalPrice.hashCode), refID.hashCode),
-                            cartLength.hashCode),
-                        status.hashCode),
-                    createdAt.hashCode),
-                vendor.hashCode),
-            minOrder.hashCode),
-        items.hashCode));
+                        $jc(
+                            $jc(
+                                $jc(
+                                    $jc($jc(0, totalPrice.hashCode),
+                                        refID.hashCode),
+                                    cartLength.hashCode),
+                                status.hashCode),
+                            createdAt.hashCode),
+                        vendor.hashCode),
+                    vendorName.hashCode),
+                minOrder.hashCode),
+            items.hashCode),
+        promoCodes.hashCode));
   }
 
   @override
@@ -203,8 +240,10 @@ class _$OnlineOrder extends OnlineOrder {
           ..add('status', status)
           ..add('createdAt', createdAt)
           ..add('vendor', vendor)
+          ..add('vendorName', vendorName)
           ..add('minOrder', minOrder)
-          ..add('items', items))
+          ..add('items', items)
+          ..add('promoCodes', promoCodes))
         .toString();
   }
 }
@@ -237,6 +276,10 @@ class OnlineOrderBuilder implements Builder<OnlineOrder, OnlineOrderBuilder> {
   String get vendor => _$this._vendor;
   set vendor(String vendor) => _$this._vendor = vendor;
 
+  String _vendorName;
+  String get vendorName => _$this._vendorName;
+  set vendorName(String vendorName) => _$this._vendorName = vendorName;
+
   int _minOrder;
   int get minOrder => _$this._minOrder;
   set minOrder(int minOrder) => _$this._minOrder = minOrder;
@@ -245,6 +288,12 @@ class OnlineOrderBuilder implements Builder<OnlineOrder, OnlineOrderBuilder> {
   ListBuilder<CartItem> get items =>
       _$this._items ??= new ListBuilder<CartItem>();
   set items(ListBuilder<CartItem> items) => _$this._items = items;
+
+  ListBuilder<String> _promoCodes;
+  ListBuilder<String> get promoCodes =>
+      _$this._promoCodes ??= new ListBuilder<String>();
+  set promoCodes(ListBuilder<String> promoCodes) =>
+      _$this._promoCodes = promoCodes;
 
   OnlineOrderBuilder();
 
@@ -256,8 +305,10 @@ class OnlineOrderBuilder implements Builder<OnlineOrder, OnlineOrderBuilder> {
       _status = _$v.status?.toBuilder();
       _createdAt = _$v.createdAt;
       _vendor = _$v.vendor;
+      _vendorName = _$v.vendorName;
       _minOrder = _$v.minOrder;
       _items = _$v.items?.toBuilder();
+      _promoCodes = _$v.promoCodes?.toBuilder();
       _$v = null;
     }
     return this;
@@ -288,8 +339,10 @@ class OnlineOrderBuilder implements Builder<OnlineOrder, OnlineOrderBuilder> {
               status: _status?.build(),
               createdAt: createdAt,
               vendor: vendor,
+              vendorName: vendorName,
               minOrder: minOrder,
-              items: _items?.build());
+              items: _items?.build(),
+              promoCodes: _promoCodes?.build());
     } catch (_) {
       String _$failedField;
       try {
@@ -298,6 +351,8 @@ class OnlineOrderBuilder implements Builder<OnlineOrder, OnlineOrderBuilder> {
 
         _$failedField = 'items';
         _items?.build();
+        _$failedField = 'promoCodes';
+        _promoCodes?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'OnlineOrder', _$failedField, e.toString());

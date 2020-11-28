@@ -58,7 +58,7 @@ class _OrderBottomSheetState extends State<OrderBottomSheet> {
                       tabBuilder: (context, index) => Column(
                         children: <Widget>[
                           Text(
-                            snapshot.data[index].vendor,
+                            snapshot.data[index].vendorName,
                           ),
                           Text(
                             "Subtotal: Rs.${snapshot.data[index].totalPrice}",

@@ -7,6 +7,7 @@ import 'package:fastuserapp/src/models/add_on.dart';
 import 'package:fastuserapp/src/models/carousel_item.dart';
 import 'package:fastuserapp/src/models/liquor.dart';
 import 'package:fastuserapp/src/models/offers_item.dart';
+import 'package:fastuserapp/src/models/promo_code.dart';
 import 'package:fastuserapp/src/models/varient.dart';
 import '../models/order_ref.dart';
 import '../models/rating.dart';
@@ -34,7 +35,8 @@ part 'serializer.g.dart';
     UserLocation,
     Liquor,
     AddOn,
-    Varient
+    Varient,
+    PromoCode,
   ],
 )
 final Serializers serializers = _$serializers;

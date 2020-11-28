@@ -3,6 +3,7 @@ import 'package:fastuserapp/src/bloc/cart_item_bloc.dart';
 import 'package:fastuserapp/src/bloc/cart_menu_bloc.dart';
 import 'package:fastuserapp/src/models/item.dart';
 import 'package:fastuserapp/src/widgets/add_to_cart_dialouge.dart';
+import 'package:fastuserapp/src/widgets/app_alert.dart';
 import 'package:fastuserapp/src/widgets/custom_tab_bar.dart';
 import 'package:fastuserapp/src/widgets/menu_item_displayer.dart';
 import 'package:flutter/foundation.dart';
@@ -18,11 +19,13 @@ import '../bloc/order_cart_bloc.dart';
 import 'package:provider/provider.dart';
 
 class VendorScreen extends StatefulWidget {
-  final String vendorName;
+  final String vendorName, vendorID;
   final List<String> categories;
   final Map<String, dynamic> user;
   final int minOrder;
   final double vendorRating;
+  final bool shouldSchedule, isNight;
+  final DateTime openingTime, closingTime;
 
   const VendorScreen(
       {Key key,
@@ -30,7 +33,12 @@ class VendorScreen extends StatefulWidget {
       @required this.categories,
       this.user,
       this.minOrder,
-      this.vendorRating})
+      this.vendorRating,
+      this.vendorID,
+      this.shouldSchedule = false,
+      this.openingTime,
+      this.closingTime,
+      this.isNight})
       : super(key: key);
   @override
   _VendorScreenState createState() => _VendorScreenState();
@@ -50,8 +58,8 @@ class _VendorScreenState extends State<VendorScreen>
   @override
   Widget build(BuildContext context) {
     orderCartBloc.getLocalOrder();
-    orderCartBloc.getCurrentOrder(widget.vendorName);
-    orderCartBloc.getCartLenth(widget.vendorName);
+    orderCartBloc.getCurrentOrder(widget.vendorID);
+    orderCartBloc.getCartLenth(widget.vendorID);
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -101,13 +109,22 @@ class _VendorScreenState extends State<VendorScreen>
       ),
       body: Column(
         children: [
+          widget.shouldSchedule
+              ? AppAlert(
+                  priority: "warning",
+                  message:
+                      "The vendor is closed at the moment but you can place an order for later.",
+                )
+              : Container(),
           Expanded(
             child: CustomTabView(
               itemCount: widget.categories.length,
               tabBuilder: (context, index) => Text(widget.categories[index]),
               pageBuilder: (context, index) => StreamBuilder<List<MenuItem>>(
                 stream: _cartMenuBloc.getMenu(
-                    widget.categories[index], widget.vendorName),
+                  widget.categories[index],
+                  widget.vendorID,
+                ),
                 builder: (context, snapshot) {
                   if (snapshot.hasError)
                     return Text("Error: ${snapshot.error}");
@@ -175,11 +192,18 @@ class _VendorScreenState extends State<VendorScreen>
                                                                 bloc) =>
                                                         bloc.dispose(),
                                                     child: AddToCartDialouge(
+                                                      openingTime:
+                                                          widget.openingTime,
+                                                      closingTime:
+                                                          widget.closingTime,
                                                       item: f,
                                                       user: widget.user,
                                                       vendorName:
                                                           widget.vendorName,
+                                                      vendorID: widget.vendorID,
                                                       minOrder: widget.minOrder,
+                                                      shouldSchedule:
+                                                          widget.shouldSchedule,
                                                     ),
                                                   ),
                                                 );
@@ -261,7 +285,7 @@ class _VendorScreenState extends State<VendorScreen>
                                     child: Column(
                                       children: <Widget>[
                                         Text(
-                                          orderSnapshot.data.vendor,
+                                          orderSnapshot.data.vendorName,
                                           style: GoogleFonts.montserrat(
                                             color: Colors.white,
                                             fontSize: 15,
@@ -272,7 +296,7 @@ class _VendorScreenState extends State<VendorScreen>
                                           child: Stack(
                                             alignment: Alignment.centerLeft,
                                             children: [
-                                              StreamBuilder<double>(
+                                              StreamBuilder<int>(
                                                   stream:
                                                       orderCartBloc.totalLength,
                                                   builder: (context, snapshot) {

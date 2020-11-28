@@ -244,8 +244,8 @@ class _AddLiquorToCartState extends State<AddLiquorToCart> {
                       : () {
                           orderCartBloc.addNewOrder(
                             context,
-                            "Liquor",
-                            parseToCartItem(
+                            vendor: "Liquor",
+                            newItem: parseToCartItem(
                               {
                                 "name": widget.item.name,
                                 "totalPrice": widget.item.price * itemQuantity,
@@ -254,8 +254,9 @@ class _AddLiquorToCartState extends State<AddLiquorToCart> {
                                 "note": _note,
                               },
                             ),
-                            widget.user,
-                            300,
+                            vendorID: "",
+                            user: widget.user,
+                            minOrder: 300,
                           );
                           Navigator.pop(context);
                         },

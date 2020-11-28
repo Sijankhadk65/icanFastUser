@@ -13,10 +13,12 @@ import 'package:rxdart/rxdart.dart';
 
 class OrderCartBloc {
   List<Map<String, dynamic>> _localOrders = [];
-  double _totalPrice = 0;
-  double _totalLength = 0;
-  double _cartsTotal = 0;
+  int _totalPrice = 0;
+  int _totalLength = 0;
+  int _cartsTotal = 0;
   String _refID = "";
+  String _scheduledTime = "";
+  List<String> _promoCodesUsed = [];
   // String _physicaLocation = "";
 
   final _repository = Repository();
@@ -55,13 +57,13 @@ class OrderCartBloc {
   Stream<List<CartItem>> get cartItems => _cartItemsSubject.stream;
   Function(List<CartItem>) get changeCartItems => _cartItemsSubject.sink.add;
 
-  final BehaviorSubject<double> _totalPriceSubject = BehaviorSubject<double>();
-  Stream<double> get totalPrice => _totalPriceSubject.stream;
-  Function(double) get changeTotalPrice => _totalPriceSubject.sink.add;
+  final BehaviorSubject<int> _totalPriceSubject = BehaviorSubject<int>();
+  Stream<int> get totalPrice => _totalPriceSubject.stream;
+  Function(int) get changeTotalPrice => _totalPriceSubject.sink.add;
 
-  final BehaviorSubject<double> _totalLengthSubject = BehaviorSubject<double>();
-  Stream<double> get totalLength => _totalLengthSubject.stream;
-  Function(double) get changeTotalLenght => _totalLengthSubject.sink.add;
+  final BehaviorSubject<int> _totalLengthSubject = BehaviorSubject<int>();
+  Stream<int> get totalLength => _totalLengthSubject.stream;
+  Function(int) get changeTotalLenght => _totalLengthSubject.sink.add;
 
   final BehaviorSubject<double> _cartsTotalSubject = BehaviorSubject<double>();
   Stream<double> get cartsTotal => _cartsTotalSubject.stream;
@@ -128,15 +130,23 @@ class OrderCartBloc {
 
   final BehaviorSubject<String> _promoCodeSubject = BehaviorSubject<String>();
   Stream<String> get promoCode => _promoCodeSubject.stream.transform(
-          StreamTransformer.fromHandlers(handleData: (String promoCode, sink) {
-        if (promoCode.isNotEmpty) {
-          sink.add(promoCode);
-        } else {
-          sink.addError("Add a vlaid Code");
-        }
-      }));
+        StreamTransformer.fromHandlers(
+          handleData: (String promoCode, sink) {
+            if (promoCode.isNotEmpty) {
+              sink.add(promoCode);
+            } else {
+              sink.addError("Add a vlaid Code");
+            }
+          },
+        ),
+      );
   Function(String) get changePromoCode => _promoCodeSubject.sink.add;
-
+  final BehaviorSubject<Map<String, dynamic>> _promoCodeMessageSubject =
+      BehaviorSubject<Map<String, dynamic>>();
+  Stream<Map<String, dynamic>> get promoCodeMessage =>
+      _promoCodeMessageSubject.stream;
+  Function(Map<String, dynamic>) get changePromoCodesMessage =>
+      _promoCodeMessageSubject.sink.add;
   final BehaviorSubject<bool> _promoCodeIsUsedSubject = BehaviorSubject<bool>();
   Stream<bool> get promoCodeIsUsed => _promoCodeIsUsedSubject.stream;
   Function(bool) get changePromoUsedStateUsed =>
@@ -182,18 +192,13 @@ class OrderCartBloc {
     changeSchedulingStatus(false);
   }
 
-  getOrderRefs(Map<String, dynamic> user) {
-    _repository.getOrderRefs(user).listen(
-      (orderRefs) {
-        changeOrderRefrence(orderRefs);
-      },
-    );
-  }
-
-  getClosedOrderRefs(Map<String, dynamic> user) {
-    _repository.getClosedOrderRefs(user).listen((closedRef) {
-      changeClosedRefrences(closedRef);
-    });
+  Stream<List<OrderRef>> getOrderRefs(Map<String, dynamic> user, String type) {
+    print("The Type is $type");
+    if (type == "open") {
+      return _repository.getOrderRefs(user);
+    } else {
+      return _repository.getClosedOrderRefs(user);
+    }
   }
 
   Future<void> deleteOrderRef(String refID) =>
@@ -205,59 +210,210 @@ class OrderCartBloc {
     });
   }
 
-  void addNewOrder(BuildContext context, String vendor, CartItem newItem,
-      Map<String, dynamic> user, int minOrder) {
+  void addNewOrder(BuildContext context,
+      {String vendor,
+      CartItem newItem,
+      String vendorID,
+      Map<String, dynamic> user,
+      bool shouldSchedule,
+      bool isNight,
+      DateTime openingTime,
+      DateTime closingTime,
+      int minOrder}) {
+    if (shouldSchedule == true) {
+      var orderScheduleTime = "";
+      if (_scheduledTime != "") {
+        if (openingTime.hour > DateTime.parse(_scheduledTime).hour) {
+          if (DateTime.now().hour < 12) {
+            orderScheduleTime = getOrderScheduleTime(
+              openingTime: openingTime,
+              increaseDay: 0,
+              increaseHour: 1,
+            ).toIso8601String();
+          } else {
+            orderScheduleTime = getOrderScheduleTime(
+              openingTime: openingTime,
+              increaseDay: 1,
+              increaseHour: 1,
+            ).toIso8601String();
+          }
+        }
+      } else {
+        if (DateTime.now().hour < 12) {
+          orderScheduleTime = getOrderScheduleTime(
+            openingTime: openingTime,
+            increaseDay: 0,
+            increaseHour: 1,
+          ).toIso8601String();
+        } else {
+          orderScheduleTime = getOrderScheduleTime(
+            openingTime: openingTime,
+            increaseDay: 1,
+            increaseHour: 1,
+          ).toIso8601String();
+        }
+      }
+      changeScheduledTime(orderScheduleTime);
+      changeSchedulingStatus(true);
+      print("The Scheduled Time:${_scheduledTimeSubject.value}");
+    }
     if (_checkedOutSubject.value == true) {
       changeCheckoutStatus(false);
     }
     if (_promoCodeIsUsedSubject.value == true) {
       changeCheckoutStatus(false);
     }
-    if (!_localOrders
-        .map((e) => e['vendor'].toLowerCase())
-        .toList()
-        .contains(vendor.toLowerCase())) {
+    if (!_localOrders.map((e) => e['vendor']).toList().contains(
+          vendorID,
+        )) {
       _localOrders.add(
         {
-          "vendor": vendor,
+          "vendor": vendorID,
+          "vendorName": vendor,
           "items": [],
           "totalPrice": 0,
           "createdAt": DateTime.now().toIso8601String(),
           "status": [],
           "cartLength": 0,
           "minOrder": minOrder,
+          "promoCodes": []
         },
       );
-      addItemsToCart(vendor, newItem);
+      addItemsToCart(vendor: vendorID, newItem: newItem);
       changeLocalOrders(
           _localOrders.map((order) => parseJsonToOnlineOrder(order)).toList());
     } else {
-      addItemsToCart(vendor, newItem);
+      addItemsToCart(vendor: vendorID, newItem: newItem);
       changeLocalOrders(
           _localOrders.map((order) => parseJsonToOnlineOrder(order)).toList());
     }
     getCartsTotal();
+    print(_localOrders);
+  }
+
+  DateTime getOrderScheduleTime(
+      {DateTime openingTime, int increaseDay = 0, int increaseHour = 0}) {
+    return DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day + increaseDay,
+      openingTime.hour + increaseHour,
+      0,
+      0,
+      0,
+      0,
+    );
   }
 
   applyPromoCode(String email) {
+    double _cartsTotal = 0;
     _repository.getUser(email).listen(
       (user) {
         if (user.promoCodes.contains(_promoCodeSubject.value)) {
-          changePromoUsedStateUsed(true);
+          changePromoCodesMessage(
+            {
+              "priority": "error",
+              "message": "You've already used this code.",
+            },
+          );
         } else {
           _repository.getPromoCode(_promoCodeSubject.value).listen(
-            (disRate) async {
-              _cartsTotal = _localOrders
-                  .map((order) => order['totalPrice'])
-                  .toList()
-                  .fold(0, (previousValue, element) => previousValue + element);
-              changeCartsTotal(_cartsTotal - (_cartsTotal * (disRate / 100)));
-              await _repository.addPromoCode(
-                email,
-                _promoCodeSubject.value,
-                user.promoCodes.toList(),
-              );
-              changePromoUsedStateUsed(true);
+            (promoCode) async {
+              if (promoCode.vendors.isEmpty) {
+                _cartsTotal = _localOrders
+                    .map((order) => order['totalPrice'])
+                    .toList()
+                    .fold(
+                      0,
+                      (
+                        previousValue,
+                        element,
+                      ) =>
+                          previousValue + element,
+                    );
+
+                _localOrders.forEach(
+                  (order) {
+                    order['promoCodes'] = [
+                      ...order['promoCodes'],
+                      _promoCodeSubject.value,
+                    ];
+                  },
+                );
+                _cartsTotal -= _cartsTotal * (promoCode.rate / 100);
+                changeCartsTotal(
+                  _cartsTotal,
+                );
+                changeLocalOrders(
+                  _localOrders
+                      .map((order) => parseJsonToOnlineOrder(order))
+                      .toList(),
+                );
+                await _repository.addPromoCode(
+                  email,
+                  _promoCodeSubject.value,
+                  user.promoCodes.toList(),
+                );
+                changePromoCodesMessage({
+                  "priority": "success",
+                  "message": "This was succefully used.",
+                });
+                changePromoUsedStateUsed(true);
+              } else {
+                if (elementChecker(
+                    _localOrders.map((order) => order['vendor']).toList(),
+                    promoCode.vendors.toList())) {
+                  promoCode.vendors.forEach(
+                    (vendor) {
+                      _localOrders.forEach(
+                        (order) {
+                          if (order['vendor'] == vendor) {
+                            order['promoCodes'] = [
+                              ...order['promoCodes'],
+                              _promoCodeSubject.value,
+                            ];
+                            order['totalPrice'] -=
+                                order['totalPrice'] * (promoCode.rate / 100);
+                          }
+                        },
+                      );
+                    },
+                  );
+                  _cartsTotal = _localOrders
+                      .map((order) => order['totalPrice'])
+                      .toList()
+                      .fold(
+                        0,
+                        (previousValue, element) => previousValue + element,
+                      );
+                  changeLocalOrders(
+                    _localOrders
+                        .map((order) => parseJsonToOnlineOrder(order))
+                        .toList(),
+                  );
+                  changeCartsTotal(
+                    _cartsTotal,
+                  );
+                  await _repository.addPromoCode(
+                    email,
+                    _promoCodeSubject.value,
+                    user.promoCodes.toList(),
+                  );
+                  changePromoCodesMessage({
+                    "priority": "success",
+                    "message": "This was succefully used.",
+                  });
+                  changePromoUsedStateUsed(true);
+                } else {
+                  changePromoCodesMessage(
+                    {
+                      "priority": "warning",
+                      "message":
+                          "This code is not valid for this set of vendors.",
+                    },
+                  );
+                }
+              }
             },
           );
         }
@@ -265,7 +421,10 @@ class OrderCartBloc {
     );
   }
 
-  void addItemsToCart(String vendor, CartItem newItem) {
+  bool elementChecker(List source, List target) =>
+      target.every((v) => source.contains(v));
+
+  void addItemsToCart({String vendor, CartItem newItem}) {
     _localOrders.forEach(
       (localOrder) {
         if (localOrder['vendor'] == vendor) {
@@ -311,12 +470,12 @@ class OrderCartBloc {
             localOrder['totalPrice'] += newItem.totalPrice;
             localOrder['cartLength'] += newItem.quantity;
           }
-          getTotalPrice(vendor);
-          getCartLenth(vendor);
-          getCurrentOrder(vendor);
         }
       },
     );
+    getTotalPrice(vendor);
+    getCartLenth(vendor);
+    getCurrentOrder(vendor);
   }
 
   void removeItemFromCart(String vendor, CartItem newItem) {
@@ -359,24 +518,26 @@ class OrderCartBloc {
   }
 
   void increaseItemCount(String vendor, CartItem newItem) {
-    _localOrders.forEach((localOrder) {
-      if (localOrder['vendor'] == vendor) {
-        localOrder['items'].forEach((item) {
-          if (item['name'] == newItem.name) {
-            item['quantity'] += 1;
-            localOrder['totalPrice'] -= item['totalPrice'];
-            item['totalPrice'] = item['quantity'] * item['price'];
-            localOrder['totalPrice'] += item['totalPrice'];
-            localOrder['cartLength'] += 1;
-          }
-        });
-        getTotalPrice(vendor);
-        getCartLenth(vendor);
-        getCurrentOrder(vendor);
-        getLocalOrder();
-        getCartsTotal();
-      }
-    });
+    _localOrders.forEach(
+      (localOrder) {
+        if (localOrder['vendor'] == vendor) {
+          localOrder['items'].forEach((item) {
+            if (item['name'] == newItem.name) {
+              item['quantity'] += 1;
+              localOrder['totalPrice'] -= item['totalPrice'];
+              item['totalPrice'] = item['quantity'] * item['price'];
+              localOrder['totalPrice'] += item['totalPrice'];
+              localOrder['cartLength'] += 1;
+            }
+          });
+          getTotalPrice(vendor);
+          getCartLenth(vendor);
+          getCurrentOrder(vendor);
+          getLocalOrder();
+          getCartsTotal();
+        }
+      },
+    );
   }
 
   void decreaseItemCount(String vendor, CartItem newItem) {
@@ -401,11 +562,13 @@ class OrderCartBloc {
   }
 
   getTotalPrice(String vendor) {
-    _localOrders.forEach((order) {
-      if (order['vendor'] == vendor) {
-        _totalPrice = order['totalPrice'];
-      }
-    });
+    _localOrders.forEach(
+      (order) {
+        if (order['vendor'] == vendor) {
+          _totalPrice = order['totalPrice'];
+        }
+      },
+    );
     changeTotalPrice(_totalPrice);
   }
 
@@ -414,7 +577,9 @@ class OrderCartBloc {
         .map((order) => order['totalPrice'])
         .toList()
         .fold(0, (previousValue, element) => previousValue + element);
-    changeCartsTotal(_cartsTotal.toDouble());
+    changeCartsTotal(
+      _cartsTotal.toDouble(),
+    );
   }
 
   getCartLenth(String vendor) {
@@ -433,6 +598,7 @@ class OrderCartBloc {
       (order) {
         if (order['vendor'] == vendor) {
           changeCurrentOrder(parseJsonToOnlineOrder(order));
+          print("Current Order:${order.toString()}");
         }
       },
     );
@@ -467,6 +633,7 @@ class OrderCartBloc {
         "createdAt": DateTime.now().toIso8601String(),
         "totalCost": _cartsTotalSubject.value + _deliveryChargeSubject.value,
         "deliveryCharge": _deliveryChargeSubject.value,
+        "isPromoCodeUsed": _promoCodeIsUsedSubject.value ?? false,
       },
     ).whenComplete(
       () {
@@ -527,11 +694,14 @@ class OrderCartBloc {
             farthestLocation = distance;
           }
           if (farthestLocation > 5000.0) {
-            _repository.getDistanceRates().listen((rates) {
-              addableAmount += (farthestLocation - 5000) * (rates.first / 1000);
+            _repository.getDistanceRates().listen(
+              (rates) {
+                addableAmount +=
+                    (farthestLocation - 5000) * (rates.first / 1000);
 
-              changeDeliveryCharge(addableAmount);
-            });
+                changeDeliveryCharge(addableAmount);
+              },
+            );
           } else {
             changeDeliveryCharge(
               addableAmount,
@@ -624,6 +794,11 @@ class OrderCartBloc {
       changePhysicalLocation(addressLine);
     }
   }
+
+  // // For DataBase usage
+  // openDB() => _repository.openDB();
+
+  // closeDB() => _repository.closeDB();
 }
 
 OrderCartBloc orderCartBloc = OrderCartBloc();

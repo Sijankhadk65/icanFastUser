@@ -28,19 +28,19 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
       result
         ..add('price')
         ..add(serializers.serialize(object.price,
-            specifiedType: const FullType(double)));
+            specifiedType: const FullType(int)));
     }
     if (object.totalPrice != null) {
       result
         ..add('totalPrice')
         ..add(serializers.serialize(object.totalPrice,
-            specifiedType: const FullType(double)));
+            specifiedType: const FullType(int)));
     }
     if (object.quantity != null) {
       result
         ..add('quantity')
         ..add(serializers.serialize(object.quantity,
-            specifiedType: const FullType(double)));
+            specifiedType: const FullType(int)));
     }
     if (object.photoURI != null) {
       result
@@ -68,15 +68,15 @@ class _$CartItemSerializer implements StructuredSerializer<CartItem> {
           break;
         case 'price':
           result.price = serializers.deserialize(value,
-              specifiedType: const FullType(double)) as double;
+              specifiedType: const FullType(int)) as int;
           break;
         case 'totalPrice':
           result.totalPrice = serializers.deserialize(value,
-              specifiedType: const FullType(double)) as double;
+              specifiedType: const FullType(int)) as int;
           break;
         case 'quantity':
           result.quantity = serializers.deserialize(value,
-              specifiedType: const FullType(double)) as double;
+              specifiedType: const FullType(int)) as int;
           break;
         case 'photoURI':
           result.photoURI = serializers.deserialize(value,
@@ -93,11 +93,11 @@ class _$CartItem extends CartItem {
   @override
   final String name;
   @override
-  final double price;
+  final int price;
   @override
-  final double totalPrice;
+  final int totalPrice;
   @override
-  final double quantity;
+  final int quantity;
   @override
   final String photoURI;
 
@@ -155,17 +155,17 @@ class CartItemBuilder implements Builder<CartItem, CartItemBuilder> {
   String get name => _$this._name;
   set name(String name) => _$this._name = name;
 
-  double _price;
-  double get price => _$this._price;
-  set price(double price) => _$this._price = price;
+  int _price;
+  int get price => _$this._price;
+  set price(int price) => _$this._price = price;
 
-  double _totalPrice;
-  double get totalPrice => _$this._totalPrice;
-  set totalPrice(double totalPrice) => _$this._totalPrice = totalPrice;
+  int _totalPrice;
+  int get totalPrice => _$this._totalPrice;
+  set totalPrice(int totalPrice) => _$this._totalPrice = totalPrice;
 
-  double _quantity;
-  double get quantity => _$this._quantity;
-  set quantity(double quantity) => _$this._quantity = quantity;
+  int _quantity;
+  int get quantity => _$this._quantity;
+  set quantity(int quantity) => _$this._quantity = quantity;
 
   String _photoURI;
   String get photoURI => _$this._photoURI;

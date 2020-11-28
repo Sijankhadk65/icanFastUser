@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:fastuserapp/src/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 import '../resources/repository.dart';
 
@@ -121,7 +123,7 @@ class LoginBloc {
     );
   }
 
-  Future<void> saveUser(FirebaseUser user) async {
+  Future<void> saveUser(User user) async {
     var token = await FirebaseMessaging().getToken();
     return _repo.addUser(
       {
@@ -130,9 +132,8 @@ class LoginBloc {
         "UID": user.uid,
         "promoCodes": [],
         "phoneNumber": int.parse(_phoneNumber),
-        "photoURI": user.photoUrl,
+        "photoURI": user.photoURL,
         "type": "client",
-        "isVerified": false,
         "home": _homeLocationSubject.value != null
             ? {
                 "lat": _homeLocationSubject.value['lat'],
@@ -182,6 +183,22 @@ class LoginBloc {
         office: office,
         email: email,
       );
+
+  Future<void> profileImageUpdater(String email, String type) async {
+    final _picker = ImagePicker();
+    final _galleryImage = await _picker.getImage(
+      source: type == "gallery" ? ImageSource.gallery : ImageSource.camera,
+    );
+    // changeImagePath(_galleryImage.path);
+    final _imageTask = await _repo.savePhoto(
+        File(_galleryImage.path), basename(File(_galleryImage.path).path));
+    if (_imageTask.error != null) return;
+    final downloadString = await _imageTask.ref.getDownloadURL();
+    _repo.updateProfilePicture(
+      email,
+      downloadString,
+    );
+  }
 
   void dispose() {
     _nameSubject.close();

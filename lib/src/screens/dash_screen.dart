@@ -190,51 +190,56 @@ class _DashScreenState extends State<DashScreen> {
                                 borderRadius: BorderRadius.circular(
                                   5,
                                 ),
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => Provider(
-                                      create: (_) => CartItemBloc(),
-                                      child: StreamBuilder<MenuItem>(
-                                        stream: _cartMenuBloc.getMenuItem(
-                                            snapshot.data[index].itemCode),
-                                        builder: (context, itemSnapshot) {
-                                          if (itemSnapshot.hasError)
-                                            return Text(
-                                                "Error:${itemSnapshot.error}");
-                                          switch (
-                                              itemSnapshot.connectionState) {
-                                            case ConnectionState.none:
-                                              return Text("awaiting bids....");
-                                              break;
-                                            case ConnectionState.waiting:
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              );
-                                              break;
-                                            case ConnectionState.active:
-                                              return AddToCartDialouge(
-                                                item: itemSnapshot.data,
-                                                minOrder: snapshot
-                                                    .data[index].minOrder,
-                                                vendorName: snapshot
-                                                    .data[index].vendorName,
-                                                user: widget.user,
-                                              );
-                                              break;
-                                            case ConnectionState.done:
-                                              return Text(
-                                                "The task has completed",
-                                              );
-                                              break;
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
+                                onTap: snapshot.data[index].isInteractive
+                                    ? () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => Provider(
+                                            create: (_) => CartItemBloc(),
+                                            child: StreamBuilder<MenuItem>(
+                                              stream: _cartMenuBloc.getMenuItem(
+                                                  snapshot
+                                                      .data[index].itemCode),
+                                              builder: (context, itemSnapshot) {
+                                                if (itemSnapshot.hasError)
+                                                  return Text(
+                                                      "Error:${itemSnapshot.error}");
+                                                switch (itemSnapshot
+                                                    .connectionState) {
+                                                  case ConnectionState.none:
+                                                    return Text(
+                                                        "awaiting bids....");
+                                                    break;
+                                                  case ConnectionState.waiting:
+                                                    return Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    );
+                                                    break;
+                                                  case ConnectionState.active:
+                                                    return AddToCartDialouge(
+                                                      item: itemSnapshot.data,
+                                                      minOrder: snapshot
+                                                          .data[index].minOrder,
+                                                      vendorName: snapshot
+                                                          .data[index]
+                                                          .vendorName,
+                                                      user: widget.user,
+                                                    );
+                                                    break;
+                                                  case ConnectionState.done:
+                                                    return Text(
+                                                      "The task has completed",
+                                                    );
+                                                    break;
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    : () {},
                               ),
                             ),
                           ),
@@ -485,7 +490,8 @@ class _DashScreenState extends State<DashScreen> {
                           ),
                           StreamBuilder<List<MenuItem>>(
                             stream: _dashBloc.getFeaturedMenuItems(
-                                featuredVendorSnapshot.data.name),
+                              featuredVendorSnapshot.data.id,
+                            ),
                             builder: (context, snapshot) {
                               if (snapshot.hasError)
                                 return Text("Error: ${snapshot.error}");

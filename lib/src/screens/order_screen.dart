@@ -1,3 +1,4 @@
+import 'package:fastuserapp/src/widgets/custom_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,33 +15,38 @@ class OrderScreen extends StatefulWidget {
   _OrderScreenState createState() => _OrderScreenState();
 }
 
-class _OrderScreenState extends State<OrderScreen> {
+class _OrderScreenState extends State<OrderScreen>
+    with SingleTickerProviderStateMixin {
+  TabController _tabController;
+
+  final _screenOptions = [
+    "Open",
+    "Close",
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    orderCartBloc.getOrderRefs(widget.user);
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(
-              left: 10,
-              right: 10,
-            ),
-            child: Text(
-              "PENDING ORDERS",
-              style: GoogleFonts.montserrat(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: Colors.orange[800].withAlpha(
-                  100,
-                ),
+      body: CustomTabView(
+          itemCount: 2,
+          tabBuilder: (context, index) => Text(
+                _screenOptions[index],
               ),
-            ),
-          ),
-          Expanded(
-            child: StreamBuilder<List<OrderRef>>(
-              stream: orderCartBloc.orderRefrence,
+          pageBuilder: (context, index) {
+            return StreamBuilder<List<OrderRef>>(
+              stream: orderCartBloc.getOrderRefs(
+                widget.user,
+                index == 0 ? "open" : "close",
+              ),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
@@ -65,34 +71,30 @@ class _OrderScreenState extends State<OrderScreen> {
                         : ListView(
                             shrinkWrap: true,
                             children: snapshot.data
-                                .map(
-                                  (order) => order.status.isNotEmpty
-                                      ? OrderRefCard(
+                                .map((order) => OrderRefCard(
                                           orderRef: order,
                                         )
-                                      : Slidable(
-                                          actionPane:
-                                              SlidableStrechActionPane(),
-                                          actionExtentRatio: 0.25,
-                                          child: Container(
-                                            color: Colors.white,
-                                            child: OrderRefCard(
-                                              orderRef: order,
-                                            ),
-                                          ),
-                                          secondaryActions: <Widget>[
-                                            IconSlideAction(
-                                              caption: 'Delete',
-                                              color: Colors.red,
-                                              icon: Icons.delete,
-                                              onTap: () {
-                                                orderCartBloc.deleteOrderRef(
-                                                    order.refID);
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                )
+                                    // :
+                                    // Slidable(
+                                    //     actionPane: SlidableStrechActionPane(),
+                                    //     actionExtentRatio: 0.25,
+                                    //     child: Container(
+                                    //       color: Colors.white,
+                                    //       child:
+                                    //     ),
+                                    //     secondaryActions: <Widget>[
+                                    //       IconSlideAction(
+                                    //         caption: 'Delete',
+                                    //         color: Colors.red,
+                                    //         icon: Icons.delete,
+                                    //         onTap: () {
+                                    //           orderCartBloc
+                                    //               .deleteOrderRef(order.refID);
+                                    //         },
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    )
                                 .toList(),
                           );
                     break;
@@ -102,10 +104,8 @@ class _OrderScreenState extends State<OrderScreen> {
                 }
                 return null;
               },
-            ),
-          ),
-        ],
-      ),
+            );
+          }),
     );
   }
 }

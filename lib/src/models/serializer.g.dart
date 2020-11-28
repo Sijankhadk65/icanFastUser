@@ -16,6 +16,7 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(OffersItem.serializer)
       ..add(OnlineOrder.serializer)
       ..add(OrderRef.serializer)
+      ..add(PromoCode.serializer)
       ..add(Rating.serializer)
       ..add(UserLocation.serializer)
       ..add(Varient.serializer)
@@ -33,8 +34,14 @@ Serializers _$serializers = (new Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(String)]),
           () => new ListBuilder<String>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => new ListBuilder<String>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(CartItem)]),
           () => new ListBuilder<CartItem>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => new ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => new ListBuilder<String>())

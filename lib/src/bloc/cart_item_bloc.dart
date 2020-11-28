@@ -12,23 +12,18 @@ class CartItemBloc {
   Function(Varient) get changeCurrentSelectedVarient =>
       _currentSelectedVarientSubject.sink.add;
 
-  final BehaviorSubject<double> _currentUnitPriceSubject =
-      BehaviorSubject<double>();
-  Stream<double> get currentUnitPrice => _currentUnitPriceSubject.stream;
-  Function(double) get changeCurrentUnitPrice =>
-      _currentUnitPriceSubject.sink.add;
+  final BehaviorSubject<int> _currentUnitPriceSubject = BehaviorSubject<int>();
+  Stream<int> get currentUnitPrice => _currentUnitPriceSubject.stream;
+  Function(int) get changeCurrentUnitPrice => _currentUnitPriceSubject.sink.add;
 
-  final BehaviorSubject<double> _currentTotalPriceSubject =
-      BehaviorSubject<double>();
-  Stream<double> get currentTotalPrice => _currentTotalPriceSubject.stream;
-  Function(double) get changeCurrentTotalPrice =>
+  final BehaviorSubject<int> _currentTotalPriceSubject = BehaviorSubject<int>();
+  Stream<int> get currentTotalPrice => _currentTotalPriceSubject.stream;
+  Function(int) get changeCurrentTotalPrice =>
       _currentTotalPriceSubject.sink.add;
 
-  final BehaviorSubject<double> _currentItemCountSubject =
-      BehaviorSubject<double>();
-  Stream<double> get currentItemCount => _currentItemCountSubject.stream;
-  Function(double) get changeCurrentItemCount =>
-      _currentItemCountSubject.sink.add;
+  final BehaviorSubject<int> _currentItemCountSubject = BehaviorSubject<int>();
+  Stream<int> get currentItemCount => _currentItemCountSubject.stream;
+  Function(int) get changeCurrentItemCount => _currentItemCountSubject.sink.add;
 
   final BehaviorSubject<List<AddOn>> _currentSelectedAddonsSubject =
       BehaviorSubject<List<AddOn>>();
@@ -44,14 +39,12 @@ class CartItemBloc {
 
   manageAddOn(AddOn addOn) {
     if (_currentSelectedAddonsSubject.value.contains(addOn)) {
-      changeCurrentUnitPrice(
-          _currentUnitPriceSubject.value - addOn.price.toDouble());
+      changeCurrentUnitPrice(_currentUnitPriceSubject.value - addOn.price);
       changeTotalPrice();
       _selectedAddOns.remove(addOn);
       changeCurrentSelectedAddons(_selectedAddOns);
     } else {
-      changeCurrentUnitPrice(
-          _currentUnitPriceSubject.value + addOn.price.toDouble());
+      changeCurrentUnitPrice(_currentUnitPriceSubject.value + addOn.price);
       changeTotalPrice();
       _selectedAddOns.add(addOn);
       changeCurrentSelectedAddons(_selectedAddOns);

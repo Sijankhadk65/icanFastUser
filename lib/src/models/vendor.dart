@@ -35,7 +35,11 @@ abstract class Vendor implements Built<Vendor, VendorBuilder> {
   @nullable
   bool get isFeatured;
   @nullable
+  bool get isNight;
+  @nullable
   String get logoURL;
+  @nullable
+  String get id;
 
   factory Vendor([void Function(VendorBuilder) updates]) = _$Vendor;
   Vendor._();

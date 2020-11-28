@@ -189,7 +189,7 @@ class _LiquorScreenState extends State<LiquorScreen> {
                                             child: Stack(
                                               alignment: Alignment.centerLeft,
                                               children: [
-                                                StreamBuilder<double>(
+                                                StreamBuilder<int>(
                                                     stream: orderCartBloc
                                                         .totalLength,
                                                     builder:

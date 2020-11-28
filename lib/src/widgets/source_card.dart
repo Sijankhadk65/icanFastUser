@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,8 @@ import '../bloc/cart_menu_bloc.dart';
 import '../models/vendor.dart';
 import '../screens/vendor_screen.dart';
 import 'package:provider/provider.dart';
+
+import 'card_alert.dart';
 
 class SourceCard extends StatefulWidget {
   final Vendor vendor;
@@ -26,6 +30,39 @@ class SourceCard extends StatefulWidget {
 
 class _SourceCardState extends State<SourceCard> {
   bool hasError = false;
+  DateTime _openingTime, _closingTime, _currentTime;
+  String _currentTimeStatus = "AM",
+      _openingTimeStatus = "AM",
+      _closingTimeStatus = "PM";
+  @override
+  void initState() {
+    _openingTime = DateTime.parse(widget.vendor.openTime);
+    _closingTime = DateTime.parse(widget.vendor.closeTime);
+    _currentTime = DateTime.now();
+    if (_currentTime.hour > 12) {
+      this.setState(
+        () {
+          _currentTimeStatus = "PM";
+        },
+      );
+    }
+    if (_openingTime.hour > 12) {
+      this.setState(
+        () {
+          _openingTimeStatus = "PM";
+        },
+      );
+    }
+    if (_closingTime.hour < 12) {
+      this.setState(
+        () {
+          _closingTimeStatus = "AM";
+        },
+      );
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,11 +82,36 @@ class _SourceCardState extends State<SourceCard> {
                         create: (_) => CartMenuBloc(),
                         dispose: (context, CartMenuBloc bloc) => bloc.dispose(),
                         child: VendorScreen(
+                          openingTime: _openingTime,
+                          closingTime: _closingTime,
+                          isNight: widget.vendor.isNight,
                           vendorRating: widget.vendor.averageRating,
+                          vendorID: widget.vendor.id,
                           vendorName: widget.vendor.name,
                           categories: widget.vendor.categories.toList(),
                           user: widget.user,
                           minOrder: widget.vendor.minOrder,
+                          shouldSchedule: widget.vendor.isNight
+                              ? _closingTimeStatus == "AM"
+                                  ? _currentTimeStatus == "AM"
+                                      ? (DateTime.now().hour <
+                                              _closingTime.hour)
+                                          ? false
+                                          : true
+                                      : (DateTime.now().hour <
+                                              (_closingTime.hour + 23))
+                                          ? false
+                                          : true
+                                  : (DateTime.now().hour >=
+                                              _openingTime.hour) &&
+                                          (DateTime.now().hour <
+                                              _closingTime.hour)
+                                      ? false
+                                      : true
+                              : (DateTime.now().hour >= _openingTime.hour) &&
+                                      (DateTime.now().hour < _closingTime.hour)
+                                  ? false
+                                  : true,
                         ),
                       ),
                     ),
@@ -86,8 +148,9 @@ class _SourceCardState extends State<SourceCard> {
                   );
                   return Container(
                     decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(5)),
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
                     child: Center(
                       child: Text(
                         error.toString(),
@@ -101,8 +164,8 @@ class _SourceCardState extends State<SourceCard> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
                         gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
                             Colors.black26,
@@ -118,6 +181,53 @@ class _SourceCardState extends State<SourceCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    widget.vendor.isNight
+                        ? _closingTimeStatus == "AM"
+                            ? _currentTimeStatus == "AM"
+                                ? (DateTime.now().hour < _closingTime.hour)
+                                    ? Container()
+                                    : CartAlerts(
+                                        message:
+                                            "The vendor has closed but you can preorder.",
+                                        indicator: Colors.yellow[500],
+                                      )
+                                : (DateTime.now().hour <
+                                        (_closingTime.hour + 23))
+                                    ? Container()
+                                    : CartAlerts(
+                                        message:
+                                            "The vendor has closed but you can preorder.",
+                                        indicator: Colors.yellow[500],
+                                      )
+                            : (DateTime.now().hour >= _openingTime.hour) &&
+                                    (DateTime.now().hour < _closingTime.hour)
+                                ? Container()
+                                : CartAlerts(
+                                    message:
+                                        "The vendor has closed but you can preorder.",
+                                    indicator: Colors.yellow[500],
+                                  )
+                        : (DateTime.now().hour >= _openingTime.hour) &&
+                                (DateTime.now().hour < _closingTime.hour)
+                            ? Container()
+                            : CartAlerts(
+                                message:
+                                    "The vendor has closed but you can preorder.",
+                                indicator: Colors.yellow[500],
+                              ),
+                    widget.vendor.isBusy
+                        ? CartAlerts(
+                            message:
+                                "The vendor is currently busy which may lead to delayed delivery.",
+                            indicator: Colors.orange[500],
+                          )
+                        : Container(),
+                    widget.vendor.isAway
+                        ? CartAlerts(
+                            message: "The vendor is currently unavailable...",
+                            indicator: Colors.red[500],
+                          )
+                        : Container(),
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -195,57 +305,13 @@ class _SourceCardState extends State<SourceCard> {
                           fontStyle: FontStyle.italic),
                     ),
                     Text(
-                      "Opens at ${widget.vendor.openTime} & Closes at ${widget.vendor.closeTime} ",
+                      "Opens at ${_openingTime.hour}:${(_openingTime.minute > 0) ? _openingTime.minute : "00"} ${_openingTime.hour < 12 ? "AM" : "PM"} & Closes at ${_closingTime.hour}:${(_closingTime.minute > 0) ? _closingTime.minute : "00"} ${_closingTime.hour < 12 ? "AM" : "PM"} ",
                       style: GoogleFonts.montserrat(
                         color: Colors.white,
                         fontSize: 10,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
-                    widget.vendor.isBusy
-                        ? Row(
-                            children: <Widget>[
-                              Icon(
-                                EvaIcons.alertCircle,
-                                color: Colors.red[700],
-                                size: 20,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  "The vendor is currently busy which may lead to delayed delivery.",
-                                  style: GoogleFonts.montserrat(
-                                    color: Colors.red[700],
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : Container(),
-                    widget.vendor.isAway
-                        ? Row(
-                            children: <Widget>[
-                              Icon(
-                                EvaIcons.alertCircle,
-                                color: Colors.red[700],
-                                size: 20,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  "The vendor is currently unavailable...",
-                                  style: GoogleFonts.montserrat(
-                                    color: Colors.red[700],
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : Container(),
                   ],
                 ),
               ),
